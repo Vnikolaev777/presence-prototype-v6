@@ -27,3 +27,6 @@ dist-ssr
 *.zip
 task-tracker.html
 tasks.json
+
+# Credentials
+*.txt
