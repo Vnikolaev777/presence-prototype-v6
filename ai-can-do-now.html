@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What AI can do right now — schulethalwil.ch</title>
+<style>
+  :root {
+    --ink:    #0F172A;
+    --body:   #334155;
+    --muted:  #64748B;
+    --line:   #E2E8F0;
+    --bg:     #F8FAFC;
+    --card:   #FFFFFF;
+    --red:    #DC2626;
+    --redBg:  #FEE2E2;
+    --orange: #EA580C;
+    --orangeBg: #FFEDD5;
+    --emerald: #059669;
+    --emeraldBg: #D1FAE5;
+    --indigo:  #4F46E5;
+    --indigoBg:#E0E7FF;
+    --sky:     #0284C7;
+    --skyBg:   #E0F2FE;
+    --slate:   #475569;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--body);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────────────────── */
+  .eyebrow {
+    color: var(--indigo);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+  .lede {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 780px;
+    margin: 0 0 32px;
+  }
+  .lede strong { color: var(--ink); font-weight: 700; }
+
+  /* ── Stat strip ───────────────────────────────────────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .stat .num {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat .lbl {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .stat.red    .num { color: var(--red); }
+  .stat.orange .num { color: var(--orange); }
+  .stat.emerald .num { color: var(--emerald); }
+  .stat.indigo .num { color: var(--indigo); }
+
+  /* ── Section ─────────────────────────────────────────────────────────── */
+  section { margin-bottom: 44px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .section-head h2 {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .section-head .meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── Card grid ───────────────────────────────────────────────────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } .stats { grid-template-columns: repeat(2, 1fr);} }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(15,23,42,.06); transform: translateY(-1px); }
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    margin: 0;
+  }
+  .card-body {
+    font-size: 13px;
+    color: var(--body);
+    line-height: 1.5;
+  }
+  .card-foot {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .card-foot .fix {
+    flex: 1;
+    color: var(--slate);
+  }
+  .card-foot .fix strong { color: var(--ink); font-weight: 700; }
+  .icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .icon svg { width: 16px; height: 16px; }
+
+  /* ── Pills ────────────────────────────────────────────────────────────── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .pill.minutes { background: var(--emeraldBg); border-color: #A7F3D0; color: var(--emerald); }
+  .pill.hours   { background: var(--skyBg);     border-color: #BAE6FD; color: var(--sky); }
+  .pill.days    { background: var(--orangeBg);  border-color: #FED7AA; color: var(--orange); }
+  .pill.weeks   { background: var(--indigoBg);  border-color: #C7D2FE; color: var(--indigo); }
+  .pill.gray    { background: #F1F5F9; border-color: #E2E8F0; color: var(--slate); }
+
+  .sev {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .sev.blocker { background: var(--redBg); color: var(--red); }
+  .sev.privacy { background: var(--redBg); color: var(--red); }
+  .sev.high    { background: var(--orangeBg); color: var(--orange); }
+  .sev.win     { background: var(--emeraldBg); color: var(--emerald); }
+
+  /* ── Section accents ─────────────────────────────────────────────────── */
+  .accent-emerald .card { border-left: 3px solid var(--emerald); }
+  .accent-orange  .card { border-left: 3px solid var(--orange); }
+  .accent-indigo  .card { border-left: 3px solid var(--indigo); }
+  .accent-slate   .card { border-left: 3px solid #CBD5E1; opacity: 0.92; }
+
+  .icon.emerald { background: var(--emeraldBg); color: var(--emerald); }
+  .icon.orange  { background: var(--orangeBg);  color: var(--orange); }
+  .icon.indigo  { background: var(--indigoBg);  color: var(--indigo); }
+  .icon.slate   { background: #F1F5F9; color: var(--slate); }
+
+  /* ── Footer ──────────────────────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; }
+
+  .methodology {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .methodology h3 {
+    font-size: 14px;
+    color: var(--ink);
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .methodology p { margin: 0 0 10px; }
+  .methodology p:last-child { margin-bottom: 0; }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 36px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO ────────────────────────────────────────────────────────────── -->
+  <div class="eyebrow">Capability Report · schulethalwil.ch</div>
+  <h1>What AI can do right now to lift the score</h1>
+  <p class="lede">
+    The audit found <strong>13 issues</strong> across performance, accessibility, privacy, security and discoverability. Of those, <strong>23 improvements</strong> are tractable for an AI agent today — meaning a single agent run can produce shippable output, not just a recommendation. This report sorts them by time-to-ship and flags what still needs humans.
+  </p>
+
+  <!-- STAT STRIP ─────────────────────────────────────────────────────────-->
+  <div class="stats">
+    <div class="stat emerald">
+      <div class="num">9</div>
+      <div class="lbl">Ship today<br><span style="opacity:.7">minutes per item</span></div>
+    </div>
+    <div class="stat orange">
+      <div class="num">8</div>
+      <div class="lbl">Ship this week<br><span style="opacity:.7">single agent task</span></div>
+    </div>
+    <div class="stat indigo">
+      <div class="num">6</div>
+      <div class="lbl">Ship this sprint<br><span style="opacity:.7">crawl + bulk fix</span></div>
+    </div>
+    <div class="stat red">
+      <div class="num">+38</div>
+      <div class="lbl">Projected score lift<br><span style="opacity:.7">53 → ~91 if all shipped</span></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="pill minutes">15 min</span></span>
+    <span class="legend-item"><span class="pill hours">hours</span></span>
+    <span class="legend-item"><span class="pill days">days</span></span>
+    <span class="legend-item"><span class="pill weeks">weeks</span></span>
+    <span style="margin-left:auto" class="legend-item"><span class="sev blocker">Blocker</span> <span class="sev privacy">Privacy</span> <span class="sev high">High</span> <span class="sev win">Win</span></span>
+  </div>
+
+  <!-- ── SHIP TODAY ──────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-head">
+      <h2>① Ship today — minutes per item</h2>
+      <span class="meta">Pure text generation or one-line edits</span>
+    </div>
+    <div class="grid accent-emerald">
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </span>
+            <h3 class="card-title">Datenschutzerklärung</h3>
+          </div>
+          <span class="pill minutes">15 min</span>
+        </div>
+        <p class="card-body">Generate a revFADP-compliant draft tailored to the school: data categories collected (form submissions, session cookies, Escola-CMS analytics), legal basis, retention, parent rights, contact for inquiries.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> revFADP transparency gap</span>
+          <span class="sev privacy">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </span>
+            <h3 class="card-title">Impressum</h3>
+          </div>
+          <span class="pill minutes">10 min</span>
+        </div>
+        <p class="card-body">Operator (Schule Thalwil / DLZ Bildung), address, phone, responsible person for content, hosting provider (Escola). Pure assembly from public information.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Impressum obligation</span>
+          <span class="sev privacy">Privacy</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </span>
+            <h3 class="card-title">Barrierefreiheitserklärung</h3>
+          </div>
+          <span class="pill minutes">15 min</span>
+        </div>
+        <p class="card-body">eCH-0059 v3 / WCAG 2.1 AA target, known gaps from this audit, complaint channel, review cadence. Drafted in German, ready for legal sign-off.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> eCH-0059 mandatory statement</span>
+          <span class="sev blocker">Blocker</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            </span>
+            <h3 class="card-title">lang="de-CH" on &lt;html&gt;</h3>
+          </div>
+          <span class="pill minutes">2 min</span>
+        </div>
+        <p class="card-body">One-line edit to the base template. Fixes WCAG 3.1.1 across every page in a single change. Highest leverage-per-keystroke item in the entire audit.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> WCAG 3.1.1 site-wide</span>
+          <span class="sev blocker">Blocker</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+            </span>
+            <h3 class="card-title">Per-page meta descriptions</h3>
+          </div>
+          <span class="pill minutes">30 min</span>
+        </div>
+        <p class="card-body">Generate descriptive 150-character meta tags for every page from its content. Same pass produces &lt;title&gt; rewrites so the tab no longer reads "Schule Thalwil" everywhere.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> No meta description, generic titles</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+            </span>
+            <h3 class="card-title">Open Graph + Twitter Cards</h3>
+          </div>
+          <span class="pill minutes">15 min</span>
+        </div>
+        <p class="card-body">og:title, og:description, og:image, og:type per page. WhatsApp/Teams/iMessage previews stop showing blank cards. Pairs with the meta-description pass.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Empty link previews</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+            <h3 class="card-title">Skip-to-content link</h3>
+          </div>
+          <span class="pill minutes">5 min</span>
+        </div>
+        <p class="card-body">Inject as the first focusable element in the layout, with the visible-on-focus CSS pattern. Keyboard users skip the 70-item nav on every page.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> WCAG 2.4.1</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
+            </span>
+            <h3 class="card-title">robots.txt + Sitemap: line</h3>
+          </div>
+          <span class="pill minutes">5 min</span>
+        </div>
+        <p class="card-body">Add Sitemap: directive once a real sitemap exists (next section). Robots.txt itself is fine; just one missing line.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Sitemap discovery</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <h3 class="card-title">Referrer-Policy + Permissions-Policy</h3>
+          </div>
+          <span class="pill minutes">5 min</span>
+        </div>
+        <p class="card-body">One snippet for Apache (.htaccess) or the Escola CMS config: <code style="background:#F1F5F9;padding:1px 4px;border-radius:3px;font-size:11px">strict-origin-when-cross-origin</code> + a baseline Permissions-Policy.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Missing security headers</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SHIP THIS WEEK ────────────────────────────────────────────── -->
+  <section>
+    <div class="section-head">
+      <h2>② Ship this week — single agent task</h2>
+      <span class="meta">One pass over the site or a known list of pages</span>
+    </div>
+    <div class="grid accent-orange">
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </span>
+            <h3 class="card-title">Generate /sitemap.xml</h3>
+          </div>
+          <span class="pill hours">2 hrs</span>
+        </div>
+        <p class="card-body">Crawl the public site, build a proper sitemap with lastmod values, deploy it. Solves the broken /sitemap.xml that currently 404s and is the prerequisite for the robots.txt entry above.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> /sitemap.xml 404</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+            </span>
+            <h3 class="card-title">Convert hero + media to WebP/AVIF</h3>
+          </div>
+          <span class="pill hours">3 hrs</span>
+        </div>
+        <p class="card-body">Batch-process every image in the dimages/ tree to WebP/AVIF with responsive srcsets and explicit width/height. The 351 KB hero becomes ~45 KB. Drops LCP and CLS together.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Hero image weight, no srcset</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M12 4v16" stroke-dasharray="2 2"/></svg>
+            </span>
+            <h3 class="card-title">Heading-structure repair</h3>
+          </div>
+          <span class="pill hours">4 hrs</span>
+        </div>
+        <p class="card-body">Walk every template and content block, replace table-headers and styled divs with semantic h1/h2/h3. Fixes WCAG 1.3.1 + 2.4.6 site-wide and lifts SEO at the same time.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Zero headings on homepage</span>
+          <span class="sev blocker">Blocker</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/></svg>
+            </span>
+            <h3 class="card-title">Alt-text generation for every image</h3>
+          </div>
+          <span class="pill hours">2 hrs</span>
+        </div>
+        <p class="card-body">Vision pass over the media library. Mark decorative images alt="" + role="presentation"; describe meaningful ones in German with the school's voice. Bulk-replace in templates.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Missing alt text</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6l9 6 9-6M21 6v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6"/></svg>
+            </span>
+            <h3 class="card-title">Replace tables with semantic markup</h3>
+          </div>
+          <span class="pill hours">3 hrs</span>
+        </div>
+        <p class="card-body">The AKTUELL announcements and SCHNELLZUGRIFF blocks are rendered as HTML tables. Convert to article + ul/li, preserve the visual layout in CSS. Cleaner DOM, better mobile, screen-readers stop announcing "table with 1 column".</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Table-based content layout</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            </span>
+            <h3 class="card-title">Form labels + ARIA on login + search</h3>
+          </div>
+          <span class="pill hours">1 hr</span>
+        </div>
+        <p class="card-body">Audit every form on the site (login, search, contact, MTO anmeldung). Add proper &lt;label for&gt; pairs, aria-label on icon-only buttons, error-message wiring. Mostly mechanical.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Form accessibility</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+            </span>
+            <h3 class="card-title">Schema.org structured data</h3>
+          </div>
+          <span class="pill hours">2 hrs</span>
+        </div>
+        <p class="card-body">JSON-LD for EducationalOrganization (school name, address, geo, sub-organisations), Event for the Agenda, Person for staff bios. Google starts surfacing rich results, Maps panel populates correctly.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> No structured data</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 3h7v7M21 3l-9 9M5 21h14a2 2 0 002-2v-5"/></svg>
+            </span>
+            <h3 class="card-title">Translate key pages</h3>
+          </div>
+          <span class="pill hours">4 hrs</span>
+        </div>
+        <p class="card-body">Identify the 20–30 highest-traffic pages (Eltern ABC, Ferienplan, Eintritt Kindergarten, school portraits), generate clean DE-FR-IT-EN versions, hreflang annotated. Critical for non-German-speaking parents in Thalwil.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Improves:</strong> Inclusion, reach</span>
+          <span class="sev win">Win</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SHIP THIS SPRINT ────────────────────────────────────────────────── -->
+  <section>
+    <div class="section-head">
+      <h2>③ Ship this sprint — crawl + bulk fix</h2>
+      <span class="meta">Site-wide passes; needs deploy access</span>
+    </div>
+    <div class="grid accent-indigo">
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            </span>
+            <h3 class="card-title">PDF accessibility tagging</h3>
+          </div>
+          <span class="pill days">2–3 days</span>
+        </div>
+        <p class="card-body">The Elternabend PPs, Ferienplan, Eltern ABC and Leporello are PDFs gated behind download.php. Auto-tag for PDF/UA: heading hierarchy, reading order, alt text on inline images. Critical for eCH-0059.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Untagged public PDFs</span>
+          <span class="sev blocker">Blocker</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </span>
+            <h3 class="card-title">Asset bundling + retire legacy JS</h3>
+          </div>
+          <span class="pill weeks">1 week</span>
+        </div>
+        <p class="card-body">Concatenate the 22 JS + 34 CSS files into one bundle each. Audit which Prototype/Scriptaculous/jQuery uses can be replaced by Alpine; remove the rest. Expected payload reduction ~60%.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Render-block bloat, EOL jQuery</span>
+          <span class="sev blocker">Blocker</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94"/></svg>
+            </span>
+            <h3 class="card-title">Site-wide a11y crawl + auto-fix</h3>
+          </div>
+          <span class="pill weeks">1 week</span>
+        </div>
+        <p class="card-body">Run axe-core against every URL in the new sitemap. Auto-fix the mechanical 60% (alt text, lang, label associations, contrast tweaks); flag the rest for human review with reproduction steps.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Long tail of WCAG issues</span>
+          <span class="sev blocker">Blocker</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+            </span>
+            <h3 class="card-title">Information-architecture redesign</h3>
+          </div>
+          <span class="pill weeks">2 weeks</span>
+        </div>
+        <p class="card-body">The current 7×7–10 nav is overwhelming. Card-sort the existing 400+ pages into a parent-task-oriented IA (Eintritt, Alltag, Termine, Kontakt, Sonderpädagogik). AI proposes; humans validate.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Fixes:</strong> Confusing navigation</span>
+          <span class="sev high">High</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+            </span>
+            <h3 class="card-title">Plain-language content rewrite</h3>
+          </div>
+          <span class="pill weeks">2 weeks</span>
+        </div>
+        <p class="card-body">A lot of content is bureaucratic German that parents skip. AI rewrites for B1-level readability, preserves accuracy, surfaces what parents actually need (deadlines, forms, who to contact). Diff for human review.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Improves:</strong> Readability, parent UX</span>
+          <span class="sev win">Win</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </span>
+            <h3 class="card-title">Multilingual parent FAQ assistant</h3>
+          </div>
+          <span class="pill weeks">2 weeks</span>
+        </div>
+        <p class="card-body">Index the school's content into a RAG bot grounded in the site itself, multilingual, deflecting routine questions ("when do holidays start?", "how do I deregister my child?"). Reduces secretariat load; serves non-German speakers.</p>
+        <div class="card-foot">
+          <span class="fix"><strong>Improves:</strong> Self-service, inclusion</span>
+          <span class="sev win">Win</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── STILL NEEDS HUMANS ────────────────────────────────────────────── -->
+  <section>
+    <div class="section-head">
+      <h2>What still needs humans</h2>
+      <span class="meta">AI drafts, humans approve or own</span>
+    </div>
+    <div class="grid accent-slate">
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/></svg>
+            </span>
+            <h3 class="card-title">Legal sign-off</h3>
+          </div>
+          <span class="pill gray">human</span>
+        </div>
+        <p class="card-body">Datenschutzerklärung and Impressum drafts must be reviewed by counsel or the Gemeinde's data-protection officer before publication. AI gets you to 90%; the last mile is liability.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5L20 7"/></svg>
+            </span>
+            <h3 class="card-title">Manual a11y validation</h3>
+          </div>
+          <span class="pill gray">human</span>
+        </div>
+        <p class="card-body">Keyboard-only traversal, screen-reader pass, real users with impairments. Automated tools catch ~30% of WCAG issues; the rest needs lived experience.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+            </span>
+            <h3 class="card-title">CMS / hosting changes</h3>
+          </div>
+          <span class="pill gray">vendor</span>
+        </div>
+        <p class="card-body">Escola is a managed CMS. Header changes, asset bundling pipelines, sitemap auto-generation likely require Escola's cooperation or a config request. AI can prepare the exact changeset; the vendor must apply it.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            </span>
+            <h3 class="card-title">Editorial decisions on IA</h3>
+          </div>
+          <span class="pill gray">human</span>
+        </div>
+        <p class="card-body">AI proposes a parent-task-oriented IA, but the school's communications team has to live with it and own the migrations. Worth one workshop, not 20 emails.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M12 8v4M12 16h.01"/></svg>
+            </span>
+            <h3 class="card-title">Gated / authenticated areas</h3>
+          </div>
+          <span class="pill gray">school</span>
+        </div>
+        <p class="card-body">The Eltern-Login, staff area, and Mein Escola dashboards are out of reach without credentials. The most sensitive student-data handling lives there; AI can audit only the public surface.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span class="icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <h3 class="card-title">DNS, email, infrastructure</h3>
+          </div>
+          <span class="pill gray">ops</span>
+        </div>
+        <p class="card-body">SPF/DMARC/DKIM/CAA/MTA-STS records, TLS configuration, edge-CDN setup. AI can spec the records; only the domain owner and ISP can apply them.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- METHODOLOGY ─────────────────────────────────────────────────────── -->
+  <div class="methodology">
+    <h3>How "ship today / week / sprint" was scored</h3>
+    <p><strong>Ship today</strong> means a single agent run produces text or a one-line edit ready to paste in. No crawl, no deploy, no orchestration. Confidence is high because the input is the audit itself and the output is well-bounded prose or a single attribute.</p>
+    <p><strong>Ship this week</strong> means one structured pass over the site or a known list of pages — alt text, structured data, sitemap generation, image optimisation. Needs file access or build access, not human review of every output.</p>
+    <p><strong>Ship this sprint</strong> means crawl + analyse + produce → human review → deploy. PDF tagging, asset bundling, IA redesign. The agent does the analysis and the diff; humans gate the deploy.</p>
+    <p>The "+38 score lift" projection assumes every Ship-Today and Ship-This-Week item lands and roughly half of Ship-This-Sprint. It is a directional figure, not a contractual one — Performance lift in particular depends on what the bundling actually removes, which can only be known once the dependency graph is mapped.</p>
+  </div>
+
+</div>
+</body>
+</html>

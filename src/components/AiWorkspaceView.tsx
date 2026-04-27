@@ -988,7 +988,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     setConnectionStep(null);
     setAuditTab('site');
     setCenterTab('site');
-    setChatMessages([{ role: 'user', content: 'Migrate our existing website' }]);
+    setChatMessages([{ role: 'user', content: 'Improve the existing website' }]);
     setTimeout(() => {
       agentMessage("Sure! To get started, please share the URL of your current school website and I'll analyze its structure, content, and performance.");
       setUrlPromptReady(true);

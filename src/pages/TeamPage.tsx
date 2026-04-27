@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { ArrowRight, Mail, GraduationCap, FileText, Check, X, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -18,6 +19,17 @@ const ADMIN = [
 ];
 
 export function TeamPage({ pendingTeacher, autoAddedTeacher, onApprove, onReject }: Props) {
+  const autoTeacherRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (autoAddedTeacher && autoTeacherRef.current) {
+      const timer = setTimeout(() => {
+        autoTeacherRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [autoAddedTeacher]);
+
   return (
     <div className="relative pb-32">
 
@@ -75,6 +87,7 @@ export function TeamPage({ pendingTeacher, autoAddedTeacher, onApprove, onReject
           {/* Auto-published teacher card — shown first with "Auto-Published" emerald badge */}
           {autoAddedTeacher && (
             <motion.div
+              ref={autoTeacherRef}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="relative"

@@ -4,10 +4,10 @@ import { cn } from '../lib/utils';
 
 const DOMAIN_MAP: Record<string, string> = {
   'PowerSchool': 'powerschool.com', 'Infinite Campus': 'infinitecampus.com', 'Skyward': 'skyward.com',
-  'FACTS SIS': 'factsmgt.com', 'Aeries SIS': 'aeries.com', 'Blackbaud': 'blackbaud.com',
+  'FACTS SIS': 'factsmgt.com', 'Aeries SIS': 'aeries.com', 'Arbor': 'arbor-education.com',
   'Canvas': 'instructure.com', 'Google Classroom': 'classroom.google.com', 'Moodle': 'moodle.org',
   'Schoology': 'schoology.com', 'Brightspace': 'd2l.com', 'Blackboard': 'blackboard.com',
-  'Microsoft 365': 'microsoft.com', 'Google Workspace': 'workspace.google.com', 'Excel': 'microsoft.com',
+  'Microsoft 365': 'microsoft.com', 'Google Workspace': 'workspace.google.com', 'Wonde': 'wonde.com',
   'Okta': 'okta.com', 'Clever': 'clever.com', 'ClassLink': 'classlink.com',
   'Google Search': 'google.com', 'Bing Search': 'bing.com', 'Zoom': 'zoom.us',
   'Power BI': 'powerbi.microsoft.com', 'Zapier': 'zapier.com', 'WordPress': 'wordpress.org',
@@ -16,7 +16,7 @@ const DOMAIN_MAP: Record<string, string> = {
   'Sdui': 'sdui.de', 'Klassly': 'klassroom.co', 'SchoolMessenger': 'schoolmessenger.com',
   'Azure AD / Entra': 'microsoft.com', 'SIMS': 'ess-sims.co.uk', 'Veracross': 'veracross.com',
   'iSAMS': 'isams.com', 'Google Analytics': 'analytics.google.com',
-  'MS Teams Edu': 'microsoft.com', 'EBA': 'eba.gov.tr', 'e-Okul (MEB)': 'eba.gov.tr',
+  'MS Teams Edu': 'microsoft.com', 'EBA': 'eba.gov.tr', 'WebUnits': 'webunits.com',
   'K12NET': 'k12net.com', 'Magister': 'magister.com', 'SomToday': 'somtoday.nl',
   'Librus': 'librus.pl', 'TalkingPoints': 'talkingpts.org', 'Sebit Vitamin': 'vitaminegitim.com',
 };
@@ -40,8 +40,8 @@ const CATEGORIES = [
   {
     label: 'Student Information & Learning',
     connectors: [
-      'Infinite Campus', 'Skyward', 'FACTS SIS', 'Aeries SIS', 'Blackbaud',
-      'e-Okul (MEB)', 'K12NET', 'SIMS', 'Magister', 'SomToday', 'Librus', 'Veracross', 'iSAMS',
+      'Infinite Campus', 'Skyward', 'FACTS SIS', 'Aeries SIS', 'Arbor',
+      'WebUnits', 'K12NET', 'SIMS', 'Magister', 'SomToday', 'Librus', 'Veracross', 'iSAMS',
       'Canvas', 'Google Classroom', 'Moodle', 'Schoology', 'Brightspace', 'Blackboard',
       'MS Teams Edu', 'EBA', 'Sebit Vitamin', 'Seesaw',
     ],
@@ -56,7 +56,7 @@ const CATEGORIES = [
   {
     label: 'Productivity, Identity & Web',
     connectors: [
-      'Microsoft 365', 'Google Workspace', 'Excel', 'Okta', 'Clever', 'ClassLink',
+      'Clever', 'ClassLink', 'Microsoft 365', 'Google Workspace', 'Wonde', 'Okta',
       'Azure AD / Entra', 'Zoom', 'Google Search', 'Bing Search',
       'Power BI', 'Zapier', 'WordPress', 'Drupal',
     ],

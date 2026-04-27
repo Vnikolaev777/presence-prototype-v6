@@ -138,15 +138,11 @@ export function AutoUpdatePreviewModal({ onClose }: Props) {
                   role="switch"
                   aria-checked={alwaysManual}
                   onClick={() => setAlwaysManual(v => !v)}
-                  className={`relative shrink-0 w-9 h-5 rounded-full transition-colors duration-200 focus:outline-none ${
-                    alwaysManual ? 'bg-indigo-500' : 'bg-slate-200'
-                  }`}
+                  className="shrink-0 focus:outline-none"
                 >
-                  <span
-                    className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
-                      alwaysManual ? 'translate-x-4' : 'translate-x-0.5'
-                    }`}
-                  />
+                  <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${alwaysManual ? 'bg-emerald-500' : 'bg-slate-200'}`}>
+                    <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${alwaysManual ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                  </div>
                 </button>
               </div>
             </div>
