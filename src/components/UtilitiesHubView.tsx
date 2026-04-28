@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, MoreHorizontal, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const DOMAIN_MAP: Record<string, string> = {
@@ -126,6 +126,14 @@ function CategorySection({ cat, ci }: { cat: typeof CATEGORIES[0]; ci: number })
 }
 
 export function UtilitiesHubView() {
+  const [search, setSearch] = useState('');
+  const query = search.toLowerCase().trim();
+
+  const filteredCategories = CATEGORIES.map(cat => ({
+    ...cat,
+    connectors: cat.connectors.filter(name => name.toLowerCase().includes(query)),
+  })).filter(cat => cat.connectors.length > 0);
+
   return (
     <div className="max-w-6xl space-y-10 animate-in fade-in duration-700">
       {/* Header */}
@@ -174,11 +182,25 @@ export function UtilitiesHubView() {
       </div>
 
       {/* Available Connectors grouped by category */}
-      <div className="space-y-10">
+      <div className="space-y-6">
         <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Available Connectors</h2>
-        {CATEGORIES.map((cat, ci) => (
-          <CategorySection key={cat.label} cat={cat} ci={ci} />
-        ))}
+        <div className="relative max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search connectors…"
+            className="w-full pl-8 pr-3 py-1.5 text-sm bg-white border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
+          />
+        </div>
+        <div className="space-y-10">
+          {filteredCategories.length > 0 ? filteredCategories.map((cat, ci) => (
+            <CategorySection key={cat.label} cat={cat} ci={ci} />
+          )) : (
+            <p className="text-sm text-slate-400 py-6 text-center">No connectors match "{search}"</p>
+          )}
+        </div>
       </div>
     </div>
   );
