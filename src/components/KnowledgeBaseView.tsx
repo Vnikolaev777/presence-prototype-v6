@@ -91,7 +91,7 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
 
       {/* ── Page header + tabs ── */}
       <div className="mb-6">
-        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Institution Context</h1>
+        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Memory</h1>
         <p className="text-slate-500 text-sm mb-5">Everything the Presence Assistant knows about your institution — its memory. The richer this context, the more accurately AI agents write, update, and make decisions on your behalf.</p>
 
         {/* Top tab bar */}
@@ -167,7 +167,7 @@ function WebsiteProfileTab() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-slate-900">Live Website Preview</p>
-            <p className="text-xs text-slate-400 mt-0.5 truncate">oakwoodhigh.org · Current version</p>
+            <p className="text-xs text-slate-600 mt-0.5 truncate">oakwoodhigh.org · Current version</p>
           </div>
           <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-500 shrink-0 transition-colors" />
         </a>
@@ -184,7 +184,7 @@ function WebsiteProfileTab() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-slate-900">Design Scheme</p>
-            <p className="text-xs text-slate-400 mt-0.5">Magic theme · AI-generated layout</p>
+            <p className="text-xs text-slate-600 mt-0.5">Magic theme · AI-generated layout</p>
           </div>
           <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 shrink-0 transition-colors" />
         </a>

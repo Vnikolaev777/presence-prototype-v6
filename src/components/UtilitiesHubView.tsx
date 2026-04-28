@@ -157,7 +157,7 @@ export function UtilitiesHubView() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-emerald-900">{conn.name}</p>
-                <p className="text-sm text-emerald-700/60">{conn.desc}</p>
+                <p className="text-sm text-slate-900">{conn.desc}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-full">

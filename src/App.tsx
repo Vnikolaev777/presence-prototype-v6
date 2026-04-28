@@ -85,7 +85,7 @@ function App() {
             <NavItem active={activeTab === 'tasks'} onClick={() => { setActiveTab('tasks'); setMobileMenuOpen(false); }} icon={<ListTodo className="w-5 h-5" />} label="Tasks" />
           </>}
           <NavItem active={activeTab === 'utilities'} onClick={() => { setActiveTab('utilities'); setMobileMenuOpen(false); }} icon={<Layers className="w-5 h-5" />} label="Integrations" />
-          <NavItem active={activeTab === 'knowledge_base'} onClick={() => { setActiveTab('knowledge_base'); setMobileMenuOpen(false); }} icon={<BookOpen className="w-5 h-5" />} label="Institution Context" />
+          <NavItem active={activeTab === 'knowledge_base'} onClick={() => { setActiveTab('knowledge_base'); setMobileMenuOpen(false); }} icon={<BookOpen className="w-5 h-5" />} label="Memory" />
           <NavItem active={activeTab === 'apps_for_schools'} onClick={() => { setActiveTab('apps_for_schools'); setMobileMenuOpen(false); }} icon={<LayoutGrid className="w-5 h-5" />} label="Recommended Apps" />
         </div>
       )}
@@ -162,7 +162,7 @@ function App() {
               active={activeTab === 'knowledge_base'}
               onClick={() => setActiveTab('knowledge_base')}
               icon={<BookOpen className="w-5 h-5" />}
-              label="Institution Context"
+              label="Memory"
             />
             <hr className="border-slate-200 mx-2 my-3" />
             <NavItem
