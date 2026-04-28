@@ -32,33 +32,38 @@ function CategoryRow({ icon, label, score, prevScore, detail }: {
   const cp = prevScore !== undefined ? scoreColor(prevScore) : null;
 
   if (prevScore !== undefined && cp) {
-    // Two-bar comparison layout
+    // Single bar with tick mark at previous score
     return (
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <span className="text-slate-400 shrink-0">{icon}</span>
-          <span className="text-xs font-semibold text-slate-700 flex-1">{label}</span>
-          <span className="text-[10px] font-bold tabular-nums text-emerald-500">+{delta}</span>
+          <span className="text-[13px] font-bold text-slate-800 flex-1">{label}</span>
+          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+{delta}</span>
         </div>
-        <div className="ml-5 space-y-1">
-          {/* Before bar — muted but readable */}
-          <div className="flex items-center gap-2 opacity-75">
-            <span className="text-[9px] text-slate-500 w-9 shrink-0 font-semibold">Before</span>
-            <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
-              <div className={cn('h-full rounded-full', cp.bar)} style={{ width: `${prevScore}%` }} />
+        {/* bar with room above for the tick label */}
+        <div className="ml-5 flex items-center gap-3" style={{ paddingTop: '14px' }}>
+          <div className="flex-1 relative">
+            {/* track */}
+            <div className="h-2 bg-slate-100 rounded-full relative overflow-visible">
+              {/* green fill */}
+              <div className="absolute inset-y-0 left-0 bg-emerald-500 rounded-full" style={{ width: `${score}%` }} />
+              {/* tick at previous score */}
+              <div
+                className="absolute w-0.5 bg-slate-500 rounded-sm"
+                style={{ left: `${prevScore}%`, transform: 'translateX(-50%)', top: '-4px', bottom: '-4px' }}
+              >
+                <span
+                  className="absolute text-[9px] text-slate-600 font-semibold tabular-nums whitespace-nowrap"
+                  style={{ bottom: '100%', marginBottom: '3px', left: '50%', transform: 'translateX(-50%)' }}
+                >
+                  {prevScore}
+                </span>
+              </div>
             </div>
-            <span className={cn('text-[10px] font-bold tabular-nums w-5 text-right', cp.text)}>{prevScore}</span>
           </div>
-          {/* Now bar — full weight */}
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] text-slate-500 w-9 shrink-0 font-semibold">Now</span>
-            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div className={cn('h-full rounded-full', c.bar)} style={{ width: `${score}%` }} />
-            </div>
-            <span className={cn('text-[10px] font-bold tabular-nums w-5 text-right', c.text)}>{score}</span>
-          </div>
+          <span className="text-sm font-bold text-emerald-600 tabular-nums w-6 text-right">{score}</span>
         </div>
-        {detail && <p className="text-[10px] text-slate-400 ml-5 leading-tight">{detail}</p>}
+        {detail && <p className="text-[10px] text-slate-500 ml-5 mt-1 leading-tight">{detail}</p>}
       </div>
     );
   }
@@ -581,9 +586,15 @@ export function PostAuditCanvasV2() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Category Scores</div>
-        <div className="space-y-2">
+      <div className="space-y-3">
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Category Scores</div>
+          <div className="flex items-center gap-1.5 mt-1">
+            <div className="w-0.5 h-3 bg-slate-500 rounded-sm shrink-0" />
+            <span className="text-[10px] text-slate-500">Previous score · current score in green</span>
+          </div>
+        </div>
+        <div className="space-y-4">
           {categories.map(cat => <CategoryRow key={cat.label} {...cat} />)}
         </div>
       </div>
