@@ -162,7 +162,7 @@ export function UtilitiesHubView() {
               <div className="flex items-center gap-2 shrink-0">
                 <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)] animate-pulse" />
-                  Live
+                  Connected
                 </div>
                 <button className="w-7 h-7 flex items-center justify-center rounded-lg text-emerald-600 opacity-0 group-hover:opacity-100 hover:bg-emerald-100 transition-all">
                   <MoreHorizontal className="w-4 h-4" />

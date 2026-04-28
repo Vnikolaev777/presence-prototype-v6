@@ -41,17 +41,17 @@ function CategoryRow({ icon, label, score, prevScore, detail }: {
           <span className="text-[10px] font-bold tabular-nums text-emerald-500">+{delta}</span>
         </div>
         <div className="ml-5 space-y-1">
-          {/* Before bar */}
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] text-slate-400 w-9 shrink-0 font-medium">Before</span>
-            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          {/* Before bar — muted but readable */}
+          <div className="flex items-center gap-2 opacity-75">
+            <span className="text-[9px] text-slate-500 w-9 shrink-0 font-semibold">Before</span>
+            <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
               <div className={cn('h-full rounded-full', cp.bar)} style={{ width: `${prevScore}%` }} />
             </div>
             <span className={cn('text-[10px] font-bold tabular-nums w-5 text-right', cp.text)}>{prevScore}</span>
           </div>
-          {/* Now bar */}
+          {/* Now bar — full weight */}
           <div className="flex items-center gap-2">
-            <span className="text-[9px] text-slate-400 w-9 shrink-0 font-medium">Now</span>
+            <span className="text-[9px] text-slate-500 w-9 shrink-0 font-semibold">Now</span>
             <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div className={cn('h-full rounded-full', c.bar)} style={{ width: `${score}%` }} />
             </div>

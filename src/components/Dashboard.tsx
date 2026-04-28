@@ -296,7 +296,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="font-semibold text-emerald-700">Live</span>
+              <span className="font-semibold text-emerald-700">Connected</span>
               <span className="text-slate-400 text-xs">oakwoodhigh.org</span>
             </div>
 
