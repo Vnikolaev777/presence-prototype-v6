@@ -205,7 +205,7 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
 }
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────
-export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSetup }: any) {
+export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSetup, onNavigate }: any) {
   const [selectedAction, setSelectedAction] = useState<AiAction | null>(null);
   const [removedActions, setRemovedActions] = useState<string[]>([]);
   const [previewVariant, setPreviewVariant] = useState<'teacher' | 'vacation' | null>(null);
@@ -283,8 +283,17 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Automations</h1>
-        <p className="text-slate-500 text-sm">AI-driven updates to your school website — review proposals or see what was already handled.</p>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-light tracking-tight text-black">Automations</h1>
+          <button
+            onClick={() => onNavigate?.('workspace')}
+            className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all"
+          >
+            <Zap className="w-4 h-4 text-indigo-500" />
+            Add more automations
+          </button>
+        </div>
+        <p className="text-slate-500 text-sm mt-1">AI-driven updates to your school website — review proposals or see what was already handled.</p>
 
         {/* Status bar — only once agents are hired and content is live */}
         {hasHiredAgents && (
