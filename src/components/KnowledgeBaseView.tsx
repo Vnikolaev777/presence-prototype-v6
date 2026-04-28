@@ -3,7 +3,7 @@ import {
   Globe, School, Upload, ExternalLink, Palette,
   File, Image, FileSpreadsheet, Trash2, Info,
   MessageSquare, ThumbsUp, ThumbsDown, Pencil,
-  Database, MonitorSmartphone, Mail, CheckCircle2, Bot, Link2
+  CheckCircle2, Link2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -42,9 +42,10 @@ interface KnowledgeBaseViewProps {
   setConnectedSystems: (s: any[]) => void;
   actions: any[];
   setActions: (a: any[]) => void;
+  onNavigate: (tab: string) => void;
 }
 
-export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actions, setActions }: KnowledgeBaseViewProps) {
+export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actions, setActions, onNavigate }: KnowledgeBaseViewProps) {
   const [activeTab, setActiveTab] = useState<MainTab>('website');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([
     { id: '1', name: 'Parent_Handbook_2026.pdf', size: 2_450_000, uploadedAt: 'Apr 10, 2026' },
@@ -90,8 +91,8 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
 
       {/* ── Page header + tabs ── */}
       <div className="mb-6">
-        <h1 className="text-3xl font-light tracking-tight text-slate-900 mb-1">Institution Context</h1>
-        <p className="text-slate-500 text-sm mb-5">Your school's knowledge source — website structure, institution profile, and uploaded documents.</p>
+        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Institution Context</h1>
+        <p className="text-slate-500 text-sm mb-5">Everything the Presence Assistant knows about your institution — its memory. The richer this context, the more accurately AI agents write, update, and make decisions on your behalf.</p>
 
         {/* Top tab bar */}
         <div className="flex bg-slate-100 p-1.5 rounded-xl w-max border border-slate-200 shadow-sm gap-1">
@@ -123,6 +124,7 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
             setConnectedSystems={setConnectedSystems}
             actions={actions}
             setActions={setActions}
+            onNavigate={onNavigate}
           />
         )}
         {activeTab === 'files'   && (
@@ -273,35 +275,12 @@ function ToneOfVoiceCard() {
         <p className="text-sm text-slate-600 leading-relaxed">{description}</p>
       )}
 
-      {/* Trait pills */}
-      <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Voice attributes</p>
-        <div className="flex flex-wrap gap-2">
-          {TONE_TRAITS.map(trait => {
-            const c = TRAIT_COLORS[trait.color];
-            return (
-              <div
-                key={trait.label}
-                className="group relative"
-              >
-                <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border cursor-default", c.pill)}>
-                  <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", c.dot)} />
-                  {trait.label}
-                </span>
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 bg-slate-900 text-white text-xs rounded-xl px-3 py-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg">
-                  {trait.desc}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Do / Don't examples */}
       <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Examples</p>
+        <div className="mb-3">
+          <p className="text-sm font-semibold text-slate-800">Do's and Don'ts</p>
+          <p className="text-xs text-slate-400 mt-0.5">How we write vs. what to avoid</p>
+        </div>
         <div className="space-y-2">
           {TONE_EXAMPLES.map((ex, i) => (
             <div key={i} className="grid grid-cols-2 gap-2">
@@ -433,23 +412,31 @@ const ALL_INTEGRATIONS = [
     name: 'PowerSchool',
     type: 'Student Information System',
     description: 'Sync class schedules, teacher directories, and student records directly to your website. Changes reflect automatically.',
-    icon: <Database className="w-6 h-6 text-blue-500" />,
+    domain: 'powerschool.com',
     defaultLive: true,
   },
   {
     name: 'Google Analytics',
     type: 'Website Analytics',
     description: 'Track visitor behaviour, page performance, and traffic sources. AI agents use this data to suggest content improvements.',
-    icon: <Bot className="w-6 h-6 text-orange-500" />,
+    domain: 'analytics.google.com',
+    defaultLive: true,
+  },
+  {
+    name: 'ClassDojo',
+    type: 'Parent & Student Engagement',
+    description: 'Connect ClassDojo to surface school announcements and parent communications directly on the website.',
+    domain: 'classdojo.com',
     defaultLive: true,
   },
 ];
 
-function IntegrationsTab({ connectedSystems, setConnectedSystems, actions, setActions }: {
+function IntegrationsTab({ connectedSystems, setConnectedSystems, actions, setActions, onNavigate }: {
   connectedSystems: any[];
   setConnectedSystems: (s: any[]) => void;
   actions: any[];
   setActions: (a: any[]) => void;
+  onNavigate: (tab: string) => void;
 }) {
   const [connecting, setConnecting] = useState<string | null>(null);
 
@@ -466,29 +453,44 @@ function IntegrationsTab({ connectedSystems, setConnectedSystems, actions, setAc
     connectedSystems.some((s: any) => s.name === name);
 
   return (
-    <div className="max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {ALL_INTEGRATIONS.map(intg => (
-        <IntegrationCard
-          key={intg.name}
-          {...intg}
-          isConnected={isConnected(intg.name)}
-          isConnecting={connecting === intg.name}
-          onConnect={() => handleConnect(intg.name, intg.type)}
-        />
-      ))}
+    <div className="max-w-3xl space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {ALL_INTEGRATIONS.map(intg => (
+          <IntegrationCard
+            key={intg.name}
+            name={intg.name}
+            type={intg.type}
+            description={intg.description}
+            domain={intg.domain}
+            isConnected={isConnected(intg.name)}
+            isConnecting={connecting === intg.name}
+            onConnect={() => handleConnect(intg.name, intg.type)}
+          />
+        ))}
+      </div>
+      <button
+        onClick={() => onNavigate('utilities')}
+        className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors px-1"
+      >
+        <span className="text-lg leading-none">+</span> Add more integrations
+      </button>
     </div>
   );
 }
 
-function IntegrationCard({ name, description, icon, isConnected, isConnecting, onConnect }: {
-  name: string; description: string; icon: React.ReactNode;
+function IntegrationCard({ name, description, domain, isConnected, isConnecting, onConnect }: {
+  name: string; description: string; domain: string;
   isConnected: boolean; isConnecting: boolean; onConnect: () => void;
 }) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl">
-          {icon}
+          <img
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
+            alt={name}
+            className="w-6 h-6 object-contain"
+          />
         </div>
         {isConnected && (
           <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">

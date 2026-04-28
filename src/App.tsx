@@ -38,6 +38,7 @@ function App() {
   // Scenario state
   const [hasHiredAgents, setHasHiredAgents] = useState(false);       // true after migrate scenario
   const [hasMonitoringSetup, setHasMonitoringSetup] = useState(false); // true after monitoring scenario
+  const [hasAutoUpdatesSetup, setHasAutoUpdatesSetup] = useState(false); // true after auto-updates scenario
   const showTeamNav = false; // hidden for now, re-enable when ready
 
   return (
@@ -85,7 +86,7 @@ function App() {
           </>}
           <NavItem active={activeTab === 'utilities'} onClick={() => { setActiveTab('utilities'); setMobileMenuOpen(false); }} icon={<Layers className="w-5 h-5" />} label="Integrations" />
           <NavItem active={activeTab === 'knowledge_base'} onClick={() => { setActiveTab('knowledge_base'); setMobileMenuOpen(false); }} icon={<BookOpen className="w-5 h-5" />} label="Institution Context" />
-          <NavItem active={activeTab === 'apps_for_schools'} onClick={() => { setActiveTab('apps_for_schools'); setMobileMenuOpen(false); }} icon={<LayoutGrid className="w-5 h-5" />} label="Apps for Schools" />
+          <NavItem active={activeTab === 'apps_for_schools'} onClick={() => { setActiveTab('apps_for_schools'); setMobileMenuOpen(false); }} icon={<LayoutGrid className="w-5 h-5" />} label="Recommended Apps" />
         </div>
       )}
 
@@ -163,11 +164,12 @@ function App() {
               icon={<BookOpen className="w-5 h-5" />}
               label="Institution Context"
             />
+            <hr className="border-slate-200 mx-2 my-3" />
             <NavItem
               active={activeTab === 'apps_for_schools'}
               onClick={() => setActiveTab('apps_for_schools')}
               icon={<LayoutGrid className="w-5 h-5" />}
-              label="Apps for Schools"
+              label="Recommended Apps"
             />
           </nav>
         </aside>
@@ -182,6 +184,7 @@ function App() {
               onNavigate={setActiveTab}
               hasHiredAgents={hasHiredAgents}
               hasMonitoringSetup={hasMonitoringSetup}
+              hasAutoUpdatesSetup={hasAutoUpdatesSetup}
             />
           )}
           {activeTab === 'hired_agents' && (
@@ -199,6 +202,10 @@ function App() {
               onAgentsHired={() => setHasHiredAgents(true)}
               onFinishScenario={() => setActiveTab('dashboard')}
               onMonitoringComplete={() => setHasMonitoringSetup(true)}
+              onAutoUpdatesComplete={() => {
+                setHasAutoUpdatesSetup(true);
+                setHasHiredAgents(true);
+              }}
             />
           )}
           {activeTab === 'team' && (
@@ -216,6 +223,7 @@ function App() {
               setConnectedSystems={setConnectedSystems}
               actions={actions}
               setActions={setActions}
+              onNavigate={setActiveTab}
             />
           )}
           {activeTab === 'apps_for_schools' && <AppsForSchoolsView />}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bot, CheckCircle, Clock, Zap, Database, BarChart2, FileText, Link2, ShieldCheck, Users, Rss, ExternalLink } from 'lucide-react';
+import { Bot, CheckCircle, Clock, Zap, Database, BarChart2, FileText, Link2, ShieldCheck, Users, Rss, ExternalLink, CalendarDays } from 'lucide-react';
 import type { AiAction } from '../data/mockData';
 import { AiReviewModal } from './AiReviewModal';
 import { AutoUpdatePreviewModal } from './AutoUpdatePreviewModal';
@@ -12,11 +12,26 @@ type AutoUpdate = {
   id: string;
   source: string;
   sourceDomain?: string;
+  sourceDomains?: string[]; // when multiple sources contributed (e.g. SIS + LMS)
   title: string;
   detail: string;
   time: string;
   icon: React.ReactNode;
   iconBg: string;
+};
+
+// New auto-update item from the auto-updates scenario.
+// Sourced from both PowerSchool (SIS) and Canvas LMS, surfaced after the
+// "Set up automated updates" scenario completes.
+const VACATION_UPDATE: AutoUpdate = {
+  id: 'au_vacation',
+  source: 'PowerSchool + Canvas LMS',
+  sourceDomains: ['powerschool.com', 'canvas.instructure.com'],
+  title: 'Vacation Schedule & Holiday Programs Published',
+  detail: 'Spring Break (Apr 13–17) added to the Calendar. New Holiday Programs hub with lesson and club schedules during the break is live.',
+  time: 'Just now',
+  icon: <CalendarDays className="w-3.5 h-3.5" />,
+  iconBg: 'bg-amber-100 text-amber-600',
 };
 
 const AUTO_UPDATES: AutoUpdate[] = [
@@ -124,26 +139,48 @@ const AUTO_UPDATES: AutoUpdate[] = [
 function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void }) {
   return (
     <div className="flex gap-3 items-start py-3 px-4 hover:bg-slate-50 transition-colors rounded-xl group">
-      {/* Source favicon or fallback icon */}
+      {/* Source favicon(s) or fallback icon */}
       <div className="relative shrink-0 mt-0.5">
-        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-slate-200 shadow-sm')}>
-          {item.sourceDomain ? (
-            <img
-              src={`https://www.google.com/s2/favicons?domain=${item.sourceDomain}&sz=64`}
-              alt={item.source}
-              className="w-5 h-5 object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const parent = e.currentTarget.parentElement;
-                if (parent) parent.className = cn('w-8 h-8 rounded-lg flex items-center justify-center', item.iconBg);
-              }}
-            />
-          ) : (
-            <div className={cn('w-full h-full flex items-center justify-center rounded-lg', item.iconBg)}>
-              {item.icon}
-            </div>
-          )}
-        </div>
+        {item.sourceDomains && item.sourceDomains.length > 1 ? (
+          // Multi-source: stacked favicons
+          <div className="flex -space-x-1.5">
+            {item.sourceDomains.slice(0, 2).map((domain, idx) => (
+              <div
+                key={domain}
+                className={cn(
+                  'w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-slate-200 shadow-sm',
+                  idx === 0 ? 'z-10' : 'z-0'
+                )}
+              >
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+                  alt={domain}
+                  className="w-4 h-4 object-contain"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-slate-200 shadow-sm')}>
+            {item.sourceDomain ? (
+              <img
+                src={`https://www.google.com/s2/favicons?domain=${item.sourceDomain}&sz=64`}
+                alt={item.source}
+                className="w-5 h-5 object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) parent.className = cn('w-8 h-8 rounded-lg flex items-center justify-center', item.iconBg);
+                }}
+              />
+            ) : (
+              <div className={cn('w-full h-full flex items-center justify-center rounded-lg', item.iconBg)}>
+                {item.icon}
+              </div>
+            )}
+          </div>
+        )}
         {/* Green auto-done dot */}
         <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
       </div>
@@ -151,11 +188,11 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm font-semibold text-slate-800 leading-tight">{item.title}</p>
-          <span className="text-[10px] text-slate-400 shrink-0 mt-0.5 whitespace-nowrap">{item.time}</span>
+          <span className="text-xs text-slate-400 shrink-0 mt-0.5 whitespace-nowrap">{item.time}</span>
         </div>
-        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{item.detail}</p>
+        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{item.detail}</p>
         <div className="flex items-center justify-between mt-1.5">
-          <span className="text-[10px] text-slate-400 font-medium">{item.source}</span>
+          <span className="text-xs text-slate-400 font-medium">{item.source}</span>
           {onView && (
             <button onClick={onView} className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity">
               View <ExternalLink className="w-3 h-3" />
@@ -168,10 +205,16 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
 }
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────
-export function Dashboard({ hasHiredAgents, hasMonitoringSetup }: any) {
+export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSetup }: any) {
   const [selectedAction, setSelectedAction] = useState<AiAction | null>(null);
   const [removedActions, setRemovedActions] = useState<string[]>([]);
-  const [showTeacherPreview, setShowTeacherPreview] = useState(false);
+  const [previewVariant, setPreviewVariant] = useState<'teacher' | 'vacation' | null>(null);
+
+  // When the auto-updates scenario has been completed, add the vacation
+  // schedule + holiday programs item at the top of the feed.
+  const autoUpdates = hasAutoUpdatesSetup
+    ? [VACATION_UPDATE, ...AUTO_UPDATES]
+    : AUTO_UPDATES;
 
   const CC_ACTION: AiAction = {
     id: 'cc_dash_1',
@@ -240,7 +283,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup }: any) {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-light tracking-tight text-slate-900 mb-1">Automations</h1>
+        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Automations</h1>
         <p className="text-slate-500 text-sm">AI-driven updates to your school website — review proposals or see what was already handled.</p>
 
         {/* Status bar — only once agents are hired and content is live */}
@@ -402,7 +445,10 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup }: any) {
             {/* Subheader */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 bg-slate-50/60">
               <div className="flex -space-x-1.5">
-                {['powerschool.com', 'analytics.google.com', 'classdojo.com'].map((domain) => (
+                {(hasAutoUpdatesSetup
+                  ? ['powerschool.com', 'canvas.instructure.com', 'analytics.google.com', 'classdojo.com']
+                  : ['powerschool.com', 'analytics.google.com', 'classdojo.com']
+                ).map((domain) => (
                   <div key={domain} className="w-5 h-5 rounded-full bg-white border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center">
                     <img
                       src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
@@ -419,18 +465,22 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup }: any) {
 
             {/* Feed */}
             <div className="divide-y divide-slate-100 max-h-[520px] overflow-y-auto">
-              {AUTO_UPDATES.map((item) => (
+              {autoUpdates.map((item) => (
                 <AutoUpdateRow
                   key={item.id}
                   item={item}
-                  onView={item.id === 'au_0' ? () => setShowTeacherPreview(true) : undefined}
+                  onView={
+                    item.id === 'au_vacation' ? () => setPreviewVariant('vacation') :
+                    item.id === 'au_0'        ? () => setPreviewVariant('teacher')  :
+                    undefined
+                  }
                 />
               ))}
             </div>
 
             {/* Footer */}
             <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
-              <p className="text-xs text-slate-400">{AUTO_UPDATES.length} updates this week</p>
+              <p className="text-xs text-slate-400">{autoUpdates.length} updates this week</p>
               <button className="text-xs font-semibold text-blue-600 hover:underline">View full history →</button>
             </div>
           </div>
@@ -439,8 +489,11 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup }: any) {
       </div>
       )}
 
-      {showTeacherPreview && (
-        <AutoUpdatePreviewModal onClose={() => setShowTeacherPreview(false)} />
+      {previewVariant && (
+        <AutoUpdatePreviewModal
+          variant={previewVariant}
+          onClose={() => setPreviewVariant(null)}
+        />
       )}
 
       {/* Review modal — unchanged */}

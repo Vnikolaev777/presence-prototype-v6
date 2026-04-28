@@ -79,7 +79,7 @@ export function TasksView() {
     <div className="max-w-2xl space-y-8 animate-in fade-in duration-500">
 
       <div>
-        <h1 className="text-3xl font-light tracking-tight text-slate-900 mb-1">Tasks</h1>
+        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Tasks</h1>
         <p className="text-slate-500 text-sm">Recent activity across all your AI agents.</p>
       </div>
 

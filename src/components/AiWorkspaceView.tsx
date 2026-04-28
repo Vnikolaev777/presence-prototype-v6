@@ -13,22 +13,25 @@ import { SchoolAfterMagic } from '../pages/SchoolAfterMagic';
 import { AuditChatCardV2, PostAuditChatCardV2, AuditCanvasV2, PostAuditCanvasV2 } from './AuditPreviews';
 
 type ScenarioStep = 'idle' | 'url_input' | 'audit' | 'orchestrator' | 'generation' | 'post_audit' | 'hiring'
-  | 'mon_input' | 'mon_scanning' | 'mon_findings' | 'mon_configure' | 'mon_active';
+  | 'mon_input' | 'mon_scanning' | 'mon_findings' | 'mon_configure' | 'mon_active'
+  | 'auto_url_input' | 'auto_analyze' | 'auto_cms' | 'auto_sis' | 'auto_lms' | 'auto_shared_folder' | 'auto_active';
 
 interface AiWorkspaceViewProps {
   onFinishScenario?: () => void;
   onAgentsHired?: () => void;
   onMonitoringComplete?: () => void;  // called when monitoring scenario finishes
+  onAutoUpdatesComplete?: () => void; // called when auto-updates scenario finishes
 }
 
 const QUICK_ACTIONS = [
-  { icon: <Layers         className="w-4 h-4" />, label: 'Improve and migrate your website to Presence', color: 'bg-indigo-50 text-indigo-600 border-indigo-100', scenario: true  },
-  { icon: <RefreshCw      className="w-4 h-4" />, label: 'Setup Internet Monitoring',   color: 'bg-violet-50 text-violet-600 border-violet-100', scenario: false, monitoringScenario: true },
-  { icon: <LayoutTemplate className="w-4 h-4" />, label: 'Create a website',            color: 'bg-blue-50 text-blue-600 border-blue-100',    scenario: false },
-  { icon: <ShieldAlert    className="w-4 h-4" />, label: 'Make a website audit',         color: 'bg-emerald-50 text-emerald-600 border-emerald-100', scenario: false },
-  { icon: <Accessibility  className="w-4 h-4" />, label: 'Improve accessibility',        color: 'bg-rose-50 text-rose-600 border-rose-100',    scenario: false },
-  { icon: <Users          className="w-4 h-4" />, label: 'Create a Family Hub',          color: 'bg-amber-50 text-amber-600 border-amber-100',  scenario: false },
-  { icon: <Database       className="w-4 h-4" />, label: 'Create event pages',           color: 'bg-cyan-50 text-cyan-600 border-cyan-100',     scenario: false },
+  { icon: <Layers         className="w-4 h-4" />, label: 'Improve existing website',      color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: true  },
+  { icon: <RefreshCw      className="w-4 h-4" />, label: 'Set up internet monitoring',    color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, monitoringScenario: true },
+  { icon: <Zap            className="w-4 h-4" />, label: 'Set up automated updates',      color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, autoUpdatesScenario: true },
+  { icon: <LayoutTemplate className="w-4 h-4" />, label: 'Create a website',              color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <ShieldAlert    className="w-4 h-4" />, label: 'Make a website audit',          color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <Accessibility  className="w-4 h-4" />, label: 'Improve accessibility',         color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <Users          className="w-4 h-4" />, label: 'Create a Family Hub',           color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <Database       className="w-4 h-4" />, label: 'Create event pages',            color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
 ];
 
 const SIS_PROVIDERS = [
@@ -440,12 +443,12 @@ function ConnectPowerSchoolScreen({ onAuthorize }: { onAuthorize: () => void }) 
   );
 }
 
-// ─── Migration progress path ────────────────────────────────────────────────
+// ─── Improvement progress path ──────────────────────────────────────────────
 const PROGRESS_STEPS: { label: string; detail: string }[] = [
   { label: 'Audit',    detail: 'Analyze current website' },
   { label: 'Connect',  detail: 'Connect data sources' },
-  { label: 'Build',    detail: 'Migrate & generate new site' },
-  { label: 'Review',   detail: 'Review migrated website' },
+  { label: 'Build',    detail: 'Generate improved site' },
+  { label: 'Review',   detail: 'Review improved website' },
   { label: 'Re-audit', detail: 'Analyzing new website' },
   { label: 'Publish',  detail: 'Go live & set up automation' },
 ];
@@ -906,8 +909,460 @@ function MonitoringProgressBar({ step }: { step: ScenarioStep }) {
   );
 }
 
+// ─── Auto-updates scenario: source systems ───────────────────────────────────
+// Each source is its own connection step. They all share the same light-blue
+// palette to match the monitoring scenario's visual language.
+type AutoSourceId = 'cms' | 'sis' | 'lms' | 'shared_folder';
+type AutoSource = {
+  id: AutoSourceId;
+  label: string;
+  sub: string;
+  domain: string;
+  permissions: string[];
+  cta: string;
+  iconKey: 'globe' | 'database' | 'book' | 'folder';
+  // What part of the site this source feeds — used by the analysis canvas.
+  feeds: string;
+};
+
+const AUTO_UPDATE_SOURCES: AutoSource[] = [
+  {
+    id: 'cms',
+    label: 'WordPress',
+    sub: 'Content Management System (CMS)',
+    domain: 'wordpress.com',
+    iconKey: 'globe',
+    cta: 'Authorize with WordPress',
+    feeds: 'Pages, posts, navigation & media',
+    permissions: [
+      'Read & publish posts, pages, and media',
+      'Update navigation menus and widgets',
+      'Sync staff bios, calendars, and announcements',
+      'Manage SEO metadata and structured data',
+    ],
+  },
+  {
+    id: 'sis',
+    label: 'PowerSchool',
+    sub: 'Student Information System (SIS)',
+    domain: 'powerschool.com',
+    iconKey: 'database',
+    cta: 'Authorize with PowerSchool',
+    feeds: 'Faculty Directory, class schedules, calendar',
+    permissions: [
+      'Student enrollment & demographics',
+      'Class schedules and rosters',
+      'Academic calendar and key dates',
+      'Faculty and staff records',
+    ],
+  },
+  {
+    id: 'lms',
+    label: 'Canvas LMS',
+    sub: 'Learning Management System (LMS)',
+    domain: 'canvas.instructure.com',
+    iconKey: 'book',
+    cta: 'Authorize with Canvas LMS',
+    feeds: 'Lesson plans, club & athletics calendars',
+    permissions: [
+      'Course catalog and lesson schedules',
+      'Club and after-school activity calendars',
+      'Assignment and event due dates',
+      'Teacher resource pages',
+    ],
+  },
+  {
+    id: 'shared_folder',
+    label: 'Shared Folder',
+    sub: 'Google Drive, OneDrive, Dropbox',
+    domain: 'drive.google.com',
+    iconKey: 'folder',
+    cta: 'Connect a Shared Folder',
+    feeds: 'Optional: PDFs, handbooks, media files',
+    permissions: [
+      'Read PDFs, handbooks, and policy docs',
+      'Sync image and media assets',
+      'Watch shared folders for new files',
+    ],
+  },
+];
+
+function autoSourceIcon(key: AutoSource['iconKey']) {
+  const cls = "w-9 h-9 object-contain";
+  switch (key) {
+    case 'globe':    return <Globe      className={cls} />;
+    case 'database': return <Database   className={cls} />;
+    case 'book':     return <BookOpen   className={cls} />;
+    case 'folder':   return <FolderOpen className={cls} />;
+  }
+}
+
+// Step → source ID mapping
+const AUTO_STEP_TO_SOURCE: Record<string, AutoSourceId> = {
+  auto_cms:           'cms',
+  auto_sis:           'sis',
+  auto_lms:           'lms',
+  auto_shared_folder: 'shared_folder',
+};
+
+const AUTO_STEP_ORDER: ScenarioStep[] = ['auto_cms', 'auto_sis', 'auto_lms', 'auto_shared_folder', 'auto_active'];
+
+// ─── Auto-updates: site analysis canvas ─────────────────────────────────────
+// Shows the current website with a "scanning" pass that progressively reveals
+// findings — areas of the site that would benefit from being auto-synced.
+function AutoUpdatesAnalyzeCanvas({
+  websiteUrl, scanTick, siteScale,
+}: {
+  websiteUrl: string;
+  scanTick: number;
+  siteScale: number;
+}) {
+  const findings: { source: AutoSourceId; area: string; example: string }[] = [
+    { source: 'cms', area: 'Pages & posts',           example: 'Homepage banners, news posts' },
+    { source: 'sis', area: 'Faculty Directory',       example: '47 staff entries' },
+    { source: 'lms', area: 'Calendar & club pages',   example: 'Spring Break, Robotics Club' },
+  ];
+
+  const scanComplete = scanTick >= findings.length;
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden bg-white animate-in fade-in zoom-in-95 duration-700">
+      {/* URL bar */}
+      <div className="shrink-0 bg-white px-3 py-2 border-b border-slate-200 flex items-center gap-2">
+        <div className="flex gap-1.5 shrink-0">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-400"/>
+          <div className="w-2.5 h-2.5 rounded-full bg-amber-400"/>
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"/>
+        </div>
+        <div className="bg-blue-50 px-3 py-1 rounded text-xs text-blue-700 font-bold font-mono flex-1 text-center border border-blue-200">{websiteUrl}</div>
+        {scanComplete ? (
+          <div className="text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full font-bold flex items-center gap-1 shrink-0">
+            <CheckCircle className="w-3 h-3" /> Analysis complete
+          </div>
+        ) : (
+          <div className="text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full font-bold flex items-center gap-1 shrink-0">
+            <Loader2 className="w-3 h-3 animate-spin" /> Scanning…
+          </div>
+        )}
+      </div>
+
+      {/* Site preview + scan / findings overlay */}
+      <div className="relative flex-1 min-h-0 overflow-hidden bg-slate-50">
+        {/* Underlying site */}
+        <div className="absolute inset-0 overflow-auto">
+          <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none">
+            <SchoolAfterMagic showAfter={true} />
+          </div>
+        </div>
+
+        {/* Scanning sweep */}
+        {!scanComplete && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div
+              className="absolute left-0 right-0 h-24 bg-gradient-to-b from-transparent via-blue-400/20 to-transparent"
+              style={{ animation: 'autoScan 2.4s linear infinite' }}
+            />
+            <style>{`@keyframes autoScan { 0% { top: -10%; } 100% { top: 110%; } }`}</style>
+          </div>
+        )}
+
+        {/* Findings overlay panel — bottom-right */}
+        <div className="absolute right-4 top-4 bottom-4 w-72 max-w-[calc(100%-2rem)] bg-white/95 backdrop-blur-sm border border-blue-200 rounded-2xl shadow-xl p-4 flex flex-col gap-3 pointer-events-auto">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+              {scanComplete ? 'What I found' : 'Analyzing site…'}
+            </p>
+            <span className={cn(
+              "text-[10px] font-bold px-2 py-0.5 rounded-full border",
+              scanComplete
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : "bg-slate-50 text-slate-500 border-slate-200"
+            )}>
+              {Math.min(scanTick, findings.length)} / {findings.length}
+            </span>
+          </div>
+
+          <div className="space-y-2 flex-1 overflow-auto">
+            {findings.map((f, i) => {
+              const revealed = scanTick > i;
+              const source = AUTO_UPDATE_SOURCES.find(s => s.id === f.source)!;
+              return (
+                <div
+                  key={f.area}
+                  className={cn(
+                    "rounded-xl border p-3 transition-all duration-500",
+                    revealed
+                      ? "bg-blue-50 border-blue-200 opacity-100 translate-y-0"
+                      : "bg-slate-50 border-slate-200 opacity-0 translate-y-2"
+                  )}
+                >
+                  <p className="text-[11px] font-bold text-slate-900 leading-tight">{f.area}</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">{f.example}</p>
+                  {revealed && (
+                    <div className="flex items-center gap-1.5 mt-2 text-[10px] font-semibold text-blue-700">
+                      <span>→</span>
+                      <div className="w-3.5 h-3.5 rounded bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                        <img
+                          src={`https://www.google.com/s2/favicons?domain=${source.domain}&sz=64`}
+                          alt={source.label}
+                          className="w-2.5 h-2.5 object-contain"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                      </div>
+                      <span>{source.label}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {scanComplete && (
+            <div className="text-[10px] text-slate-500 leading-relaxed pt-2 border-t border-slate-100">
+              I'd like to connect <strong>3 sources</strong> to keep this in sync — see the chat for the plan.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Auto-updates: generic per-source connection canvas ─────────────────────
+// One screen per data source — used for CMS, SIS, LMS, Shared Folder, Other.
+// Each step has its own Authorize and Skip CTAs.
+function ConnectAutoSourceCanvas({
+  source, websiteUrl, stepIndex, totalSteps, onAuthorize, onSkip,
+}: {
+  source: AutoSource;
+  websiteUrl: string;
+  stepIndex: number;
+  totalSteps: number;
+  onAuthorize: () => void;
+  onSkip: () => void;
+}) {
+  return (
+    <div className="flex-1 flex items-center justify-center bg-slate-100 p-8 animate-in fade-in duration-500">
+      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 w-full max-w-sm space-y-6">
+
+        {/* Step pill */}
+        <div className="flex items-center justify-center">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+            Step {stepIndex} of {totalSteps}
+          </span>
+        </div>
+
+        {/* Header */}
+        <div className="flex flex-col items-center text-center gap-3">
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 text-white">
+            {autoSourceIcon(source.iconKey)}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Connect {source.label}</h2>
+            <p className="text-slate-500 text-sm mt-0.5">
+              {source.id === 'cms'
+                ? <>Link your CMS to keep <span className="font-semibold">{websiteUrl}</span> in sync</>
+                : source.sub}
+            </p>
+          </div>
+        </div>
+
+        {/* Security badges */}
+        <div className="space-y-2">
+          <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3">
+            <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Secure Connection</p>
+              <p className="text-xs text-slate-500">OAuth 2.0 — credentials never stored on our servers</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <CheckCircle className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Scoped Access</p>
+              <p className="text-xs text-slate-500">You can revoke this at any time from Integrations</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Permissions list */}
+        <div>
+          <p className="text-sm font-bold text-slate-800 mb-3">This integration will be able to:</p>
+          <div className="space-y-2">
+            {source.permissions.map(item => (
+              <div key={item} className="flex items-center gap-2 text-sm text-slate-700">
+                <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="space-y-2">
+          <button
+            onClick={onAuthorize}
+            className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
+          >
+            <ExternalLink className="w-4 h-4" />
+            {source.cta}
+          </button>
+          <button
+            onClick={onSkip}
+            className="w-full text-xs text-slate-500 hover:text-slate-800 underline underline-offset-2 transition-colors py-1"
+          >
+            Skip for now
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ─── Auto-updates: final "active" canvas ────────────────────────────────────
+function AutoUpdatesActiveCanvas({ websiteUrl, connected, skipped }: {
+  websiteUrl: string;
+  connected: AutoSourceId[];
+  skipped: AutoSourceId[];
+}) {
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center gap-8 p-12 bg-white animate-in fade-in duration-700">
+      <div className="text-center">
+        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Auto-Updates Are Live</h2>
+        <p className="text-slate-400 mt-1 text-sm font-medium">
+          <span className="font-semibold text-slate-700">{websiteUrl}</span> will stay in sync with the sources you connected.
+        </p>
+      </div>
+      <div className="w-full max-w-md space-y-3">
+        {AUTO_UPDATE_SOURCES.map(s => {
+          const isConnected = connected.includes(s.id);
+          const isSkipped   = skipped.includes(s.id);
+          return (
+            <div key={s.id} className={cn(
+              "flex items-center gap-4 p-3 rounded-xl border transition-all duration-500",
+              isConnected ? "bg-blue-50 border-blue-200" :
+              isSkipped   ? "bg-slate-50 border-dashed border-slate-300 opacity-60" :
+                            "bg-slate-50 border-slate-200 opacity-40"
+            )}>
+              <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`}
+                  alt={s.label}
+                  className="w-5 h-5 object-contain"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={cn("text-sm font-bold", isConnected ? "text-slate-900" : "text-slate-500")}>{s.label}</p>
+                <p className="text-xs text-slate-400">
+                  {isConnected ? 'Connected · syncing changes' :
+                   isSkipped   ? 'Skipped — connect later from Integrations' :
+                                 s.sub}
+                </p>
+              </div>
+              <div className="shrink-0">
+                {isConnected ? <CheckCircle className="w-5 h-5 text-blue-500" /> :
+                 isSkipped   ? <span className="text-[10px] font-bold text-slate-400 uppercase">Skipped</span> :
+                               <div className="w-5 h-5 rounded-full border-2 border-slate-200" />}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-5 py-2.5 animate-in fade-in duration-500">
+        <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
+        <span className="text-sm font-bold text-blue-700">
+          {connected.length} of {AUTO_UPDATE_SOURCES.length} sources connected · Auto-updates active
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Auto-updates workflow progress bar ──────────────────────────────────────
+const AUTO_STEPS: { label: string; detail: string }[] = [
+  { label: 'Site',          detail: 'Open the website to keep in sync' },
+  { label: 'Analyze',       detail: 'Spot what to automate' },
+  { label: 'CMS',           detail: 'Authorize WordPress' },
+  { label: 'SIS',           detail: 'Authorize PowerSchool' },
+  { label: 'LMS',           detail: 'Authorize Canvas LMS' },
+  { label: 'Shared Folder', detail: 'Optional — Drive, OneDrive…' },
+  { label: 'Active',        detail: 'Auto-updates running' },
+];
+
+function getAutoProgressIndex(step: ScenarioStep): number {
+  switch (step) {
+    case 'auto_url_input':     return 0;
+    case 'auto_analyze':       return 1;
+    case 'auto_cms':           return 2;
+    case 'auto_sis':           return 3;
+    case 'auto_lms':           return 4;
+    case 'auto_shared_folder': return 5;
+    case 'auto_active':        return 6;
+    default:                   return -1;
+  }
+}
+
+function AutoUpdatesProgressBar({ step }: { step: ScenarioStep }) {
+  const active = getAutoProgressIndex(step);
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 p-4 animate-in fade-in duration-300">
+      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Workflow</p>
+      <div>
+        {AUTO_STEPS.map(({ label, detail }, i) => {
+          const isComplete = i < active;
+          const isActive   = i === active;
+          const isLast     = i === AUTO_STEPS.length - 1;
+          return (
+            <div key={i} className="flex gap-3">
+              <div className="flex flex-col items-center shrink-0">
+                <div className={cn(
+                  'w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500 shrink-0',
+                  isComplete ? 'bg-blue-600' :
+                  isActive   ? 'bg-blue-600 ring-2 ring-blue-200 ring-offset-1' :
+                               'bg-slate-100 border-2 border-slate-200'
+                )}>
+                  {isComplete
+                    ? <CheckCircle className="w-3.5 h-3.5 text-white" />
+                    : isActive
+                      ? <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                      : <span className="w-2 h-2 rounded-full bg-slate-300" />
+                  }
+                </div>
+                {!isLast && (
+                  <div className={cn(
+                    'w-0.5 my-1 transition-colors duration-500',
+                    i < active ? 'bg-blue-400' : 'bg-slate-200'
+                  )} style={{ minHeight: '22px' }} />
+                )}
+              </div>
+              <div className="pb-4 min-w-0">
+                <p className={cn(
+                  'text-sm font-bold leading-tight transition-colors duration-300',
+                  isComplete ? 'text-slate-400 line-through decoration-slate-300' :
+                  isActive   ? 'text-slate-900' :
+                               'text-slate-400'
+                )}>
+                  {label}
+                </p>
+                <p className={cn(
+                  'text-[11px] mt-0.5 transition-colors duration-300',
+                  isActive ? 'text-blue-600 font-medium' : 'text-slate-400'
+                )}>
+                  {detail}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ─────────────────────────────────────────────────────────
-export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringComplete }: AiWorkspaceViewProps) {
+export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringComplete, onAutoUpdatesComplete }: AiWorkspaceViewProps) {
   const [scenarioStep, setScenarioStep] = useState<ScenarioStep>('idle');
   const [chatMessages, setChatMessages] = useState<{role: 'user' | 'agent', content: React.ReactNode}[]>([]);
   const [orchestratorTick, setOrchestratorTick] = useState<number>(-4);
@@ -921,6 +1376,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const [connectionStep, setConnectionStep] = useState<'type_select' | 'sis_select' | 'powerschool_auth' | null>(null);
   const [centerTab, setCenterTab] = useState<'site' | 'audit'>('site');
   const [auditTab, setAuditTab] = useState<'site' | 'audit'>('site');
+  const [showMoreActions, setShowMoreActions] = useState(false);
 
   // Monitoring scenario state
   const [monTopicsSubmitted, setMonTopicsSubmitted]   = useState(false);
@@ -928,6 +1384,15 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const [monWebsiteReady, setMonWebsiteReady]         = useState(false);
   const [monWebsiteSubmitted, setMonWebsiteSubmitted] = useState(false);
   const [monExtraSite, setMonExtraSite]               = useState<string | null>(null);
+
+  // Auto-updates scenario state
+  const [autoTypedUrl, setAutoTypedUrl]                 = useState('');
+  const [autoUrlPromptReady, setAutoUrlPromptReady]     = useState(false);
+  const [autoUrlSubmitted, setAutoUrlSubmitted]         = useState(false);
+  const [autoAnalyzeTick, setAutoAnalyzeTick]           = useState(0);
+  const [autoPlanReady, setAutoPlanReady]               = useState(false);
+  const [autoConnectedSources, setAutoConnectedSources] = useState<AutoSourceId[]>([]);
+  const [autoSkippedSources, setAutoSkippedSources]     = useState<AutoSourceId[]>([]);
 
   const TARGET_URL = 'https://oakwoodhigh.org';
 
@@ -967,10 +1432,60 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
         agentMessage("To sync your directory, calendar, and announcements automatically, connect your SIS. You can also skip this and connect later.");
         setConnectionStep('type_select');
       } else if (orchestratorTick === 4) {
-        agentMessage("Everything's in place — time to build your new site.");
+        agentMessage("Everything's in place — time to build your improved site.");
       }
     }
   }, [orchestratorTick, scenarioStep]);
+
+  // Auto-updates analysis tick + chat narration
+  useEffect(() => {
+    if (scenarioStep !== 'auto_analyze') return;
+
+    // Analysis findings narrated as the scan reveals each one.
+    const FINDINGS_TOTAL = 3;
+
+    if (autoAnalyzeTick === 0) {
+      const t = setTimeout(() => {
+        agentMessage("The site looks good — modern theme, content's all there. Let me see what's powering each section so I know what's worth automating.");
+        setAutoAnalyzeTick(1);
+      }, 1200);
+      return () => clearTimeout(t);
+    }
+
+    if (autoAnalyzeTick === 1) {
+      const t = setTimeout(() => {
+        agentMessage(<span>Found your <strong>Faculty Directory</strong> — 47 staff entries. That's a great fit for your <strong>SIS</strong>, so new hires sync automatically.</span>);
+        setAutoAnalyzeTick(2);
+      }, 1800);
+      return () => clearTimeout(t);
+    }
+
+    if (autoAnalyzeTick === 2) {
+      const t = setTimeout(() => {
+        agentMessage(<span>Calendars and club pages — these change every term. Your <strong>LMS</strong> already has the schedules; let's pipe them into the site.</span>);
+        setAutoAnalyzeTick(3);
+      }, 1800);
+      return () => clearTimeout(t);
+    }
+
+    if (autoAnalyzeTick === FINDINGS_TOTAL) {
+      const t = setTimeout(() => {
+        agentMessage(
+          <span>
+            And to publish updates back into pages, posts, and the homepage — your <strong>CMS</strong>. Here's the plan:
+            <ul className="mt-2 ml-4 list-disc text-slate-700 space-y-0.5">
+              <li><strong>WordPress</strong> — pages, posts, navigation</li>
+              <li><strong>PowerSchool</strong> — Faculty Directory, schedules</li>
+              <li><strong>Canvas LMS</strong> — calendar &amp; club pages</li>
+            </ul>
+            I'll also offer a <strong>Shared Folder</strong> at the end for PDFs and media — totally optional.
+          </span>
+        );
+        setAutoPlanReady(true);
+      }, 1500);
+      return () => clearTimeout(t);
+    }
+  }, [scenarioStep, autoAnalyzeTick]);
 
   const agentMessage = (content: React.ReactNode) => setChatMessages(prev => [...prev, { role: 'agent', content }]);
   const userMessage  = (content: React.ReactNode) => setChatMessages(prev => [...prev, { role: 'user',  content }]);
@@ -999,25 +1514,26 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     setUrlSubmitted(true);
     userMessage(typedUrl);
     setTimeout(() => {
+      setScenarioStep('audit');
+      setAuditTab('audit');
       agentMessage(
-        <span>Scanning <span className="font-bold text-blue-600">{typedUrl}</span> now — pulling up the current structure, page hierarchy, and assets. This will only take a moment...</span>
+        <span>
+          Scanned <span className="font-bold text-blue-600">{typedUrl}</span>. Here's what we found:
+          <ol className="mt-2 space-y-1 list-decimal list-inside text-slate-700">
+            <li>Current structure, page hierarchy, and assets are mapped — full report in the Audit tab.</li>
+            <li>Visitors struggle to navigate it on mobile and the content is hard to read.</li>
+            <li>The site is nearly invisible in search results.</li>
+          </ol>
+        </span>
       );
+      // agentMessage(<AuditChatCardV2 />); // hidden for now
       setTimeout(() => {
-        setScenarioStep('audit');
-        setAuditTab('audit');
-        agentMessage("Audit done — check the Audit tab for the full report.");
-        // agentMessage(<AuditChatCardV2 />); // hidden for now
-        setTimeout(() => {
-          agentMessage("Visitors struggle to navigate it on mobile, the content is hard to read, and it's nearly invisible in search results.");
-          setTimeout(() => {
-            agentMessage(
-              <span>We can fix all of this — want me to go ahead?</span>
-            );
-            setTimeout(() => setAuditReady(true), 400);
-          }, 900);
-        }, 700);
-      }, 2500);
-    }, 900);
+        agentMessage(
+          <span>We can fix all of this — want me to go ahead?</span>
+        );
+        setTimeout(() => setAuditReady(true), 400);
+      }, 900);
+    }, 2500);
   };
 
   const handleTypeSelectSIS = () => {
@@ -1042,7 +1558,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const advanceToOrchestrator = () => {
-    userMessage("Let's fix it — migrate the site.");
+    userMessage("Let's fix it — improve the site.");
     setTimeout(() => {
       setScenarioStep('orchestrator');
       setOrchestratorTick(-4);
@@ -1050,17 +1566,17 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const advanceToGeneration = () => {
-    userMessage("Let's go — migrate the site.");
+    userMessage("Let's go — improve the site.");
     setTimeout(() => {
       setScenarioStep('generation');
-      agentMessage("On it — building your new website now.");
+      agentMessage("On it — building your improved website now.");
       // Auto-advance to post_audit after the site "loads"
       setTimeout(() => {
         setScenarioStep('post_audit');
         setTimeout(() => {
           agentMessage(
             <span>
-              Take a look — all your content has been migrated.{' '}
+              Take a look — the site has been rebuilt and improved.{' '}
               <a href={window.location.hostname === 'localhost' ? `${import.meta.env.BASE_URL}school-after-magic` : 'https://vnikolaev777.github.io/presence-prototype-v3/preview.html'} target="_blank" rel="noopener noreferrer"
                 className="text-blue-600 underline underline-offset-2 hover:text-blue-800 font-medium">
                 Open in new tab ↗
@@ -1173,7 +1689,19 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
 
   const submitWebsite = () => {
     const site = 'State Ministry of Education website';
-    userMessage(`Yes — add the ${site}.`);
+    userMessage(
+      <span>
+        Yes — add the{' '}
+        <a
+          href="https://www.education.gov/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          {site}
+        </a>.
+      </span>
+    );
     setMonWebsiteSubmitted(true);
     setMonExtraSite(site);
     startSetup(site);
@@ -1183,6 +1711,115 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     userMessage("No, that's all.");
     setMonWebsiteSubmitted(true);
     startSetup(null);
+  };
+
+  // ── Auto-updates scenario handlers ────────────────────────────────────────
+
+  const startAutoUpdatesScenario = () => {
+    setScenarioStep('auto_url_input');
+    setAutoTypedUrl(TARGET_URL);
+    setAutoUrlSubmitted(false);
+    setAutoUrlPromptReady(false);
+    setAutoAnalyzeTick(0);
+    setAutoPlanReady(false);
+    setAutoConnectedSources([]);
+    setAutoSkippedSources([]);
+    setChatMessages([{ role: 'user', content: 'Set up automated updates for my website' }]);
+    setTimeout(() => {
+      agentMessage("Happy to. Share the URL of the website you want me to keep up to date and I'll take a look first.");
+      setAutoUrlPromptReady(true);
+    }, 800);
+  };
+
+  const confirmAutoUrl = () => {
+    setAutoUrlSubmitted(true);
+    userMessage(autoTypedUrl);
+    setTimeout(() => {
+      agentMessage(
+        <span>
+          Opening <span className="font-bold text-blue-600">{autoTypedUrl}</span> now — let me see what's on the site
+          and figure out where automated updates would help most.
+        </span>
+      );
+      setScenarioStep('auto_analyze');
+      setAutoAnalyzeTick(0);
+    }, 1200);
+  };
+
+  const proceedAutoPlan = () => {
+    userMessage("Sounds good — let's set them up.");
+    setAutoPlanReady(false);
+    setTimeout(() => {
+      agentMessage(
+        <span>
+          I'll walk through each source one at a time. Authorize the ones you want — or skip any you'd rather link later
+          from Integrations. First up: your <strong>CMS</strong>.
+        </span>
+      );
+      setScenarioStep('auto_cms');
+    }, 600);
+  };
+
+  // Generic per-step authorize / skip handler.
+  const handleAutoSourceAction = (action: 'authorize' | 'skip') => {
+    const sourceId = AUTO_STEP_TO_SOURCE[scenarioStep];
+    if (!sourceId) return;
+    const source = AUTO_UPDATE_SOURCES.find(s => s.id === sourceId);
+    if (!source) return;
+
+    const stepIdx = AUTO_STEP_ORDER.indexOf(scenarioStep);
+    const nextStep = AUTO_STEP_ORDER[stepIdx + 1] ?? 'auto_active';
+
+    if (action === 'authorize') {
+      userMessage(source.cta);
+      setAutoConnectedSources(prev => prev.includes(sourceId) ? prev : [...prev, sourceId]);
+    } else {
+      userMessage('Skip for now');
+      setAutoSkippedSources(prev => prev.includes(sourceId) ? prev : [...prev, sourceId]);
+    }
+
+    setTimeout(() => {
+      // Build the agent message based on what we just did and what's next
+      const nextSource = AUTO_STEP_TO_SOURCE[nextStep];
+      const nextLabel = nextSource && AUTO_UPDATE_SOURCES.find(s => s.id === nextSource)?.label;
+
+      if (nextStep === 'auto_active') {
+        // Final transition — go straight to active state with summary message
+        setScenarioStep('auto_active');
+        // Include the just-handled source so the message reflects the latest decision.
+        const willConnect = action === 'authorize'
+          ? Array.from(new Set([...autoConnectedSources, sourceId]))
+          : autoConnectedSources;
+        const willSkip    = action === 'skip'
+          ? Array.from(new Set([...autoSkippedSources, sourceId]))
+          : autoSkippedSources;
+        agentMessage(
+          <span>
+            <strong>All set.</strong> I'll auto-publish updates whenever{' '}
+            {willConnect.length > 0
+              ? <>your <strong>{willConnect.map(id => AUTO_UPDATE_SOURCES.find(s => s.id === id)?.label).join(', ')}</strong> change</>
+              : 'connected sources change'}
+            — new staff, schedules, lessons, clubs, vacation calendars.
+            {willSkip.length > 0 && <> You can connect <strong>{willSkip.map(id => AUTO_UPDATE_SOURCES.find(s => s.id === id)?.label).join(', ')}</strong> later from Integrations.</>}
+            {' '}Manage everything in the <strong>Automations</strong> tab.
+          </span>
+        );
+        return;
+      }
+
+      // Mid-flow — acknowledge and prompt for the next source
+      agentMessage(
+        action === 'authorize'
+          ? <span><strong>{source.label} connected.</strong> Next: {nextLabel}.</span>
+          : <span>Skipped <strong>{source.label}</strong>. You can connect it later from Integrations. Next: {nextLabel}.</span>
+      );
+      setScenarioStep(nextStep);
+    }, 800);
+  };
+
+  const finishAutoUpdatesAndGoToDashboard = () => {
+    onAutoUpdatesComplete?.();
+    onFinishScenario?.();
   };
 
   // ── Derived booleans ──────────────────────────────────────────────────────
@@ -1197,6 +1834,22 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const isMonActive   = scenarioStep === 'mon_active';
   const isMonitoring  = isMonInput || isMonScanning || isMonActive;
 
+  // Auto-updates derived booleans
+  const isAutoUrlInput     = scenarioStep === 'auto_url_input';
+  const isAutoAnalyze      = scenarioStep === 'auto_analyze';
+  const isAutoCms          = scenarioStep === 'auto_cms';
+  const isAutoSis          = scenarioStep === 'auto_sis';
+  const isAutoLms          = scenarioStep === 'auto_lms';
+  const isAutoSharedFolder = scenarioStep === 'auto_shared_folder';
+  const isAutoActive       = scenarioStep === 'auto_active';
+  const isAutoConnectingStep = isAutoCms || isAutoSis || isAutoLms || isAutoSharedFolder;
+  const isAutoUpdates      = isAutoUrlInput || isAutoAnalyze || isAutoConnectingStep || isAutoActive;
+  const currentAutoSourceId = AUTO_STEP_TO_SOURCE[scenarioStep];
+  const currentAutoSource   = currentAutoSourceId
+    ? AUTO_UPDATE_SOURCES.find(s => s.id === currentAutoSourceId)
+    : undefined;
+  const currentAutoStepIdx  = AUTO_STEP_ORDER.indexOf(scenarioStep);
+
   return (
     <div className="flex h-full w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-500">
 
@@ -1209,13 +1862,20 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
           <div>
             <h2 className="font-bold text-slate-800 text-sm">Presence Assistant</h2>
             <p className="text-xs text-slate-500">
-              {isIdle          ? 'Ready to help'             :
-               isAudit         ? 'Audit complete'            :
-               isPostAudit     ? 'Site live — 10/10'         :
-               isMonInput      ? 'Configuring sources'       :
-               isMonScanning   ? 'Setting up feeds...'       :
-               isMonActive     ? 'Monitoring is live'        :
-                                 'Migrating website'}
+              {isIdle              ? 'Ready to help'                 :
+               isAudit             ? 'Audit complete'                :
+               isPostAudit         ? 'Site live — 10/10'             :
+               isMonInput          ? 'Configuring sources'           :
+               isMonScanning       ? 'Setting up feeds...'           :
+               isMonActive         ? 'Monitoring is live'            :
+               isAutoUrlInput      ? 'Awaiting site URL'             :
+               isAutoAnalyze       ? 'Analyzing your site'           :
+               isAutoCms           ? 'Linking your CMS'              :
+               isAutoSis           ? 'Linking your SIS'              :
+               isAutoLms           ? 'Linking your LMS'              :
+               isAutoSharedFolder  ? 'Linking a shared folder'       :
+               isAutoActive        ? 'Auto-updates are live'         :
+                                     'Migrating website'}
             </p>
           </div>
         </div>
@@ -1234,14 +1894,38 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               </div>
               <div className="space-y-2">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Quick Actions</p>
-                {QUICK_ACTIONS.map((action, i) => (
-                  <button key={i} onClick={action.scenario ? startScenario : (action as any).monitoringScenario ? startMonitoringScenario : undefined}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all group text-sm font-semibold bg-white hover:shadow-md hover:border-slate-300 cursor-pointer border-slate-200 text-slate-700">
-                    <span className={cn("p-1.5 rounded-lg border shrink-0", action.color)}>{action.icon}</span>
-                    <span className="flex-1">{action.label}</span>
-                    <MoveRight className="w-3.5 h-3.5 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
+                {QUICK_ACTIONS.slice(0, showMoreActions ? QUICK_ACTIONS.length : 3).map((action, i) => (
+                  i === 0 ? (
+                    <button
+                      key={i}
+                      onClick={startScenario}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all group text-sm font-semibold bg-indigo-50 hover:bg-indigo-100 hover:shadow-md border-indigo-300 text-indigo-800 cursor-pointer relative">
+                      <span className={cn("p-1.5 rounded-lg border shrink-0", action.color)}>{action.icon}</span>
+                      <span className="flex-1">{action.label}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white shrink-0">Suggested</span>
+                    </button>
+                  ) : (
+                    <button
+                      key={i}
+                      onClick={
+                        action.scenario                       ? startScenario           :
+                        (action as any).monitoringScenario    ? startMonitoringScenario :
+                        (action as any).autoUpdatesScenario   ? startAutoUpdatesScenario :
+                                                                undefined
+                      }
+                      className="w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all group text-sm font-semibold bg-white hover:shadow-md hover:border-slate-300 cursor-pointer border-slate-200 text-slate-700">
+                      <span className={cn("p-1.5 rounded-lg border shrink-0", action.color)}>{action.icon}</span>
+                      <span className="flex-1">{action.label}</span>
+                      <MoveRight className="w-3.5 h-3.5 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  )
                 ))}
+                <button
+                  onClick={() => setShowMoreActions(v => !v)}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors">
+                  <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", showMoreActions && "rotate-180")} />
+                  {showMoreActions ? 'View less' : 'View more'}
+                </button>
               </div>
             </div>
           )}
@@ -1251,7 +1935,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div key={i} className={cn("flex flex-col max-w-[90%]", msg.role === 'user' ? "ml-auto items-end" : "mr-auto items-start")}>
               <div className={cn("px-3 py-2 rounded-2xl text-sm shadow-sm",
                 msg.role === 'user'
-                  ? "bg-slate-800 text-white rounded-br-sm"
+                  ? "bg-slate-800 text-white rounded-br-sm [&_a]:text-blue-300 [&_a]:underline [&_a:hover]:text-blue-100"
                   : "bg-white border border-slate-200 text-slate-700 rounded-bl-sm"
               )}>
                 {msg.content}
@@ -1260,12 +1944,57 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             </div>
           ))}
 
-          {/* URL INPUT (migration): confirm button */}
+          {/* URL INPUT (improvement): confirm button */}
           {isUrlInput && !urlSubmitted && urlPromptReady && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
               <button onClick={confirmUrl}
                 className="border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
                 Submit link &rarr;
+              </button>
+            </div>
+          )}
+
+          {/* URL INPUT (auto-updates): confirm button */}
+          {isAutoUrlInput && !autoUrlSubmitted && autoUrlPromptReady && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
+              <button onClick={confirmAutoUrl}
+                className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5 shrink-0" />
+                Submit {autoTypedUrl}
+              </button>
+            </div>
+          )}
+
+          {/* AUTO-UPDATES: continue-with-plan button after analysis */}
+          {isAutoAnalyze && autoPlanReady && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
+              <button onClick={proceedAutoPlan}
+                className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                Sounds good — set them up &rarr;
+              </button>
+            </div>
+          )}
+
+          {/* AUTO-UPDATES: per-step Authorize / Skip quick replies */}
+          {isAutoConnectingStep && currentAutoSource && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2 flex flex-wrap gap-2">
+              <button onClick={() => handleAutoSourceAction('authorize')}
+                className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                {currentAutoSource.cta} &rarr;
+              </button>
+              <button onClick={() => handleAutoSourceAction('skip')}
+                className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                Skip for now
+              </button>
+            </div>
+          )}
+
+          {/* AUTO-UPDATES: go to Automations */}
+          {isAutoActive && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
+              <button onClick={finishAutoUpdatesAndGoToDashboard}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                Go to Automations <CheckCircle className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -1292,18 +2021,18 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
           )}
 
           {/* SCENARIO ACTION BUTTONS */}
-          {!isIdle && !isUrlInput && !isMonInput && !isMonScanning && (
+          {!isIdle && !isUrlInput && !isMonInput && !isMonScanning && !isAutoUpdates && (
             <div className="pt-4 flex justify-start">
               {isAudit && auditReady && (
                 <button onClick={advanceToOrchestrator}
                   className="animate-in fade-in slide-in-from-bottom border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors">
-                  Proceed with migration &rarr;
+                  Proceed with improvements &rarr;
                 </button>
               )}
               {scenarioStep === 'orchestrator' && orchestratorTick >= 4 && (
                 <button onClick={advanceToGeneration}
                   className="animate-in fade-in slide-in-from-bottom border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors">
-                  Migrate &amp; Improve &rarr;
+                  Build Improved Site &rarr;
                 </button>
               )}
               {isPostAudit && postAuditReady && !siteApproved && (
@@ -1340,7 +2069,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
       <div ref={centerColRef} className="flex-1 min-w-0 relative hidden md:flex flex-col border-r border-slate-200 overflow-hidden bg-white">
 
         {/* IDLE + URL not yet submitted: placeholder */}
-        {(isIdle || (isUrlInput && !urlSubmitted)) && (
+        {(isIdle || (isUrlInput && !urlSubmitted) || (isAutoUrlInput && !autoUrlSubmitted)) && (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center bg-slate-100 animate-in fade-in duration-700">
             <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 shadow-md flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-slate-300" />
@@ -1351,6 +2080,52 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                 : 'Your site preview will load once the URL is confirmed.'}
             </p>
           </div>
+        )}
+
+        {/* AUTO-UPDATES: post-URL site preview while we wait to enter analyze */}
+        {isAutoUrlInput && autoUrlSubmitted && (
+          <div className="flex-1 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-700">
+            <div className="shrink-0 bg-white px-3 py-2 border-b border-slate-200 flex items-center gap-2">
+              <div className="flex gap-1.5 shrink-0"><div className="w-2.5 h-2.5 rounded-full bg-red-400"/><div className="w-2.5 h-2.5 rounded-full bg-amber-400"/><div className="w-2.5 h-2.5 rounded-full bg-emerald-400"/></div>
+              <div className="bg-blue-50 px-3 py-1 rounded text-xs text-blue-700 font-bold font-mono flex-1 text-center border border-blue-200">{autoTypedUrl}</div>
+              <div className="text-[10px] text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full font-bold flex items-center gap-1 shrink-0">
+                <CheckCircle className="w-3 h-3" /> Loaded
+              </div>
+            </div>
+            <div className="flex-1 min-h-0 overflow-auto bg-white">
+              <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none"><SchoolAfterMagic showAfter={true} /></div>
+            </div>
+          </div>
+        )}
+
+        {/* AUTO-UPDATES: site analysis canvas */}
+        {isAutoAnalyze && (
+          <AutoUpdatesAnalyzeCanvas
+            websiteUrl={autoTypedUrl}
+            scanTick={autoAnalyzeTick}
+            siteScale={siteScale}
+          />
+        )}
+
+        {/* AUTO-UPDATES: per-source connection screens */}
+        {isAutoConnectingStep && currentAutoSource && (
+          <ConnectAutoSourceCanvas
+            source={currentAutoSource}
+            websiteUrl={autoTypedUrl}
+            stepIndex={currentAutoStepIdx}
+            totalSteps={AUTO_STEP_ORDER.length - 1 /* exclude auto_active */}
+            onAuthorize={() => handleAutoSourceAction('authorize')}
+            onSkip={() => handleAutoSourceAction('skip')}
+          />
+        )}
+
+        {/* AUTO-UPDATES: final active canvas */}
+        {isAutoActive && (
+          <AutoUpdatesActiveCanvas
+            websiteUrl={autoTypedUrl}
+            connected={autoConnectedSources}
+            skipped={autoSkippedSources}
+          />
         )}
 
         {/* MONITORING: source config / website question phase */}
@@ -1495,7 +2270,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                 )}
               >
                 {siteApproved
-                  ? <><CheckCircle className="w-3.5 h-3.5 text-emerald-500" />10/10 Audit</>
+                  ? <><CheckCircle className="w-3.5 h-3.5 text-emerald-500" />Audit</>
                   : <><Loader2 className="w-3.5 h-3.5 animate-spin" />Audit</>
                 }
               </button>
@@ -1533,10 +2308,72 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
         <div className="p-5 space-y-6">
 
           {/* MIGRATION PROGRESS PATH */}
-          {!isIdle && !isMonitoring && <ScenarioProgressBar step={scenarioStep} siteApproved={siteApproved} />}
+          {!isIdle && !isMonitoring && !isAutoUpdates && <ScenarioProgressBar step={scenarioStep} siteApproved={siteApproved} />}
 
           {/* MONITORING PROGRESS PATH */}
           {isMonitoring && <MonitoringProgressBar step={scenarioStep} />}
+
+          {/* AUTO-UPDATES PROGRESS PATH */}
+          {isAutoUpdates && <AutoUpdatesProgressBar step={scenarioStep} />}
+
+          {/* AUTO-UPDATES: connected sources card */}
+          {isAutoUpdates && (isAutoConnectingStep || isAutoActive) && (
+            <div className="p-4 bg-white border border-blue-200 shadow-sm rounded-2xl animate-in slide-in-from-right-10 fade-in duration-500">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">Sources</p>
+                {isAutoActive && (
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Live
+                  </span>
+                )}
+              </div>
+              <div className="space-y-2">
+                {AUTO_UPDATE_SOURCES.map((s) => {
+                  const isConnected = autoConnectedSources.includes(s.id);
+                  const isSkipped   = autoSkippedSources.includes(s.id);
+                  const isCurrent   = currentAutoSourceId === s.id;
+                  return (
+                    <div key={s.id} className={cn(
+                      "flex items-center justify-between p-2 rounded-xl border transition-all duration-500",
+                      isConnected ? "bg-blue-50 border-blue-100"             :
+                      isSkipped   ? "bg-slate-50 border-dashed border-slate-300 opacity-70" :
+                      isCurrent   ? "bg-blue-50 border-blue-200"             :
+                                    "bg-slate-50 border-slate-100 opacity-60"
+                    )}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded bg-white shadow-sm p-0.5 border border-slate-200 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=128`}
+                            alt={s.label}
+                            className="w-full h-full object-contain"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className={cn("text-xs font-bold leading-tight",
+                            isConnected ? "text-blue-800" :
+                            isCurrent   ? "text-blue-800" :
+                            isSkipped   ? "text-slate-500" :
+                                          "text-slate-500"
+                          )}>{s.label}</p>
+                          <p className="text-[9px] text-slate-400 leading-tight">{s.sub.replace(/\s*\([^)]+\)$/, '')}</p>
+                        </div>
+                      </div>
+                      {isConnected ? <CheckCircle className="w-4 h-4 text-blue-500 animate-in zoom-in shrink-0" />          :
+                       isSkipped   ? <span className="text-[9px] font-bold text-slate-400 uppercase shrink-0">Skipped</span> :
+                       isCurrent   ? <Loader2     className="w-4 h-4 text-blue-500 animate-spin shrink-0" />                 :
+                                     <LinkIcon    className="w-3 h-3 text-slate-300 shrink-0" />}
+                    </div>
+                  );
+                })}
+              </div>
+              {isAutoActive && (
+                <p className="text-[10px] text-slate-400 leading-relaxed pt-3 mt-3 border-t border-slate-100">
+                  Syncs continuously · changes auto-published to your site
+                </p>
+              )}
+            </div>
+          )}
 
           {/* IDLE / URL INPUT / AUDIT / MONITORING: empty state */}
           {(isMonInput || isMonScanning) && (
@@ -1579,8 +2416,8 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             </div>
           )}
 
-          {/* Integrations (migration only) */}
-          {!isIdle && !isUrlInput && !isAudit && !isMonitoring && (scenarioStep !== 'orchestrator' || orchestratorTick >= 0) && (
+          {/* Integrations (improvement only) */}
+          {!isIdle && !isUrlInput && !isAudit && !isMonitoring && !isAutoUpdates && (scenarioStep !== 'orchestrator' || orchestratorTick >= 0) && (
             <div className="p-4 bg-white border border-slate-200 shadow-sm rounded-2xl animate-in slide-in-from-right-10 fade-in duration-500">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-900">Integrations</p>

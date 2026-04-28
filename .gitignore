@@ -30,3 +30,4 @@ tasks.json
 
 # Credentials
 *.txt
+dist-check*

@@ -57,7 +57,7 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
 
       {/* Page header */}
       <div>
-        <h1 className="text-3xl font-light tracking-tight text-slate-900 mb-1 flex items-center gap-3">
+        <h1 className="text-3xl font-light tracking-tight text-black mb-1 flex items-center gap-3">
           <Bot className="w-7 h-7 text-indigo-500" /> Our Team (AI)
         </h1>
         <p className="text-slate-500 text-sm">Your dedicated AI agents — working 24/7 so you don't have to.</p>

@@ -1,21 +1,41 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Zap, Eye, CheckCircle, ArrowRight } from 'lucide-react';
+import { X, Zap, Eye, CheckCircle, ArrowRight, CalendarDays, BookOpen, Database } from 'lucide-react';
 import { SchoolAfterMagic } from '../pages/SchoolAfterMagic';
+
+type Variant = 'teacher' | 'vacation';
 
 interface Props {
   onClose: () => void;
+  variant?: Variant;
 }
 
-const WHAT_WAS_DONE = [
+const TEACHER_WHAT_WAS_DONE = [
   'New faculty profile created for Mr. James Holloway',
   'Added to Team page — 10th Grade History',
   'Faculty Directory updated and re-indexed',
 ];
 
-export function AutoUpdatePreviewModal({ onClose }: Props) {
+const VACATION_WHAT_WAS_DONE = [
+  'Spring Break schedule (Apr 13–17) added to the Calendar page',
+  'Holiday Programs hub created — lessons & clubs running during the break',
+  '7 club pages updated with break-period meeting times',
+  'Homepage banner highlighting break dates and signups published',
+];
+
+export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) {
   const [showAfter, setShowAfter] = useState(true);
   const [alwaysManual, setAlwaysManual] = useState(false);
+
+  const isVacation = variant === 'vacation';
+  const whatWasDone = isVacation ? VACATION_WHAT_WAS_DONE : TEACHER_WHAT_WAS_DONE;
+  const headerLabel = isVacation ? 'Auto-Applied Update' : 'Auto-Applied Update';
+  const title = isVacation
+    ? 'Vacation Schedule & Holiday Programs Published'
+    : 'New Teacher Profile Published';
+  const toggleLabel = isVacation
+    ? 'Always require my review for calendar updates'
+    : 'Always require my review for teacher updates';
 
   return (
     <AnimatePresence>
@@ -50,9 +70,9 @@ export function AutoUpdatePreviewModal({ onClose }: Props) {
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2 text-emerald-600 text-xs font-bold tracking-wide uppercase mb-2">
                 <Zap className="w-4 h-4" />
-                Auto-Applied Update
+                {headerLabel}
               </div>
-              <h2 className="text-xl font-bold text-slate-900 leading-tight">New Teacher Profile Published</h2>
+              <h2 className="text-xl font-bold text-slate-900 leading-tight">{title}</h2>
             </div>
 
             {/* Body */}
@@ -60,27 +80,60 @@ export function AutoUpdatePreviewModal({ onClose }: Props) {
 
               {/* Source */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source</h3>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
-                    <img
-                      src="https://www.google.com/s2/favicons?domain=powerschool.com&sz=64"
-                      alt="PowerSchool"
-                      className="w-5 h-5 object-contain"
-                    />
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source{isVacation ? 's' : ''}</h3>
+                {isVacation ? (
+                  <div className="space-y-2">
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                        <img
+                          src="https://www.google.com/s2/favicons?domain=powerschool.com&sz=64"
+                          alt="PowerSchool"
+                          className="w-5 h-5 object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-700">PowerSchool <span className="text-[10px] text-slate-400 font-normal">(SIS)</span></p>
+                        <p className="text-xs text-slate-400">Academic calendar updated — Spring Break dates</p>
+                      </div>
+                      <Database className="w-4 h-4 text-blue-400 shrink-0" />
+                    </div>
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                        <img
+                          src="https://www.google.com/s2/favicons?domain=canvas.instructure.com&sz=64"
+                          alt="Canvas LMS"
+                          className="w-5 h-5 object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-700">Canvas LMS</p>
+                        <p className="text-xs text-slate-400">Holiday-period lessons &amp; clubs schedule</p>
+                      </div>
+                      <BookOpen className="w-4 h-4 text-indigo-400 shrink-0" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-700">PowerSchool</p>
-                    <p className="text-xs text-slate-400">New staff record detected · Just now</p>
+                ) : (
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                      <img
+                        src="https://www.google.com/s2/favicons?domain=powerschool.com&sz=64"
+                        alt="PowerSchool"
+                        className="w-5 h-5 object-contain"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700">PowerSchool</p>
+                      <p className="text-xs text-slate-400">New staff record detected · Just now</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* What was done */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">What Was Done</h3>
                 <ul className="space-y-3 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                  {WHAT_WAS_DONE.map((item, idx) => (
+                  {whatWasDone.map((item, idx) => (
                     <li key={idx} className="flex gap-3 text-slate-700">
                       <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                       <span className="text-sm font-medium">{item}</span>
@@ -89,22 +142,54 @@ export function AutoUpdatePreviewModal({ onClose }: Props) {
                 </ul>
               </div>
 
-              {/* Published profile card */}
+              {/* Published card */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Published Profile</h3>
-                <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
-                  <img
-                    src="https://randomuser.me/api/portraits/men/75.jpg"
-                    alt="Mr. James Holloway"
-                    className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <p className="font-bold text-slate-900 text-sm">Mr. James Holloway</p>
-                    <p className="text-xs text-indigo-600 font-semibold mt-0.5">10th Grade History</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Social Studies Department</p>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  {isVacation ? 'Published Schedule' : 'Published Profile'}
+                </h3>
+                {isVacation ? (
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-rose-400 text-white flex items-center justify-center shadow-sm shrink-0">
+                        <CalendarDays className="w-6 h-6" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-900 text-sm">Spring Break 2026</p>
+                        <p className="text-xs text-amber-600 font-semibold mt-0.5">April 13 – April 17</p>
+                        <p className="text-xs text-slate-400 mt-0.5">5 school days · Classes resume April 20</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-slate-300 ml-auto shrink-0" />
+                    </div>
+                    <div className="border-t border-slate-200 pt-3 space-y-1.5">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Running during break</p>
+                      {[
+                        { label: 'Robotics Club', time: 'Mon · Wed · 9–11am' },
+                        { label: 'Art Studio Open Hours', time: 'Tue · Thu · 10am–1pm' },
+                        { label: 'JV Soccer Practice', time: 'Daily · 3–5pm' },
+                        { label: 'College Prep Workshops', time: 'Wed · 1–3pm' },
+                      ].map(c => (
+                        <div key={c.label} className="flex items-center justify-between text-xs">
+                          <span className="text-slate-700 font-medium">{c.label}</span>
+                          <span className="text-slate-400">{c.time}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-300 ml-auto shrink-0" />
-                </div>
+                ) : (
+                  <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <img
+                      src="https://randomuser.me/api/portraits/men/75.jpg"
+                      alt="Mr. James Holloway"
+                      className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900 text-sm">Mr. James Holloway</p>
+                      <p className="text-xs text-indigo-600 font-semibold mt-0.5">10th Grade History</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Social Studies Department</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-300 ml-auto shrink-0" />
+                  </div>
+                )}
               </div>
 
             </div>
@@ -131,7 +216,7 @@ export function AutoUpdatePreviewModal({ onClose }: Props) {
               {/* Toggle row — opt into manual review */}
               <div className="flex items-center justify-between pt-1">
                 <span className="text-xs text-slate-500 font-medium leading-snug pr-4">
-                  Always require my review for teacher updates
+                  {toggleLabel}
                 </span>
                 <button
                   type="button"
@@ -181,7 +266,7 @@ export function AutoUpdatePreviewModal({ onClose }: Props) {
             <div className="flex-1 relative overflow-hidden">
               <div className="w-full h-full overflow-y-auto bg-slate-50">
                 <SchoolAfterMagic
-                  previewType="new_teacher"
+                  previewType={isVacation ? undefined : 'new_teacher'}
                   showAfter={showAfter}
                 />
               </div>

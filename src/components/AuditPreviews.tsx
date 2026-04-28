@@ -24,10 +24,46 @@ function scoreColor(n: number) {
 }
 
 // ─── Category row (used in V2 canvas) ────────────────────────────────────────
-function CategoryRow({ icon, label, score, detail }: {
-  icon: React.ReactNode; label: string; score: number; detail: string;
+function CategoryRow({ icon, label, score, prevScore, detail }: {
+  icon: React.ReactNode; label: string; score: number; prevScore?: number; detail?: string;
 }) {
   const c = scoreColor(score);
+  const delta = prevScore !== undefined ? score - prevScore : undefined;
+  const cp = prevScore !== undefined ? scoreColor(prevScore) : null;
+
+  if (prevScore !== undefined && cp) {
+    // Two-bar comparison layout
+    return (
+      <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 shrink-0">{icon}</span>
+          <span className="text-xs font-semibold text-slate-700 flex-1">{label}</span>
+          <span className="text-[10px] font-bold tabular-nums text-emerald-500">+{delta}</span>
+        </div>
+        <div className="ml-5 space-y-1">
+          {/* Before bar */}
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-slate-400 w-9 shrink-0 font-medium">Before</span>
+            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className={cn('h-full rounded-full', cp.bar)} style={{ width: `${prevScore}%` }} />
+            </div>
+            <span className={cn('text-[10px] font-bold tabular-nums w-5 text-right', cp.text)}>{prevScore}</span>
+          </div>
+          {/* Now bar */}
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-slate-400 w-9 shrink-0 font-medium">Now</span>
+            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className={cn('h-full rounded-full', c.bar)} style={{ width: `${score}%` }} />
+            </div>
+            <span className={cn('text-[10px] font-bold tabular-nums w-5 text-right', c.text)}>{score}</span>
+          </div>
+        </div>
+        {detail && <p className="text-[10px] text-slate-400 ml-5 leading-tight">{detail}</p>}
+      </div>
+    );
+  }
+
+  // Single-bar layout (used in before-audit canvas)
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2">
@@ -465,15 +501,17 @@ export function AuditCanvasV2() {
 // ─── V2: New site audit — full canvas ────────────────────────────────────────
 export function PostAuditCanvasV2() {
   const SCORE = 97;
+  const PREV_SCORE = 46;
   const c = scoreColor(SCORE);
+  const cp = scoreColor(PREV_SCORE);
   const categories = [
-    { icon: <Zap className="w-3.5 h-3.5" />,        label: 'Performance',     score: 98,  detail: 'LCP 1.2s · No blocking resources · WebP images · CDN enabled' },
-    { icon: <Eye className="w-3.5 h-3.5" />,         label: 'Accessibility',   score: 96,  detail: 'All images have alt text · WCAG 2.1 AA · All PDFs tagged' },
-    { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'Student Privacy', score: 95,  detail: 'No trackers on student pages · FERPA notice published · COPPA compliant' },
-    { icon: <Lock className="w-3.5 h-3.5" />,        label: 'Security',        score: 99,  detail: 'HTTPS enforced · No mixed content · No vulnerabilities' },
-    { icon: <Monitor className="w-3.5 h-3.5" />,     label: 'Usability',       score: 94,  detail: 'Mobile-friendly · nav OK · avg 1.4 clicks to CTA' },
-    { icon: <FileText className="w-3.5 h-3.5" />,    label: 'Content',         score: 97,  detail: 'All pages current · 0 dead links' },
-    { icon: <Search className="w-3.5 h-3.5" />,      label: 'Discoverability',     score: 100, detail: 'Meta descriptions on all pages · Google Maps verified · Sitemap live' },
+    { icon: <Zap className="w-3.5 h-3.5" />,        label: 'Performance',     score: 98,  prevScore: 38, detail: 'LCP 1.2s · No blocking resources · WebP images · CDN enabled' },
+    { icon: <Eye className="w-3.5 h-3.5" />,         label: 'Accessibility',   score: 96,  prevScore: 31, detail: 'All images have alt text · WCAG 2.1 AA · All PDFs tagged' },
+    { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'Student Privacy', score: 95,  prevScore: 45, detail: 'No trackers on student pages · FERPA notice published · COPPA compliant' },
+    { icon: <Lock className="w-3.5 h-3.5" />,        label: 'Security',        score: 99,  prevScore: 72, detail: 'HTTPS enforced · No mixed content · No vulnerabilities' },
+    { icon: <Monitor className="w-3.5 h-3.5" />,     label: 'Usability',       score: 94,  prevScore: 42, detail: 'Mobile-friendly · nav OK · avg 1.4 clicks to CTA' },
+    { icon: <FileText className="w-3.5 h-3.5" />,    label: 'Content',         score: 97,  prevScore: 40, detail: 'All pages current · 0 dead links' },
+    { icon: <Search className="w-3.5 h-3.5" />,      label: 'Discoverability', score: 100, prevScore: 52, detail: 'Meta descriptions on all pages · Google Maps verified · Sitemap live' },
   ];
   const passed = [
     'LCP 1.2s — down from 8.4s · all images WebP-optimized',
@@ -499,16 +537,46 @@ export function PostAuditCanvasV2() {
         </span>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative shrink-0">
-          <AuditGauge score={SCORE} maxScore={100} size={80} strokeWidth={8} color={c.hex} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={cn('text-2xl font-extrabold leading-none', c.text)}>{SCORE}</span>
-            <span className="text-slate-400 text-[10px]">/100</span>
+      {/* ── Before / Now gauges ── */}
+      <div className="flex items-center gap-3">
+        {/* Before */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="relative shrink-0">
+            <AuditGauge score={PREV_SCORE} maxScore={100} size={64} strokeWidth={7} color={cp.hex} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={cn('text-base font-extrabold leading-none', cp.text)}>{PREV_SCORE}</span>
+              <span className="text-slate-400 text-[9px]">/100</span>
+            </div>
           </div>
+          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Before</span>
         </div>
-        <div className="space-y-1">
-          <div className="text-sm font-bold text-slate-700">Health Score</div>
+
+        {/* Arrow + delta */}
+        <div className="flex flex-col items-center gap-0.5 flex-1">
+          <span className="text-emerald-500 font-extrabold text-base">+{SCORE - PREV_SCORE}</span>
+          <div className="flex items-center gap-1 w-full">
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-slate-300 text-xs">→</span>
+            <div className="flex-1 h-px bg-emerald-300" />
+          </div>
+          <span className="text-[9px] text-slate-400">pts improvement</span>
+        </div>
+
+        {/* Now */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="relative shrink-0">
+            <AuditGauge score={SCORE} maxScore={100} size={64} strokeWidth={7} color={c.hex} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={cn('text-base font-extrabold leading-none', c.text)}>{SCORE}</span>
+              <span className="text-slate-400 text-[9px]">/100</span>
+            </div>
+          </div>
+          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Now</span>
+        </div>
+
+        {/* All-clear badge */}
+        <div className="ml-1 space-y-1 border-l border-slate-100 pl-3">
+          <div className="text-[10px] font-bold text-slate-700">Health Score</div>
           <div className="text-[11px] text-emerald-600 font-bold">● All checks passed</div>
         </div>
       </div>

@@ -88,7 +88,7 @@ function ConnectorCard({ name, fallbackIndex, size = 'md' }: { name: string; fal
           />
         ) : initial}
       </div>
-      <span className="text-xs font-semibold text-slate-700 line-clamp-2 leading-tight">{name}</span>
+      <span className="text-sm font-medium text-slate-700 line-clamp-2 leading-tight">{name}</span>
     </div>
   );
 }
@@ -131,7 +131,7 @@ export function UtilitiesHubView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-light tracking-tight text-slate-900 mb-1">Integrations</h1>
+          <h1 className="text-3xl font-light tracking-tight text-black mb-1">Integrations</h1>
           <p className="text-slate-500 text-sm">Manage your connected data sources and browse available integrations.</p>
         </div>
         <div className="text-xs text-blue-600 font-bold cursor-pointer hover:underline bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 shrink-0">
@@ -156,8 +156,8 @@ export function UtilitiesHubView() {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-emerald-900">{conn.name}</p>
-                <p className="text-xs text-emerald-700 opacity-70">{conn.desc}</p>
+                <p className="text-sm font-semibold text-emerald-900">{conn.name}</p>
+                <p className="text-sm text-emerald-700/60">{conn.desc}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-full">
