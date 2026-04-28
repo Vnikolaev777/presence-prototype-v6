@@ -111,35 +111,14 @@ export function AppsForSchoolsView() {
               "Help every child from kindergarten to 4th grade excel in math with our proven online training program."
             </p>
 
-            {/* Stat strip — pulled from constructor.tech */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              <div className="bg-sky-50 border border-sky-100 rounded-lg px-2 py-2 text-center">
-                <div className="text-base font-extrabold text-sky-600 leading-none">25%</div>
-                <div className="text-[10px] text-slate-500 leading-tight mt-1">less math anxiety</div>
-              </div>
-              <div className="bg-sky-50 border border-sky-100 rounded-lg px-2 py-2 text-center">
-                <div className="text-base font-extrabold text-sky-600 leading-none">45%</div>
-                <div className="text-[10px] text-slate-500 leading-tight mt-1">more correct answers</div>
-              </div>
-              <div className="bg-sky-50 border border-sky-100 rounded-lg px-2 py-2 text-center">
-                <div className="text-base font-extrabold text-sky-600 leading-none">100k+</div>
-                <div className="text-[10px] text-slate-500 leading-tight mt-1">parents trust it</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button className="flex-1 flex items-center justify-center gap-1 bg-sky-500 text-white px-4 py-2.5 rounded-full text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm whitespace-nowrap">
-                Add Calcularis <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-              <a
-                href="https://constructor.tech/products/learning/practice/calcularis/schools"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-bold text-sky-600 hover:text-sky-700 px-3 py-2.5 whitespace-nowrap"
-              >
-                Learn more
-              </a>
-            </div>
+            <a
+              href="https://constructor.tech/products/learning/practice/calcularis/schools"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-1.5 bg-sky-500 text-white px-4 py-2.5 rounded-full text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm"
+            >
+              Learn more <ArrowRight className="w-3.5 h-3.5" />
+            </a>
           </div>
         </div>
       </div>
