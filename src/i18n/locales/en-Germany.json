@@ -13,5 +13,8 @@
   "workspace.monitoringSetup.subtitleActive": "Connecting topic feeds for Primarschule Rosenbach",
   "workspace.topic.district.sub": "Rosenbach School District feed",
   "knowledge.website.preview.subtitle": "rosenbach.de · Current version",
-  "knowledge.school.fact.0": "Primarschule Rosenbach, founded 1978, public primary school in Rosenbach."
+  "knowledge.school.fact.0": "Primarschule Rosenbach, founded 1978, public primary school in Rosenbach.",
+
+  "dashboard.fixture.autoUpdate.0.title": "New Teacher Profile Published",
+  "dashboard.fixture.autoUpdate.0.detail": "Li Chen joined as Maths teacher for Class 4b. Profile page created and added to the Faculty Directory."
 }

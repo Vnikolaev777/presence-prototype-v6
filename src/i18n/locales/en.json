@@ -956,7 +956,5 @@
   "dashboard.review.weather.preview.tab.email": "Email",
   "dashboard.review.weather.preview.title": "Weather Alert Preview",
   "dashboard.review.weather.preview.sub": "How parents will see the alert across each channel",
-  "dashboard.review.weather.actionPublish": "Publish Alert",
-  "dashboard.fixture.autoUpdate.0.dach.title": "New Teacher Profile Published",
-  "dashboard.fixture.autoUpdate.0.dach.detail": "Li Chen joined as Maths teacher for Class 4b. Profile page created and added to the Faculty Directory."
+  "dashboard.review.weather.actionPublish": "Publish Alert"
 }

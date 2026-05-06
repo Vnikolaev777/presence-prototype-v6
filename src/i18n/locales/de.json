@@ -956,7 +956,5 @@
   "dashboard.review.weather.preview.tab.email": "E-Mail",
   "dashboard.review.weather.preview.title": "Vorschau: Unwetterwarnung",
   "dashboard.review.weather.preview.sub": "So sehen Eltern die Warnung auf jedem Kanal",
-  "dashboard.review.weather.actionPublish": "Warnung veröffentlichen",
-  "dashboard.fixture.autoUpdate.0.dach.title": "Neues Lehrprofil veröffentlicht",
-  "dashboard.fixture.autoUpdate.0.dach.detail": "Li Chen ist neu als Mathematik-Lehrkraft der Klasse 4b. Profilseite erstellt und im Kollegiumsverzeichnis ergänzt."
+  "dashboard.review.weather.actionPublish": "Warnung veröffentlichen"
 }

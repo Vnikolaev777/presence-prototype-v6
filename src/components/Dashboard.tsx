@@ -147,10 +147,8 @@ const AUTO_UPDATES: AutoUpdate[] = [
 // ─── Auto-update row component ──────────────────────────────────────────────
 function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void }) {
   const t = useT();
-  const region = useRegion();
-  const isDACH = region.id === 'DACH';
-  const titleKey  = isDACH && item.id === 'au_0' ? 'dashboard.fixture.autoUpdate.0.dach.title'  : item.titleKey;
-  const detailKey = isDACH && item.id === 'au_0' ? 'dashboard.fixture.autoUpdate.0.dach.detail' : item.detailKey;
+  const titleKey  = item.titleKey;
+  const detailKey = item.detailKey;
   return (
     <div className="flex gap-3 items-start py-3 px-4 hover:bg-slate-50 transition-colors rounded-xl group">
       {/* Source favicon(s) or fallback icon */}
