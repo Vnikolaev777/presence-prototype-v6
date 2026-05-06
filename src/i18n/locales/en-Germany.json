@@ -1,2 +1,17 @@
 {
+  "workspace.narration.improve.finding.0": "Current structure, page hierarchy, and assets are mapped — full report in the Audit tab.",
+  "workspace.narration.improve.finding.1": "Visitors struggle to navigate on mobile, content is hard to read, and the site loads slowly.",
+  "workspace.narration.improve.finding.2": "Missing Impressum, no Datenschutzerklärung, Google Fonts loaded from external servers — DSGVO and BITV 2.0 issues.",
+  "workspace.narration.improve.fixOffer": "We can fix all of this — including bringing the site into DSGVO and BITV 2.0 compliance. Want me to go ahead?",
+  "workspace.narration.improve.siteLive": "🎉 Your new site is live at a temporary Presence URL. Ready to connect your own domain and make it official?",
+  "workspace.narration.improve.hiringLine.0": "Automatic updates from DaNiS — student records, class rosters, and enrollment data, ready to publish.",
+  "workspace.narration.improve.hiringLine.1": "News drafts generated from external events and school feeds, waiting for your approval.",
+  "workspace.narration.improve.hiringLine.2": "Accessibility and compliance reports flagging any issues against BITV 2.0 and DSGVO standards.",
+  "workspace.narration.improve.connected": "{name} connected! You can add more systems — WebUntis, IServ, shared folders — anytime from the Integrations tab.",
+  "workspace.narration.mon.preselected": "I've pre-selected 6 relevant topic categories for Primarschule Rosenbach. Tap to adjust, then activate when you're ready.",
+  "workspace.narration.mon.settingUp": "Setting up {count} monitoring source{plural} for Primarschule Rosenbach — connecting feeds now...",
+  "workspace.monitoringSetup.subtitleActive": "Connecting topic feeds for Primarschule Rosenbach",
+  "workspace.topic.district.sub": "Rosenbach School District feed",
+  "knowledge.website.preview.subtitle": "rosenbach.de · Current version",
+  "knowledge.school.fact.0": "Primarschule Rosenbach, founded 1978, public primary school in Rosenbach."
 }

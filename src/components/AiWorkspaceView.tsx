@@ -1523,7 +1523,10 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const region = useRegion();
   const isGermany = region.id === 'Germany';
   const TARGET_URL = isGermany ? 'https://rosenbach.de' : 'https://oakwoodhigh.org';
-  const auditLang = locale.language === 'de' ? 'de' : 'en';
+  const auditLang: import('./AuditPreviews').AuditLang =
+    locale.language === 'de' ? 'de' : 'en';
+  const auditRegion: import('./AuditPreviews').AuditRegion =
+    isGermany ? 'DACH' : 'US';
 
   // Scale site previews to fit the center column
   const centerColRef = useRef<HTMLDivElement>(null);
@@ -2484,7 +2487,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             </div>
             {/* Content */}
             {auditTab === 'audit' && (isAudit || scenarioStep === 'generation') ? (
-              <AuditCanvasV2 lang={auditLang} />
+              <AuditCanvasV2 lang={auditLang} region={auditRegion} />
             ) : (
               <div className="flex-1 min-h-0 overflow-auto bg-white">
                 <div className="sticky top-0 z-10 bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center text-xs text-amber-700 font-medium">
@@ -2535,7 +2538,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               </button>
             </div>
             {auditTab === 'audit' ? (
-              <AuditCanvasV2 lang={auditLang} />
+              <AuditCanvasV2 lang={auditLang} region={auditRegion} />
             ) : (
               <div className="flex-1 min-h-0 overflow-auto bg-white">
                 <div className="sticky top-0 z-10 bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center text-xs text-amber-700 font-medium">
@@ -2583,7 +2586,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             </div>
             {/* Content */}
             {centerTab === 'audit' && siteApproved ? (
-              <PostAuditCanvasV2 lang={auditLang} />
+              <PostAuditCanvasV2 lang={auditLang} region={auditRegion} />
             ) : (
               <div className="flex-1 min-h-0 overflow-auto bg-white">
                 <DemoSiteAfter siteScale={siteScale} />

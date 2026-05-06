@@ -375,9 +375,14 @@ export function PostAuditChatCardV2() {
 }
 
 // ─── Locale data for V2 canvases ─────────────────────────────────────────────
-export type AuditLang = 'en' | 'de';
+// lang  → display language:  'en' | 'de'
+// region → compliance regime: 'US' | 'DACH'
+// Locale key = `${lang}-${region}` (mirrors the project's en-DACH.json pattern)
+export type AuditLang   = 'en' | 'de';
+export type AuditRegion = 'US' | 'DACH';
+type AuditLocaleKey = 'en-US' | 'en-DACH' | 'de-DACH';
 
-const AUDIT_LOCALE: Record<AuditLang, {
+const AUDIT_LOCALE: Record<AuditLocaleKey, {
   auditTitle: string; newAuditTitle: string; domain: string;
   needsImprovement: string; excellent: string;
   healthScore: string; allChecksPassed: string;
@@ -392,7 +397,7 @@ const AUDIT_LOCALE: Record<AuditLang, {
   complianceAfter:  { law: string; sub: string; status: ComplianceStatus }[];
   passed: string[];
 }> = {
-  en: {
+  'en-US': {
     auditTitle: 'Site Audit Report',
     newAuditTitle: 'New Site Audit Report',
     domain: 'oakwoodhigh.org · April 2026',
@@ -450,7 +455,7 @@ const AUDIT_LOCALE: Record<AuditLang, {
       'All tracking pixels removed from student-facing pages',
     ],
   },
-  de: {
+  'de-DACH': {
     auditTitle: 'Website-Audit-Bericht',
     newAuditTitle: 'Neuer Website-Audit-Bericht',
     domain: 'oakwoodhigh.de · April 2026',
@@ -508,11 +513,75 @@ const AUDIT_LOCALE: Record<AuditLang, {
       'Alle Tracking-Pixel von schülerbezogenen Seiten entfernt',
     ],
   },
+
+  // ── English language, DACH region ────────────────────────────────────────
+  // English UI text + DACH compliance regime (BITV 2.0, DSGVO, §5 TMG)
+  // category `key` values must match BASE_SCORES keys — only `label` changes per region
+  'en-DACH': {
+    auditTitle: 'Site Audit Report',
+    newAuditTitle: 'New Site Audit Report',
+    domain: 'oakwoodhigh.de · April 2026',
+    needsImprovement: 'Needs Improvement',
+    excellent: 'Excellent',
+    healthScore: 'Health Score',
+    allChecksPassed: '● All checks passed',
+    critical: 'critical', warning: 'warning', warnings: 'warnings',
+    ptsImprovement: 'pts improvement',
+    before: 'Before', now: 'Now',
+    categoryScoresTitle: 'Category Scores',
+    comparisonLegend: 'Previous score · current score in green',
+    complianceTitle: 'Compliance',
+    keyImprovementsTitle: 'Key Improvements',
+    saveLbl: 'Save', shareLbl: 'Share', viewFullReportLbl: 'View Full Report',
+    categories: [
+      // key must match BASE_SCORES — label is the DACH-region display name in English
+      { key: 'Performance',     label: 'Performance',   beforeDetail: 'LCP 8.4s · Images unoptimized',                                           afterDetail: 'LCP 1.2s · No blocking resources · WebP images · CDN enabled' },
+      { key: 'Accessibility',   label: 'Accessibility', beforeDetail: '19 untagged PDFs · Missing alt text · No BITV statement',                 afterDetail: 'All images have alt text · BITV 2.0 / WCAG 2.1 AA · All PDFs tagged' },
+      { key: 'Student Privacy', label: 'Data Privacy',  beforeDetail: 'No DSGVO notice · Google Fonts external call · no cookie consent',        afterDetail: 'DSGVO notice published · system fonts · cookie consent active' },
+      { key: 'Security',        label: 'Security',      beforeDetail: 'HTTPS present · Mixed content on 3 pages · 2 warnings',                   afterDetail: 'HTTPS enforced · No mixed content · No vulnerabilities' },
+      { key: 'Usability',       label: 'Usability',     beforeDetail: 'Not mobile-friendly · nav confusing · avg 4.2 clicks to CTA',             afterDetail: 'Mobile-friendly · nav OK · avg 1.4 clicks to CTA' },
+      { key: 'Content',         label: 'Content',       beforeDetail: '18 pages outdated · 6 dead links',                                        afterDetail: 'All pages current · 0 dead links' },
+      { key: 'Discoverability', label: 'Discoverability', beforeDetail: 'No meta descriptions · Not indexed · Missing sitemap',                  afterDetail: 'Meta descriptions on all pages · Indexed · Sitemap live' },
+    ],
+    issues: [
+      // category values that match BASE_SCORES keys affect scores; others only add to counts
+      { tag: 'blocker', category: 'Accessibility',   text: 'PDF policies not screen-reader accessible — BITV 2.0 / WCAG 2.1 AA required' },
+      { tag: 'blocker', category: 'Accessibility',   text: 'No accessibility statement published — required under BITV 2.0' },
+      { tag: 'privacy', category: 'Student Privacy', text: 'Google Fonts loaded from external server — nDSG / DSGVO violation' },
+      { tag: 'privacy', category: 'Student Privacy', text: 'Google Analytics UA snippet — no consent mechanism, DSGVO risk' },
+      { tag: 'high',    category: 'Performance',     text: 'LCP 8.4s on enrollment page · hero image 4.2 MB unoptimized' },
+      { tag: 'blocker', category: 'Forms',           text: 'Enrollment form has no ARIA labels — keyboard navigation impossible' },
+      { tag: 'blocker', category: 'Navigation',      text: 'Skip-to-content link missing — screen readers cannot bypass nav' },
+      { tag: 'privacy', category: 'Legal',           text: 'No Datenschutzerklärung link in footer — legally required in Germany' },
+      { tag: 'high',    category: 'Mobile',          text: 'Hamburger menu unresponsive on iOS — touch target below 44×44px minimum' },
+      { tag: 'high',    category: 'Links',           text: '6 broken internal links on About and Staff pages' },
+      { tag: 'blocker', category: 'Legal',           text: 'No Impressum page — required under §5 TMG for German school websites' },
+    ],
+    complianceBefore: [
+      { law: 'BITV 2.0 · WCAG 2.1 AA', sub: 'Digital accessibility for public bodies',     status: 'non-compliant' },
+      { law: 'DSGVO (Art. 13 & 14)',    sub: 'Privacy notices, consent, data processing',   status: 'partial' },
+      { law: 'nDSG / TTDSG',            sub: 'Cookie consent and third-party tracking',      status: 'at-risk' },
+      { law: '§5 TMG',                  sub: 'Impressum obligation for German websites',      status: 'non-compliant' },
+    ],
+    complianceAfter: [
+      { law: 'BITV 2.0 · WCAG 2.1 AA', sub: 'Digital accessibility for public bodies',     status: 'compliant' },
+      { law: 'DSGVO (Art. 13 & 14)',    sub: 'Privacy notices, consent, data processing',   status: 'compliant' },
+      { law: 'nDSG / TTDSG',            sub: 'Cookie consent and third-party tracking',      status: 'compliant' },
+      { law: '§5 TMG',                  sub: 'Impressum obligation for German websites',      status: 'compliant' },
+    ],
+    passed: [
+      'LCP 1.2s — down from 8.4s · all images WebP-optimised',
+      '19 PDFs fully tagged and screen-reader accessible (BITV 2.0)',
+      'Accessibility statement with complaint contact published',
+      'Google Fonts replaced with system fonts — no external data transfer',
+    ],
+  },
 };
 
 // ─── V2: Current site audit — full canvas ────────────────────────────────────
-export function AuditCanvasV2({ lang = 'en' }: { lang?: AuditLang }) {
-  const L = AUDIT_LOCALE[lang];
+export function AuditCanvasV2({ lang = 'en', region = 'US' }: { lang?: AuditLang; region?: AuditRegion }) {
+  const key: AuditLocaleKey = lang === 'de' ? 'de-DACH' : region === 'DACH' ? 'en-DACH' : 'en-US';
+  const L = AUDIT_LOCALE[key];
   const PENALTIES: Record<string, number> = { blocker: 20, privacy: 15, high: 10 };
   const { issues } = L;
 
@@ -608,8 +677,9 @@ export function AuditCanvasV2({ lang = 'en' }: { lang?: AuditLang }) {
 }
 
 // ─── V2: New site audit — full canvas ────────────────────────────────────────
-export function PostAuditCanvasV2({ lang = 'en' }: { lang?: AuditLang }) {
-  const L = AUDIT_LOCALE[lang];
+export function PostAuditCanvasV2({ lang = 'en', region = 'US' }: { lang?: AuditLang; region?: AuditRegion }) {
+  const key: AuditLocaleKey = lang === 'de' ? 'de-DACH' : region === 'DACH' ? 'en-DACH' : 'en-US';
+  const L = AUDIT_LOCALE[key];
   const SCORE = 97;
   const PREV_SCORE = 46;
   const c = scoreColor(SCORE);
@@ -768,32 +838,47 @@ export function AuditPreviewPage() {
           </div>
         </div>
 
-        {/* EN canvases */}
+        {/* EN × US */}
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇺🇸 English — full canvas panels</p>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇺🇸 English · US region — ADA / FERPA / COPPA / CIPA</p>
           <div className="flex gap-6 flex-wrap items-start">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
-              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">AuditCanvasV2 lang="en" — 46/100</div>
-              <AuditCanvasV2 lang="en" />
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">lang="en" region="US"</div>
+              <AuditCanvasV2 lang="en" region="US" />
             </div>
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
-              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">PostAuditCanvasV2 lang="en" — 97/100</div>
-              <PostAuditCanvasV2 lang="en" />
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">lang="en" region="US" (after)</div>
+              <PostAuditCanvasV2 lang="en" region="US" />
             </div>
           </div>
         </div>
 
-        {/* DE canvases */}
+        {/* EN × DACH */}
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇩🇪 Deutsch — Vollansicht</p>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇩🇪 English · DACH region — BITV 2.0 / DSGVO / §5 TMG</p>
           <div className="flex gap-6 flex-wrap items-start">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
-              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">AuditCanvasV2 lang="de" — 46/100</div>
-              <AuditCanvasV2 lang="de" />
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">lang="en" region="DACH"</div>
+              <AuditCanvasV2 lang="en" region="DACH" />
             </div>
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
-              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">PostAuditCanvasV2 lang="de" — 97/100</div>
-              <PostAuditCanvasV2 lang="de" />
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">lang="en" region="DACH" (after)</div>
+              <PostAuditCanvasV2 lang="en" region="DACH" />
+            </div>
+          </div>
+        </div>
+
+        {/* DE × DACH */}
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇩🇪 Deutsch · DACH-Region — BITV 2.0 / DSGVO / §5 TMG</p>
+          <div className="flex gap-6 flex-wrap items-start">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">lang="de" region="DACH"</div>
+              <AuditCanvasV2 lang="de" region="DACH" />
+            </div>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">lang="de" region="DACH" (after)</div>
+              <PostAuditCanvasV2 lang="de" region="DACH" />
             </div>
           </div>
         </div>
