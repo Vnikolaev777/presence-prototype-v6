@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Bot, Code2, PenTool, BrainCircuit, Zap, GraduationCap, Activity, Globe, Database, CheckCircle, Clock, AlertTriangle, Settings, Sliders, Bell, ShieldCheck } from 'lucide-react';
+import { Bot, Code2, PenTool, BrainCircuit, Zap, GraduationCap, Activity, Globe, AlertTriangle, Sliders, Bell, ShieldCheck, CheckCircle, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { useT } from '../lib/i18n';
 
 interface Props {
   agents: any[];
@@ -12,44 +13,83 @@ interface Props {
 type SubTab = 'team' | 'activity' | 'settings';
 
 // ─── Mock activity log ───────────────────────────────────────────────────────
-const ACTIVITY_LOG = [
-  { agent: 'CC', agentName: 'Content Creator', color: 'bg-emerald-100 text-emerald-700', icon: <PenTool className="w-3.5 h-3.5"/>, action: 'Drafted blog post: "Oakwood Excels at State Science Fair"', status: 'pending_review', time: '2 min ago' },
-  { agent: 'WA', agentName: 'Web Admin', color: 'bg-blue-100 text-blue-700', icon: <Code2 className="w-3.5 h-3.5"/>, action: 'Detected 300% traffic spike → recommended Quick Links widget', status: 'pending_review', time: '4 min ago' },
-  { agent: 'WA', agentName: 'Web Admin', color: 'bg-blue-100 text-blue-700', icon: <Code2 className="w-3.5 h-3.5"/>, action: 'Ran accessibility scan — 0 issues found', status: 'auto_applied', time: '18 min ago' },
-  { agent: 'CC', agentName: 'Content Creator', color: 'bg-emerald-100 text-emerald-700', icon: <PenTool className="w-3.5 h-3.5"/>, action: 'Generated parent newsletter for October (awaiting approval)', status: 'pending_review', time: '1 hr ago' },
-  { agent: 'WA', agentName: 'Web Admin', color: 'bg-blue-100 text-blue-700', icon: <Code2 className="w-3.5 h-3.5"/>, action: 'Synced faculty directory from PowerSchool', status: 'auto_applied', time: '1 hr ago' },
-  { agent: 'CC', agentName: 'Content Creator', color: 'bg-emerald-100 text-emerald-700', icon: <PenTool className="w-3.5 h-3.5"/>, action: 'Indexed 14 new district announcements from MoE feed', status: 'auto_applied', time: '2 hrs ago' },
-  { agent: 'WA', agentName: 'Web Admin', color: 'bg-blue-100 text-blue-700', icon: <Code2 className="w-3.5 h-3.5"/>, action: 'Updated Parent Handbook link (new version detected in Drive)', status: 'auto_applied', time: '3 hrs ago' },
-  { agent: 'WA', agentName: 'Web Admin', color: 'bg-blue-100 text-blue-700', icon: <Code2 className="w-3.5 h-3.5"/>, action: 'Fixed 2 broken navigation links', status: 'auto_applied', time: 'Yesterday' },
+// Action and time strings reuse the tasks.* keys defined in TasksView since
+// they're identical fixtures.
+type ActivityEntry = {
+  agentKey: string;
+  color: string;
+  icon: React.ReactNode;
+  actionKey: string;
+  timeKey: string;
+  status: 'pending_review' | 'auto_applied';
+};
+
+const ACTIVITY_LOG: ActivityEntry[] = [
+  { agentKey: 'ourTeam.activity.agent.contentCreator', color: 'bg-emerald-100 text-emerald-700', icon: <PenTool className="w-3.5 h-3.5"/>, actionKey: 'tasks.contentCreator.t0.action', timeKey: 'tasks.time.2MinAgo',  status: 'pending_review' },
+  { agentKey: 'ourTeam.activity.agent.webAdmin',       color: 'bg-blue-100 text-blue-700',       icon: <Code2 className="w-3.5 h-3.5"/>,    actionKey: 'tasks.webAdmin.t0.action',       timeKey: 'tasks.time.4MinAgo',  status: 'pending_review' },
+  { agentKey: 'ourTeam.activity.agent.webAdmin',       color: 'bg-blue-100 text-blue-700',       icon: <Code2 className="w-3.5 h-3.5"/>,    actionKey: 'tasks.webAdmin.t1.action',       timeKey: 'tasks.time.18MinAgo', status: 'auto_applied' },
+  { agentKey: 'ourTeam.activity.agent.contentCreator', color: 'bg-emerald-100 text-emerald-700', icon: <PenTool className="w-3.5 h-3.5"/>, actionKey: 'tasks.contentCreator.t1.action', timeKey: 'tasks.time.1HrAgo',   status: 'pending_review' },
+  { agentKey: 'ourTeam.activity.agent.webAdmin',       color: 'bg-blue-100 text-blue-700',       icon: <Code2 className="w-3.5 h-3.5"/>,    actionKey: 'tasks.webAdmin.t2.action',       timeKey: 'tasks.time.1HrAgo',   status: 'auto_applied' },
+  { agentKey: 'ourTeam.activity.agent.contentCreator', color: 'bg-emerald-100 text-emerald-700', icon: <PenTool className="w-3.5 h-3.5"/>, actionKey: 'tasks.contentCreator.t2.action', timeKey: 'tasks.time.2HrAgo',   status: 'auto_applied' },
+  { agentKey: 'ourTeam.activity.agent.webAdmin',       color: 'bg-blue-100 text-blue-700',       icon: <Code2 className="w-3.5 h-3.5"/>,    actionKey: 'tasks.webAdmin.t3.action',       timeKey: 'tasks.time.3HrAgo',   status: 'auto_applied' },
+  { agentKey: 'ourTeam.activity.agent.webAdmin',       color: 'bg-blue-100 text-blue-700',       icon: <Code2 className="w-3.5 h-3.5"/>,    actionKey: 'tasks.webAdmin.t4.action',       timeKey: 'tasks.time.yesterday', status: 'auto_applied' },
+];
+
+// ─── Skill chip arrays ───────────────────────────────────────────────────────
+const WA_SKILL_KEYS = [
+  'ourTeam.cv.webAdmin.skill.0',
+  'ourTeam.cv.webAdmin.skill.1',
+  'ourTeam.cv.webAdmin.skill.2',
+  'ourTeam.cv.webAdmin.skill.3',
+  'ourTeam.cv.webAdmin.skill.4',
+  'ourTeam.cv.webAdmin.skill.5',
+];
+
+const CC_SKILL_KEYS = [
+  'ourTeam.cv.contentCreator.skill.0',
+  'ourTeam.cv.contentCreator.skill.1',
+  'ourTeam.cv.contentCreator.skill.2',
+  'ourTeam.cv.contentCreator.skill.3',
+  'ourTeam.cv.contentCreator.skill.4',
+  'ourTeam.cv.contentCreator.skill.5',
 ];
 
 // ─── Settings data ────────────────────────────────────────────────────────────
+const NOTIFICATION_SETTINGS = [
+  { labelKey: 'ourTeam.settings.notifications.0', enabled: true  },
+  { labelKey: 'ourTeam.settings.notifications.1', enabled: true  },
+  { labelKey: 'ourTeam.settings.notifications.2', enabled: false },
+];
+
 const AGENT_SETTINGS = [
   {
-    agent: 'Web Admin Agent', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100',
+    headingKey: 'ourTeam.settings.webAdmin.heading',
+    color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100',
     icon: <Code2 className="w-4 h-4" />,
     settings: [
-      { label: 'Auto-fix broken links',         enabled: true  },
-      { label: 'Accessibility scans (daily)',    enabled: true  },
-      { label: 'SIS directory auto-sync',        enabled: true  },
-      { label: 'Performance monitoring',         enabled: true  },
-      { label: 'Auto-deploy widget suggestions', enabled: false },
+      { labelKey: 'ourTeam.settings.webAdmin.toggle.0', enabled: true  },
+      { labelKey: 'ourTeam.settings.webAdmin.toggle.1', enabled: true  },
+      { labelKey: 'ourTeam.settings.webAdmin.toggle.2', enabled: true  },
+      { labelKey: 'ourTeam.settings.webAdmin.toggle.3', enabled: true  },
+      { labelKey: 'ourTeam.settings.webAdmin.toggle.4', enabled: false },
     ]
   },
   {
-    agent: 'Content Creator Agent', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100',
+    headingKey: 'ourTeam.settings.contentCreator.heading',
+    color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100',
     icon: <PenTool className="w-4 h-4" />,
     settings: [
-      { label: 'Draft blog posts from inbox',       enabled: true  },
-      { label: 'Monitor district news feeds',       enabled: true  },
-      { label: 'Auto-generate parent newsletters',  enabled: false },
-      { label: 'Social media caption drafts',       enabled: false },
-      { label: 'Translate content to Spanish',      enabled: true  },
+      { labelKey: 'ourTeam.settings.contentCreator.toggle.0', enabled: true  },
+      { labelKey: 'ourTeam.settings.contentCreator.toggle.1', enabled: true  },
+      { labelKey: 'ourTeam.settings.contentCreator.toggle.2', enabled: false },
+      { labelKey: 'ourTeam.settings.contentCreator.toggle.3', enabled: false },
+      { labelKey: 'ourTeam.settings.contentCreator.toggle.4', enabled: true  },
     ]
   }
 ];
 
-export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Props) {
+export function OurTeamView({ autoUpdatesCount }: Props) {
+  const t = useT();
   const [subTab, setSubTab] = useState<SubTab>('team');
 
   return (
@@ -58,33 +98,33 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
       {/* Page header */}
       <div>
         <h1 className="text-3xl font-light tracking-tight text-black mb-1 flex items-center gap-3">
-          <Bot className="w-7 h-7 text-indigo-500" /> Our Team (AI)
+          <Bot className="w-7 h-7 text-indigo-500" /> {t('ourTeam.title')}
         </h1>
-        <p className="text-slate-500 text-sm">Your dedicated AI agents — working 24/7 so you don't have to.</p>
+        <p className="text-slate-500 text-sm">{t('ourTeam.subtitle')}</p>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard title="Active Agents"      value={2}           icon={<Activity  className="text-emerald-500 w-5 h-5" />} />
-        <StatCard title="Auto-Updates Today" value={autoUpdatesCount || 5} icon={<Globe    className="text-blue-500 w-5 h-5" />} />
-        <StatCard title="Pending Reviews"    value={2}           icon={<AlertTriangle className="text-amber-500 w-5 h-5" />} />
-        <StatCard title="Uptime"             value="100%"        icon={<ShieldCheck className="text-indigo-500 w-5 h-5" />} />
+        <StatCard title={t('ourTeam.stats.activeAgents')}      value={2}                     icon={<Activity      className="text-emerald-500 w-5 h-5" />} />
+        <StatCard title={t('ourTeam.stats.autoUpdatesToday')}  value={autoUpdatesCount || 5} icon={<Globe         className="text-blue-500 w-5 h-5" />} />
+        <StatCard title={t('ourTeam.stats.pendingReviews')}    value={2}                     icon={<AlertTriangle className="text-amber-500 w-5 h-5" />} />
+        <StatCard title={t('ourTeam.stats.uptime')}            value="100%"                  icon={<ShieldCheck   className="text-indigo-500 w-5 h-5" />} />
       </div>
 
       {/* Sub-tabs */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
-        {(['team', 'activity', 'settings'] as SubTab[]).map(t => (
+        {(['team', 'activity', 'settings'] as SubTab[]).map(tab => (
           <button
-            key={t}
-            onClick={() => setSubTab(t)}
+            key={tab}
+            onClick={() => setSubTab(tab)}
             className={cn(
-              "px-5 py-2 rounded-lg text-sm font-semibold transition-all capitalize",
-              subTab === t
+              "px-5 py-2 rounded-lg text-sm font-semibold transition-all",
+              subTab === tab
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
             )}
           >
-            {t === 'team' ? 'Our Team' : t === 'activity' ? 'Activity Log' : 'Settings'}
+            {tab === 'team' ? t('ourTeam.tab.team') : tab === 'activity' ? t('ourTeam.tab.activity') : t('ourTeam.tab.settings')}
           </button>
         ))}
       </div>
@@ -104,25 +144,25 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
                     <Code2 className="w-12 h-12 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold">W.A. "Admin" Turing</h2>
-                    <p className="text-blue-100 font-medium text-lg">Senior Systems Architect & Widget Optimizer</p>
+                    <h2 className="text-3xl font-bold">{t('ourTeam.cv.webAdmin.name')}</h2>
+                    <p className="text-blue-100 font-medium text-lg">{t('ourTeam.cv.webAdmin.title')}</p>
                     <div className="flex gap-2 mt-3">
-                      <span className="bg-blue-500/50 px-3 py-1 rounded-full text-xs font-bold border border-blue-400">24/7 Availability</span>
-                      <span className="bg-blue-500/50 px-3 py-1 rounded-full text-xs font-bold border border-blue-400">Zero Bugs Policy</span>
+                      <span className="bg-blue-500/50 px-3 py-1 rounded-full text-xs font-bold border border-blue-400">{t('ourTeam.cv.webAdmin.tag.0')}</span>
+                      <span className="bg-blue-500/50 px-3 py-1 rounded-full text-xs font-bold border border-blue-400">{t('ourTeam.cv.webAdmin.tag.1')}</span>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="p-8 space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Objective</h3>
-                  <p className="text-slate-700 leading-relaxed font-medium">To guarantee 100% uptime, pixel-perfect layouts, and instant backend integrations for schools worldwide while processing 50,000 React components before breakfast.</p>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">{t('ourTeam.cv.objective')}</h3>
+                  <p className="text-slate-700 leading-relaxed font-medium">{t('ourTeam.cv.webAdmin.objective')}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Technical Skills</h3>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">{t('ourTeam.cv.webAdmin.skillsHeading')}</h3>
                   <div className="flex flex-wrap gap-2">
-                    {['TypeScript', 'React', 'WCAG Accessibility', 'SIS Integrations', 'CSS Grid Magic', 'Infinite Scalability'].map(s => (
-                      <span key={s} className="px-3 py-1 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg">{s}</span>
+                    {WA_SKILL_KEYS.map(k => (
+                      <span key={k} className="px-3 py-1 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg">{t(k)}</span>
                     ))}
                   </div>
                 </div>
@@ -139,25 +179,25 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
                     <PenTool className="w-12 h-12 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold">C.C. Wordsworth</h2>
-                    <p className="text-emerald-100 font-medium text-lg">Chief Content & Vibe Officer</p>
+                    <h2 className="text-3xl font-bold">{t('ourTeam.cv.contentCreator.name')}</h2>
+                    <p className="text-emerald-100 font-medium text-lg">{t('ourTeam.cv.contentCreator.title')}</p>
                     <div className="flex gap-2 mt-3">
-                      <span className="bg-emerald-500/50 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400">Pulitzer-Ready</span>
-                      <span className="bg-emerald-500/50 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400">Typo-Free</span>
+                      <span className="bg-emerald-500/50 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400">{t('ourTeam.cv.contentCreator.tag.0')}</span>
+                      <span className="bg-emerald-500/50 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400">{t('ourTeam.cv.contentCreator.tag.1')}</span>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="p-8 space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Objective</h3>
-                  <p className="text-slate-700 leading-relaxed font-medium">To craft compelling narratives, draft engaging newsletters, and ensure your school's brand voice is consistently enthusiastic, professional, and entirely free of writer's block.</p>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">{t('ourTeam.cv.objective')}</h3>
+                  <p className="text-slate-700 leading-relaxed font-medium">{t('ourTeam.cv.contentCreator.objective')}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Core Competencies</h3>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">{t('ourTeam.cv.contentCreator.skillsHeading')}</h3>
                   <div className="flex flex-wrap gap-2">
-                    {['Creative Writing', 'SEO Domination', 'Empathy Simulation', 'Grammar Enforcement', 'Meme Translation', 'Tone Tuning'].map(s => (
-                      <span key={s} className="px-3 py-1 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg">{s}</span>
+                    {CC_SKILL_KEYS.map(k => (
+                      <span key={k} className="px-3 py-1 text-xs font-bold bg-slate-100 text-slate-600 rounded-lg">{t(k)}</span>
                     ))}
                   </div>
                 </div>
@@ -167,8 +207,8 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
 
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center max-w-2xl mx-auto shadow-sm">
             <GraduationCap className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-            <h3 className="font-bold text-slate-800">Education Background</h3>
-            <p className="text-sm text-slate-500 mt-1">Both agents hold honorary doctorates in Machine Learning from the server racks of a massive data center. Trained on the sum of all human knowledge, but somehow still very passionate about high school extracurriculars.</p>
+            <h3 className="font-bold text-slate-800">{t('ourTeam.cv.education.heading')}</h3>
+            <p className="text-sm text-slate-500 mt-1">{t('ourTeam.cv.education.body')}</p>
           </div>
         </div>
       )}
@@ -176,7 +216,7 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
       {/* ── ACTIVITY LOG TAB ──────────────────────────────────────────────── */}
       {subTab === 'activity' && (
         <div className="animate-in fade-in duration-500 space-y-3">
-          <p className="text-xs text-slate-400 font-semibold uppercase tracking-widest mb-4">Last 24 hours</p>
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-widest mb-4">{t('ourTeam.activity.heading')}</p>
           {ACTIVITY_LOG.map((entry, i) => (
             <motion.div
               key={i}
@@ -190,21 +230,21 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-slate-500">{entry.agentName}</span>
+                  <span className="text-xs font-bold text-slate-500">{t(entry.agentKey)}</span>
                   <span className="text-slate-200">·</span>
                   <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> {entry.time}
+                    <Clock className="w-3 h-3" /> {t(entry.timeKey)}
                   </span>
                 </div>
-                <p className="text-sm text-slate-700 leading-snug">{entry.action}</p>
+                <p className="text-sm text-slate-700 leading-snug">{t(entry.actionKey)}</p>
               </div>
               {entry.status === 'auto_applied' ? (
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full shrink-0 flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3" /> Auto-applied
+                  <CheckCircle className="w-3 h-3" /> {t('ourTeam.activity.status.autoApplied')}
                 </span>
               ) : (
                 <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full shrink-0 flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> Needs review
+                  <Clock className="w-3 h-3" /> {t('ourTeam.activity.status.needsReview')}
                 </span>
               )}
             </motion.div>
@@ -218,14 +258,10 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
           <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Bell className="w-4 h-4 text-slate-500" />
-              <h3 className="font-bold text-slate-800 text-sm">Notification Preferences</h3>
+              <h3 className="font-bold text-slate-800 text-sm">{t('ourTeam.settings.notifications.heading')}</h3>
             </div>
-            {[
-              { label: 'Email me when agents need review',    enabled: true  },
-              { label: 'Slack summary every morning at 8am',  enabled: true  },
-              { label: 'Notify on auto-applied changes',      enabled: false },
-            ].map((s, i) => (
-              <ToggleRow key={i} label={s.label} enabled={s.enabled} />
+            {NOTIFICATION_SETTINGS.map((s, i) => (
+              <ToggleRow key={i} label={t(s.labelKey)} enabled={s.enabled} />
             ))}
           </div>
 
@@ -233,10 +269,10 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
             <div key={i} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
               <div className={cn("flex items-center gap-2 mb-2", ag.color)}>
                 {ag.icon}
-                <h3 className="font-bold text-slate-800 text-sm">{ag.agent}</h3>
+                <h3 className="font-bold text-slate-800 text-sm">{t(ag.headingKey)}</h3>
               </div>
               {ag.settings.map((s, j) => (
-                <ToggleRow key={j} label={s.label} enabled={s.enabled} />
+                <ToggleRow key={j} label={t(s.labelKey)} enabled={s.enabled} />
               ))}
             </div>
           ))}
@@ -244,15 +280,15 @@ export function OurTeamView({ agents, connectedSystems, autoUpdatesCount }: Prop
           <div className="bg-white border border-red-200 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Sliders className="w-4 h-4 text-red-500" />
-              <h3 className="font-bold text-red-700 text-sm">Agent Control</h3>
+              <h3 className="font-bold text-red-700 text-sm">{t('ourTeam.settings.control.heading')}</h3>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-700">Pause all agents</p>
-                <p className="text-xs text-slate-400">Agents will stop acting until re-enabled</p>
+                <p className="text-sm font-semibold text-slate-700">{t('ourTeam.settings.control.title')}</p>
+                <p className="text-xs text-slate-400">{t('ourTeam.settings.control.body')}</p>
               </div>
               <button className="text-xs font-bold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-colors">
-                Pause
+                {t('ourTeam.settings.control.action')}
               </button>
             </div>
           </div>

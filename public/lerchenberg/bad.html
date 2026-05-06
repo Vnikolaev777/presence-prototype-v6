@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<!-- ISSUE #1: lang="en" but content is German -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- ISSUE #14: no viewport meta tag -->
+  <!-- ISSUE #21: generic/missing title -->
+  <title>Home</title>
+  <!-- ISSUE #4: no meta description -->
+  <!-- ISSUE #5: no Open Graph tags -->
+
+  <!-- ISSUE #2: Google Fonts loaded from external server — Swiss nDSG/DSGVO violation -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- ISSUE #3: Google Analytics snippet -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-12345678-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-12345678-1');
+  </script>
+
+  <style>
+    /* Global reset, minimal */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      background: #ffffff;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header */
+    #header {
+      background-color: #1B5E8C;
+      width: 100%;
+      padding: 0;
+    }
+    #header-inner {
+      width: 960px;
+      margin: 0 auto;
+      padding: 18px 0 14px 0;
+    }
+    #site-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      letter-spacing: 0.5px;
+    }
+    #site-subtitle {
+      font-size: 12px;
+      color: #aecde4;
+      margin-top: 3px;
+    }
+
+    /* Navigation */
+    #nav {
+      background: #154d73;
+      border-top: 2px solid #0e3a57;
+      border-bottom: 2px solid #0e3a57;
+    }
+    /* ISSUE #13: small touch targets, only 24px tall with 8px padding */
+    #nav ul {
+      list-style: none;
+      margin: 0 auto;
+      padding: 0;
+      width: 960px;
+      display: block;
+      white-space: nowrap;
+    }
+    #nav ul li {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+    }
+    /* ISSUE #13: nav links 24px tall with only 8px padding — small touch targets */
+    #nav ul li a {
+      display: inline-block;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 12px;
+      padding: 8px 10px;
+      height: 24px;
+      line-height: 24px;
+      border-right: 1px solid #1e6699;
+    }
+    #nav ul li a:hover,
+    #nav ul li.active a {
+      background: #1B5E8C;
+      color: #ffd700;
+    }
+
+    /* Wrapper */
+    #wrapper {
+      width: 960px;
+      margin: 0 auto;
+      padding: 12px 0;
+    }
+
+    /* ISSUE #15: Table used for sidebar layout */
+    #layout-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #content-cell {
+      width: 640px;
+      vertical-align: top;
+      padding-right: 18px;
+    }
+    #sidebar-cell {
+      width: 300px;
+      vertical-align: top;
+      border-left: 1px solid #d0d0d0;
+      padding-left: 16px;
+    }
+
+    /* Breadcrumb */
+    #breadcrumb {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    #breadcrumb a {
+      color: #1B5E8C;
+      text-decoration: none;
+    }
+
+    /* Content styles */
+    /* ISSUE #11: heading hierarchy jumps from h1 straight to h4 */
+    h1 {
+      font-size: 18px;
+      color: #1B5E8C;
+      border-bottom: 2px solid #1B5E8C;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+    /* skips h2 and h3 entirely in body content */
+    h4 {
+      font-size: 13px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 4px;
+      margin-top: 14px;
+    }
+    p {
+      margin-bottom: 10px;
+    }
+
+    /* Sidebar */
+    .sidebar-box {
+      background: #f2f7fb;
+      border: 1px solid #c2d8ea;
+      margin-bottom: 14px;
+      padding: 10px;
+    }
+    .sidebar-box h4 {
+      color: #1B5E8C;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #c2d8ea;
+      padding-bottom: 4px;
+    }
+    .sidebar-box ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .sidebar-box ul li {
+      padding: 3px 0;
+      border-bottom: 1px dotted #c2d8ea;
+      font-size: 12px;
+    }
+    .sidebar-box ul li:last-child {
+      border-bottom: none;
+    }
+    .sidebar-box ul li a {
+      color: #1B5E8C;
+      text-decoration: none;
+    }
+    .sidebar-box ul li a:hover {
+      text-decoration: underline;
+    }
+    .news-item {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dotted #c2d8ea;
+    }
+    .news-item:last-child {
+      border-bottom: none;
+    }
+    .news-date {
+      font-size: 10px;
+      color: #999;
+    }
+    .news-title {
+      font-weight: bold;
+      font-size: 12px;
+      color: #1B5E8C;
+    }
+    .news-text {
+      font-size: 11px;
+      color: #555;
+    }
+
+    /* Document list */
+    .doc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 12px 0;
+    }
+    .doc-list li {
+      padding: 4px 0;
+      border-bottom: 1px dotted #ddd;
+      font-size: 12px;
+    }
+    .doc-list li a {
+      color: #1B5E8C;
+      text-decoration: none;
+    }
+    .doc-list li a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    #footer {
+      background: #1B5E8C;
+      border-top: 3px solid #0e3a57;
+      margin-top: 20px;
+      padding: 18px 0 12px 0;
+    }
+    #footer-inner {
+      width: 960px;
+      margin: 0 auto;
+      display: table;
+      width: 960px;
+    }
+    .footer-col {
+      display: table-cell;
+      width: 33%;
+      vertical-align: top;
+      padding: 0 16px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      color: #cce0f0;
+      font-size: 12px;
+    }
+    .footer-col:last-child {
+      border-right: none;
+    }
+    .footer-col h4 {
+      color: #fff;
+      font-size: 12px;
+      margin-top: 0;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 8px 0;
+    }
+    /* ISSUE #16: HTTP links in footer (not HTTPS) */
+    .footer-col ul li a {
+      color: #aecde4;
+      text-decoration: none;
+      font-size: 11px;
+    }
+    .footer-col ul li a:hover {
+      text-decoration: underline;
+    }
+    #footer-bottom {
+      width: 960px;
+      margin: 10px auto 0;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      text-align: center;
+    }
+    /* ISSUE #19: inline style with tiny, unreadable font for legal text */
+
+    /* Image placeholder */
+    .school-photo {
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid #c2d8ea;
+      margin-bottom: 12px;
+      line-height: 0;
+    }
+
+    .highlight-box {
+      background: #edf4fa;
+      border-left: 3px solid #1B5E8C;
+      padding: 8px 12px;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+
+    table.info-table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+    table.info-table td {
+      padding: 5px 8px;
+      border: 1px solid #ddd;
+      vertical-align: top;
+    }
+    table.info-table tr:nth-child(even) td {
+      background: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <!-- ISSUE #6: no skip-to-content link -->
+
+  <!-- Header -->
+  <div id="header">
+    <div id="header-inner">
+      <!-- ISSUE #7: img without alt attribute — note: this SVG logo also has no accessible label -->
+      <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="float:left;margin-right:12px;margin-top:-2px;flex-shrink:0;">
+        <circle cx="26" cy="26" r="25" fill="#0e3a57"/>
+        <circle cx="26" cy="26" r="22" fill="#1B5E8C" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <rect x="16" y="27" width="20" height="13" fill="white"/>
+        <polygon points="26,14 13,27 39,27" fill="white"/>
+        <rect x="22" y="31" width="8" height="9" fill="#1B5E8C"/>
+        <rect x="16" y="29" width="5" height="4" fill="#aecde4"/>
+        <rect x="31" y="29" width="5" height="4" fill="#aecde4"/>
+        <text x="26" y="49" font-family="Arial" font-size="4.5" fill="rgba(255,255,255,0.65)" text-anchor="middle" letter-spacing="0.5">ROSENBACH SN</text>
+      </svg>
+      <div id="site-title">Primarschule Rosenbach</div>
+      <div id="site-subtitle">Gemeinde Rosenbach/Vogtl. &bull; Sachsen</div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <!-- ISSUE #10: "Index A–Z" link — over-engineered old CMS nav -->
+  <div id="nav">
+    <ul>
+      <li class="active"><a href="index.php?page_id=1">Home</a></li>
+      <!-- ISSUE #9: old CMS-style URLs -->
+      <li><a href="index.php?page_id=23">Unsere Schule</a></li>
+      <li><a href="schule/kindergarten.html/34">Kindergarten</a></li>
+      <li><a href="index.php?page_id=47">Lehrplan 21</a></li>
+      <li><a href="schule/tagesstruktur.html/55">Tagesstruktur</a></li>
+      <li><a href="index.php?page_id=61">Dokumente</a></li>
+      <li><a href="schule/team.html/78">Team</a></li>
+      <li><a href="index.php?page_id=99">Index A&ndash;Z</a></li>
+      <li><a href="index.php?page_id=12">Kontakt</a></li>
+    </ul>
+  </div>
+
+  <!-- Wrapper: table layout -->
+  <div id="wrapper">
+    <!-- Breadcrumb -->
+    <div id="breadcrumb">
+      <a href="index.php?page_id=1">Home</a>
+    </div>
+
+    <!-- ISSUE #8: uses <div id="content"> instead of <main> landmark -->
+    <div id="content">
+      <!-- ISSUE #15: table-based layout for sidebar -->
+      <table id="layout-table">
+        <tr>
+          <td id="content-cell">
+
+            <!-- ISSUE #11: heading jumps from h1 to h4, no h2/h3 -->
+            <h1>Willkommen</h1>
+
+            <!-- ISSUE #7: img without alt attribute -->
+            <div class="school-photo">
+              <img src="https://picsum.photos/id/164/620/200" width="620" height="200" style="display:block;border:1px solid #cccccc;margin-bottom:4px;">
+            </div>
+
+            <p>Herzlich willkommen auf der Website der Primarschule Rosenbach. Wir freuen uns, dass Sie unsere Schule im Internet besuchen. Hier finden Sie alle wichtigen Informationen rund um unsere Schule, das Schuljahr 2025/26 sowie aktuelle Mitteilungen an Eltern und Erziehungsberechtigte.</p>
+
+            <!-- ISSUE #20: <font> tag used -->
+            <font color="#1B5E8C" size="2"><b>Schuljahr 2025/26 &ndash; Wichtige Hinweise</b></font>
+
+            <p>Das neue Schuljahr hat am 11. August 2025 begonnen. Wir w&uuml;nschen allen Sch&uuml;lerinnen und Sch&uuml;lern sowie ihren Familien einen guten Start. Das Schulb&uuml;ro ist an Schultagen von 07:45 bis 12:00 Uhr ge&ouml;ffnet.</p>
+
+            <div class="highlight-box">
+              &#128276; <b>Elternabend 1.&ndash;2. Klasse:</b> Dienstag, 20. Mai 2025, 19:30 Uhr, Aula Schulhaus Rosenbach
+            </div>
+
+            <!-- ISSUE #11: h4 directly after h1, skipping h2, h3 -->
+            <h4>Primarschule</h4>
+            <p>Die Primarschule Rosenbach umfasst die Klassen 1 bis 6 und wird von rund 240 Kindern aus Rosenbach und den umliegenden Weilern besucht. Der Unterricht orientiert sich am sächsischen Lehrplan.</p>
+
+            <h4>Kindergarten</h4>
+            <p>Unsere zwei Kindergartenklassen bieten Kindern im Vorschulalter eine spielerische Einf&uuml;hrung in die Schulwelt. Die Kindergartenjahre gelten als wichtige Grundlage f&uuml;r die sp&auml;tere Schullaufbahn.</p>
+
+            <h4>Tagesstruktur</h4>
+            <p>F&uuml;r berufst&auml;tige Eltern bieten wir eine Tagesstruktur mit Morgen- und Mittagsbetreuung an. Anmeldungen nehmen wir gerne im Schulb&uuml;ro entgegen.</p>
+
+            <h4>Lehrplan 21</h4>
+            <p>Seit dem Schuljahr 2018/19 unterrichten wir nach dem sächsischen Lehrplan. Dieser regelt die Volksschulbildung in Vogtlandkreis, Sachsen und legt kompetenzorientierte Ziele fest.</p>
+
+            <h4>Wichtige Dokumente</h4>
+            <!-- ISSUE #12: PDF links with no file size or type warning -->
+            <ul class="doc-list">
+              <li>&#128196; <a href="/dokumente/schulordnung.pdf">Schulordnung</a></li>
+              <li>&#128196; <a href="/dokumente/jahresplan_2025_26.pdf">Jahresplan 2025/26</a></li>
+              <li>&#128196; <a href="/dokumente/ferienplan_sachsen_2025_26.pdf">Ferienplan Sachsen 2025/26</a></li>
+              <li>&#128196; <a href="/dokumente/elterninfo_august_2025.pdf">Elterninformation August 2025</a></li>
+              <li>&#128196; <a href="/dokumente/anmeldeformular_tagesstruktur.pdf">Anmeldeformular Tagesstruktur</a></li>
+            </ul>
+
+            <h4>Stundentafel</h4>
+            <table class="info-table">
+              <tr>
+                <td><b>Klasse</b></td>
+                <td><b>Lektionen/Woche</b></td>
+                <td><b>Schultage</b></td>
+              </tr>
+              <tr>
+                <td>Kindergarten</td>
+                <td>ca. 20</td>
+                <td>Mo &ndash; Fr</td>
+              </tr>
+              <tr>
+                <td>1.&ndash;2. Klasse</td>
+                <td>28</td>
+                <td>Mo &ndash; Fr</td>
+              </tr>
+              <tr>
+                <td>3.&ndash;4. Klasse</td>
+                <td>30</td>
+                <td>Mo &ndash; Fr</td>
+              </tr>
+              <tr>
+                <td>5.&ndash;6. Klasse</td>
+                <td>32</td>
+                <td>Mo &ndash; Fr</td>
+              </tr>
+            </table>
+
+            <h4>Schulleitung</h4>
+            <!-- ISSUE #7: imgs without alt attribute -->
+            <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:6px;">
+              <div style="text-align:center;">
+                <img src="https://randomuser.me/api/portraits/men/45.jpg" width="72" height="72" style="border:2px solid #cccccc;display:block;">
+                <div style="font-size:11px;margin-top:3px;color:#555;">Hans-Peter Egger</div>
+                <div style="font-size:10px;color:#888;">Schulleiter</div>
+              </div>
+              <div style="text-align:center;">
+                <img src="https://randomuser.me/api/portraits/women/52.jpg" width="72" height="72" style="border:2px solid #cccccc;display:block;">
+                <div style="font-size:11px;margin-top:3px;color:#555;">Monika Winteler</div>
+                <div style="font-size:10px;color:#888;">Stv. Schulleiterin</div>
+              </div>
+              <div style="text-align:center;">
+                <img src="https://randomuser.me/api/portraits/women/34.jpg" width="72" height="72" style="border:2px solid #cccccc;display:block;">
+                <div style="font-size:11px;margin-top:3px;color:#555;">Ursula Meier</div>
+                <div style="font-size:10px;color:#888;">Schulverwaltung</div>
+              </div>
+            </div>
+
+          </td>
+
+          <!-- Sidebar column — inside the layout table -->
+          <!-- ISSUE #15: table cell used as sidebar layout mechanism -->
+          <td id="sidebar-cell">
+
+            <!-- Aktuelles -->
+            <div class="sidebar-box">
+              <h4>Aktuelles</h4>
+              <div class="news-item">
+                <div class="news-date">02.05.2026</div>
+                <div class="news-title">Elternabend 1./2. Klasse</div>
+                <div class="news-text">Dienstag, 20. Mai 2026, 19:30 Uhr, Aula. Traktanden per Post.</div>
+              </div>
+              <div class="news-item">
+                <div class="news-date">24.04.2026</div>
+                <div class="news-title">Sporttag 2026</div>
+                <div class="news-text">Der Sporttag findet am 18. Juni 2026 auf dem Sportplatz statt.</div>
+              </div>
+              <div class="news-item">
+                <div class="news-date">11.04.2026</div>
+                <div class="news-title">Osterferien &mdash; B&uuml;ro geschlossen</div>
+                <div class="news-text">Das Schulb&uuml;ro ist vom 14. bis 25. April geschlossen.</div>
+              </div>
+            </div>
+
+            <!-- Quick links -->
+            <div class="sidebar-box">
+              <h4>Schnellzugriff</h4>
+              <ul>
+                <!-- ISSUE #9: old CMS-style URLs -->
+                <li>&#128197; <a href="index.php?page_id=81">Stundenplan 2025/26</a></li>
+                <li>&#128196; <a href="schule/elternbriefe.html/22">Elternbriefe</a></li>
+                <li>&#9200; <a href="index.php?page_id=88">Schulzeiten</a></li>
+                <li>&#128205; <a href="index.php?page_id=12">Anfahrt &amp; Lageplan</a></li>
+                <li>&#128222; <a href="index.php?page_id=12">Kontakt Schulb&uuml;ro</a></li>
+              </ul>
+            </div>
+
+            <!-- Termine -->
+            <div class="sidebar-box">
+              <h4>N&auml;chste Termine</h4>
+              <ul>
+                <li>20.05.2026 &mdash; Elternabend</li>
+                <li>28.05.2026 &mdash; Auffahrt (schulfrei)</li>
+                <li>18.06.2026 &mdash; Sporttag</li>
+                <li>05.07.2026 &mdash; Sommerferien beginnen</li>
+              </ul>
+            </div>
+
+            <!-- Kontakt box -->
+            <div class="sidebar-box">
+              <h4>Schulb&uuml;ro</h4>
+              <p style="font-size:11px;color:#555;margin:0 0 6px 0;">Schulhaus Rosenbach<br>
+              Friedensstr. 4<br>
+              08539 Rosenbach/Vogtl., Sachsen</p>
+              <p style="font-size:11px;margin:0;">Tel: <a href="tel:+49374313380">037431 33 80</a><br>
+              E-Mail: <a href="mailto:sekretariat@ps-rosenbach.ch">sekretariat@ps-rosenbach.ch</a><br>
+              Mo&ndash;Fr: 07:45&ndash;12:00 Uhr</p>
+            </div>
+
+          </td>
+        </tr>
+      </table>
+    </div>
+    <!-- end #content (div, not main) -->
+  </div>
+
+  <!-- Footer -->
+  <div id="footer">
+    <div id="footer-inner">
+      <div class="footer-col">
+        <h4>Primarschule Rosenbach</h4>
+        <ul>
+          <!-- ISSUE #16: HTTP links (not HTTPS) -->
+          <li><a href="http://www.ps-rosenbach.ch/index.php?page_id=23">Unsere Schule</a></li>
+          <li><a href="http://www.ps-rosenbach.ch/schule/team.html">Team &amp; Lehrpersonen</a></li>
+          <li><a href="http://www.ps-rosenbach.ch/index.php?page_id=47">Lehrplan 21</a></li>
+          <li><a href="http://www.ps-rosenbach.ch/index.php?page_id=61">Dokumente</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>F&uuml;r Eltern</h4>
+        <ul>
+          <li><a href="http://www.ps-rosenbach.ch/index.php?page_id=81">Stundenplan</a></li>
+          <li><a href="http://www.ps-rosenbach.ch/schule/elternbriefe.html">Elternbriefe</a></li>
+          <!-- ISSUE #12: PDF link, no type/size info -->
+          <li><a href="/dokumente/jahresplan_2025_26.pdf">Jahresplan (PDF)</a></li>
+          <li><a href="http://www.ps-rosenbach.ch/index.php?page_id=55">Tagesstruktur</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Gemeinde &amp; Kanton</h4>
+        <ul>
+          <!-- ISSUE #16: more HTTP links -->
+          <li><a href="http://www.rosenbach.ch">Gemeinde Rosenbach</a></li>
+          <li><a href="https://www.bildung.sachsen.de">Grundschule Sachsen</a></li>
+          <li><a href="https://www.bildung.sachsen.de">Bildungsdirektion Vogtlandkreis, Sachsen</a></li>
+          <!-- ISSUE #17: no Datenschutzerklärung link — intentionally missing -->
+          <li><a href="http://www.ps-rosenbach.ch/index.php?page_id=5">Impressum</a></li>
+          <!-- ISSUE #18: no accessibility statement -->
+        </ul>
+      </div>
+    </div>
+    <div id="footer-bottom">
+      <!-- ISSUE #19: inline style with tiny 11px unreadable font for legal text -->
+      <span style="font-size:11px; color:#999;">&copy; 2026 Gemeinde Rosenbach/Vogtl. &bull; Sachsen &bull; Alle Rechte vorbehalten</span>
+    </div>
+  </div>
+
+</body>
+</html>

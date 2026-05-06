@@ -374,86 +374,190 @@ export function PostAuditChatCardV2() {
   );
 }
 
+// ─── Locale data for V2 canvases ─────────────────────────────────────────────
+export type AuditLang = 'en' | 'de';
+
+const AUDIT_LOCALE: Record<AuditLang, {
+  auditTitle: string; newAuditTitle: string; domain: string;
+  needsImprovement: string; excellent: string;
+  healthScore: string; allChecksPassed: string;
+  critical: string; warning: string; warnings: string;
+  ptsImprovement: string; before: string; now: string;
+  categoryScoresTitle: string; comparisonLegend: string;
+  complianceTitle: string; keyImprovementsTitle: string;
+  saveLbl: string; shareLbl: string; viewFullReportLbl: string;
+  categories: { key: string; label: string; beforeDetail: string; afterDetail: string }[];
+  issues: { tag: string; category: string; text: string }[];
+  complianceBefore: { law: string; sub: string; status: ComplianceStatus }[];
+  complianceAfter:  { law: string; sub: string; status: ComplianceStatus }[];
+  passed: string[];
+}> = {
+  en: {
+    auditTitle: 'Site Audit Report',
+    newAuditTitle: 'New Site Audit Report',
+    domain: 'oakwoodhigh.org · April 2026',
+    needsImprovement: 'Needs Improvement',
+    excellent: 'Excellent',
+    healthScore: 'Health Score',
+    allChecksPassed: '● All checks passed',
+    critical: 'critical', warning: 'warning', warnings: 'warnings',
+    ptsImprovement: 'pts improvement',
+    before: 'Before', now: 'Now',
+    categoryScoresTitle: 'Category Scores',
+    comparisonLegend: 'Previous score · current score in green',
+    complianceTitle: 'Compliance',
+    keyImprovementsTitle: 'Key Improvements',
+    saveLbl: 'Save', shareLbl: 'Share', viewFullReportLbl: 'View Full Report',
+    categories: [
+      { key: 'Performance',     label: 'Performance',     beforeDetail: 'LCP 8.4s · Images unoptimized',                                     afterDetail: 'LCP 1.2s · No blocking resources · WebP images · CDN enabled' },
+      { key: 'Accessibility',   label: 'Accessibility',   beforeDetail: '19 untagged PDFs · Missing alt text · No WCAG statement',           afterDetail: 'All images have alt text · WCAG 2.1 AA · All PDFs tagged' },
+      { key: 'Student Privacy', label: 'Student Privacy', beforeDetail: 'No FERPA notice · COPPA gaps',                                      afterDetail: 'No trackers on student pages · FERPA notice published · COPPA compliant' },
+      { key: 'Security',        label: 'Security',        beforeDetail: 'HTTPS present · Mixed content on 3 pages · 2 warnings',             afterDetail: 'HTTPS enforced · No mixed content · No vulnerabilities' },
+      { key: 'Usability',       label: 'Usability',       beforeDetail: 'Not mobile-friendly · nav confusing · avg 4.2 clicks to CTA',       afterDetail: 'Mobile-friendly · nav OK · avg 1.4 clicks to CTA' },
+      { key: 'Content',         label: 'Content',         beforeDetail: '18 pages outdated · 6 dead links',                                  afterDetail: 'All pages current · 0 dead links' },
+      { key: 'Discoverability', label: 'Discoverability', beforeDetail: 'No meta descriptions · Not in Google Maps · Missing sitemap',       afterDetail: 'Meta descriptions on all pages · Google Maps verified · Sitemap live' },
+    ],
+    issues: [
+      { tag: 'blocker', category: 'Accessibility',   text: 'PDF policies not screen-reader accessible — ADA Title II deadline Apr 24' },
+      { tag: 'blocker', category: 'Accessibility',   text: 'No accessibility statement published — required under ADA Title II' },
+      { tag: 'privacy', category: 'Student Privacy', text: 'Tracking pixels on student pages — COPPA risk for under-13 users' },
+      { tag: 'high',    category: 'Performance',     text: 'LCP 8.4s on enrollment page · hero image 4.2 MB unoptimized' },
+      { tag: 'blocker', category: 'Forms',           text: 'Enrollment form has no ARIA labels — keyboard navigation impossible' },
+      { tag: 'blocker', category: 'Navigation',      text: 'Skip-to-content link missing — screen readers cannot bypass nav' },
+      { tag: 'blocker', category: 'Authentication',  text: 'Password reset flow broken on Safari — students locked out' },
+      { tag: 'privacy', category: 'Analytics',       text: 'Google Analytics collecting PII from student profile pages — FERPA risk' },
+      { tag: 'privacy', category: 'Analytics',       text: 'Third-party chatbot retaining student conversation data — COPPA risk' },
+      { tag: 'high',    category: 'Mobile',          text: 'Hamburger menu unresponsive on iOS 17 — 3-tap workaround required' },
+      { tag: 'high',    category: 'Links',           text: '6 broken internal links on About and Staff pages' },
+      { tag: 'high',    category: 'Mobile',          text: 'Touch targets on events calendar below 44×44px minimum' },
+    ],
+    complianceBefore: [
+      { law: 'ADA Title II · WCAG 2.1 AA', sub: 'Digital accessibility for public entities', status: 'non-compliant' },
+      { law: 'FERPA',                       sub: 'Directory info, annual notice, consent',     status: 'partial' },
+      { law: 'COPPA',                       sub: 'Third-party services for under-13 users',    status: 'at-risk' },
+      { law: 'CIPA',                        sub: 'Internet safety policy disclosure',           status: 'compliant' },
+    ],
+    complianceAfter: [
+      { law: 'ADA Title II · WCAG 2.1 AA', sub: 'Digital accessibility for public entities', status: 'compliant' },
+      { law: 'FERPA',                       sub: 'Directory info, annual notice, consent',     status: 'compliant' },
+      { law: 'COPPA',                       sub: 'Third-party services for under-13 users',    status: 'compliant' },
+      { law: 'CIPA',                        sub: 'Internet safety policy disclosure',           status: 'compliant' },
+    ],
+    passed: [
+      'LCP 1.2s — down from 8.4s · all images WebP-optimized',
+      '19 PDFs fully tagged and screen-reader accessible',
+      'Accessibility statement with complaint contact published',
+      'All tracking pixels removed from student-facing pages',
+    ],
+  },
+  de: {
+    auditTitle: 'Website-Audit-Bericht',
+    newAuditTitle: 'Neuer Website-Audit-Bericht',
+    domain: 'oakwoodhigh.de · April 2026',
+    needsImprovement: 'Verbesserungsbedarf',
+    excellent: 'Ausgezeichnet',
+    healthScore: 'Gesundheitswert',
+    allChecksPassed: '● Alle Prüfungen bestanden',
+    critical: 'kritisch', warning: 'Warnung', warnings: 'Warnungen',
+    ptsImprovement: 'Punkte Verbesserung',
+    before: 'Vorher', now: 'Jetzt',
+    categoryScoresTitle: 'Kategoriebewertungen',
+    comparisonLegend: 'Vorheriger Wert · aktueller Wert in Grün',
+    complianceTitle: 'Rechtskonformität',
+    keyImprovementsTitle: 'Wichtigste Verbesserungen',
+    saveLbl: 'Speichern', shareLbl: 'Teilen', viewFullReportLbl: 'Vollständiger Bericht',
+    categories: [
+      { key: 'Performance',     label: 'Leistung',                beforeDetail: 'LCP 8,4 s · Bilder unkomprimiert',                                              afterDetail: 'LCP 1,2 s · Keine Render-Blocker · WebP-Bilder · CDN aktiv' },
+      { key: 'Accessibility',   label: 'Barrierefreiheit',        beforeDetail: '19 ungetaggte PDFs · Fehlende Alt-Texte · Kein BITV-Hinweis',                   afterDetail: 'Alle Bilder mit Alt-Text · BITV 2.0 / WCAG 2.1 AA · Alle PDFs getaggt' },
+      { key: 'Student Privacy', label: 'Schülerdatenschutz',      beforeDetail: 'Kein DSGVO-Hinweis · Datenschutzlücken',                                        afterDetail: 'Keine Tracker auf Schülerseiten · DSGVO-Hinweis veröffentlicht · Konform' },
+      { key: 'Security',        label: 'Sicherheit',              beforeDetail: 'HTTPS vorhanden · Mixed Content auf 3 Seiten · 2 Warnungen',                    afterDetail: 'HTTPS erzwungen · Kein Mixed Content · Keine Schwachstellen' },
+      { key: 'Usability',       label: 'Benutzerfreundlichkeit',  beforeDetail: 'Nicht mobil-optimiert · Navigation unübersichtlich · Ø 4,2 Klicks bis CTA',    afterDetail: 'Mobil-optimiert · Navigation klar · Ø 1,4 Klicks bis CTA' },
+      { key: 'Content',         label: 'Inhalte',                 beforeDetail: '18 veraltete Seiten · 6 tote Links',                                            afterDetail: 'Alle Seiten aktuell · 0 tote Links' },
+      { key: 'Discoverability', label: 'Auffindbarkeit',          beforeDetail: 'Keine Meta-Beschreibungen · Nicht in Google Maps · Sitemap fehlt',              afterDetail: 'Meta-Beschreibungen auf allen Seiten · Google Maps verifiziert · Sitemap aktiv' },
+    ],
+    issues: [
+      { tag: 'blocker', category: 'Accessibility',   text: 'PDF-Richtlinien nicht barrierefrei lesbar — BITV-2.0-Frist Apr 24' },
+      { tag: 'blocker', category: 'Accessibility',   text: 'Kein Barrierefreiheits-Hinweis veröffentlicht — BITV 2.0 erforderlich' },
+      { tag: 'privacy', category: 'Student Privacy', text: 'Tracking-Pixel auf Schülerseiten — DSGVO-Risiko' },
+      { tag: 'high',    category: 'Performance',     text: 'LCP 8,4 s auf Anmeldeseite · Hero-Bild 4,2 MB unkomprimiert' },
+      { tag: 'blocker', category: 'Formulare',       text: 'Anmeldeformular ohne ARIA-Labels — Tastaturnavigation unmöglich' },
+      { tag: 'blocker', category: 'Navigation',      text: 'Skip-to-content-Link fehlt — Screenreader können Navigation nicht überspringen' },
+      { tag: 'blocker', category: 'Authentifizierung', text: 'Passwort-Reset fehlerhaft in Safari — Schüler ausgesperrt' },
+      { tag: 'privacy', category: 'Analyse',         text: 'Google Analytics erfasst personenbezogene Daten auf Schülerprofilen — DSGVO-Verstoß' },
+      { tag: 'privacy', category: 'Analyse',         text: 'Drittanbieter-Chatbot speichert Schüler-Gesprächsdaten — DSGVO-Risiko' },
+      { tag: 'high',    category: 'Mobil',           text: 'Hamburger-Menü reagiert nicht auf iOS 17 — 3-Tippen-Workaround erforderlich' },
+      { tag: 'high',    category: 'Links',           text: '6 tote interne Links auf Über-uns- und Lehrkräfte-Seiten' },
+      { tag: 'high',    category: 'Mobil',           text: 'Tipp-Ziele im Veranstaltungskalender unter 44×44 px Mindestgröße' },
+    ],
+    complianceBefore: [
+      { law: 'BITV 2.0 · WCAG 2.1 AA',  sub: 'Digitale Barrierefreiheit für öffentliche Stellen', status: 'non-compliant' },
+      { law: 'DSGVO (Art. 13 & 14)',     sub: 'Informationspflichten, Einwilligung, Verzeichnis',  status: 'partial' },
+      { law: 'DSGVO + JMStV',            sub: 'Drittanbieter-Dienste für unter-13-Jährige',         status: 'at-risk' },
+      { law: 'JMStV',                    sub: 'Jugendmedienschutz-Staatsvertrag',                   status: 'compliant' },
+    ],
+    complianceAfter: [
+      { law: 'BITV 2.0 · WCAG 2.1 AA',  sub: 'Digitale Barrierefreiheit für öffentliche Stellen', status: 'compliant' },
+      { law: 'DSGVO (Art. 13 & 14)',     sub: 'Informationspflichten, Einwilligung, Verzeichnis',  status: 'compliant' },
+      { law: 'DSGVO + JMStV',            sub: 'Drittanbieter-Dienste für unter-13-Jährige',         status: 'compliant' },
+      { law: 'JMStV',                    sub: 'Jugendmedienschutz-Staatsvertrag',                   status: 'compliant' },
+    ],
+    passed: [
+      'LCP 1,2 s — von 8,4 s · Alle Bilder als WebP optimiert',
+      '19 PDFs vollständig getaggt und barrierefrei lesbar',
+      'Barrierefreiheits-Hinweis mit Beschwerdekontakt veröffentlicht',
+      'Alle Tracking-Pixel von schülerbezogenen Seiten entfernt',
+    ],
+  },
+};
+
 // ─── V2: Current site audit — full canvas ────────────────────────────────────
-export function AuditCanvasV2() {
-  // Issues are the single source of truth — category scores and counts derive from here
+export function AuditCanvasV2({ lang = 'en' }: { lang?: AuditLang }) {
+  const L = AUDIT_LOCALE[lang];
   const PENALTIES: Record<string, number> = { blocker: 20, privacy: 15, high: 10 };
+  const { issues } = L;
 
-  const issues = [
-    { tag: 'blocker', category: 'Accessibility',   text: 'PDF policies not screen-reader accessible — ADA Title II deadline Apr 24' },
-    { tag: 'blocker', category: 'Accessibility',   text: 'No accessibility statement published — required under ADA Title II' },
-    { tag: 'privacy', category: 'Student Privacy', text: 'Tracking pixels on student pages — COPPA risk for under-13 users' },
-    { tag: 'high',    category: 'Performance',     text: 'LCP 8.4s on enrollment page · hero image 4.2 MB unoptimized' },
-    // Additional issues — categories outside BASE_SCORES so scores are unaffected
-    { tag: 'blocker', category: 'Forms',           text: 'Enrollment form has no ARIA labels — keyboard navigation impossible' },
-    { tag: 'blocker', category: 'Navigation',      text: 'Skip-to-content link missing — screen readers cannot bypass nav' },
-    { tag: 'blocker', category: 'Authentication',  text: 'Password reset flow broken on Safari — students locked out' },
-    { tag: 'privacy', category: 'Analytics',       text: 'Google Analytics collecting PII from student profile pages — FERPA risk' },
-    { tag: 'privacy', category: 'Analytics',       text: 'Third-party chatbot retaining student conversation data — COPPA risk' },
-    { tag: 'high',    category: 'Mobile',          text: 'Hamburger menu unresponsive on iOS 17 — 3-tap workaround required' },
-    { tag: 'high',    category: 'Links',           text: '6 broken internal links on About and Staff pages' },
-    { tag: 'high',    category: 'Mobile',          text: 'Touch targets on events calendar below 44×44px minimum' },
-  ];
-
-  // Base scores = what the category would score with no issues
   const BASE_SCORES: Record<string, number> = {
-    Performance:       48,
-    Accessibility:     71,
-    'Student Privacy': 60,
-    Security:          72,
-    Usability:         42,
-    Content:           40,
-    Discoverability:   52,
+    Performance: 48, Accessibility: 71, 'Student Privacy': 60,
+    Security: 72, Usability: 42, Content: 40, Discoverability: 52,
   };
 
-  // Deduct penalties from base scores based on issues in each category
   const catScores: Record<string, number> = Object.fromEntries(
     Object.entries(BASE_SCORES).map(([cat, base]) => {
-      const penalty = issues
-        .filter(i => i.category === cat)
-        .reduce((s, i) => s + PENALTIES[i.tag], 0);
+      const penalty = issues.filter(i => i.category === cat).reduce((s, i) => s + PENALTIES[i.tag], 0);
       return [cat, Math.max(0, base - penalty)];
     })
   );
 
-  // Overall = average of all category scores
-  const SCORE = Math.round(
-    Object.values(catScores).reduce((s, v) => s + v, 0) / Object.keys(catScores).length
-  );
+  const SCORE = Math.round(Object.values(catScores).reduce((s, v) => s + v, 0) / Object.keys(catScores).length);
   const c = scoreColor(SCORE);
 
-  const categories = [
-    { icon: <Zap className="w-3.5 h-3.5" />,        label: 'Performance',     score: catScores['Performance'],     detail: 'LCP 8.4s · Images unoptimized' },
-    { icon: <Eye className="w-3.5 h-3.5" />,         label: 'Accessibility',   score: catScores['Accessibility'],   detail: '19 untagged PDFs · Missing alt text · No WCAG statement' },
-    { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'Student Privacy', score: catScores['Student Privacy'], detail: 'No FERPA notice · COPPA gaps' },
-    { icon: <Lock className="w-3.5 h-3.5" />,        label: 'Security',        score: catScores['Security'],        detail: 'HTTPS present · Mixed content on 3 pages · 2 warnings' },
-    { icon: <Monitor className="w-3.5 h-3.5" />,     label: 'Usability',       score: catScores['Usability'],       detail: 'Not mobile-friendly · nav confusing · avg 4.2 clicks to CTA' },
-    { icon: <FileText className="w-3.5 h-3.5" />,    label: 'Content',         score: catScores['Content'],         detail: '18 pages outdated · 6 dead links' },
-    { icon: <Search className="w-3.5 h-3.5" />,      label: 'Discoverability', score: catScores['Discoverability'], detail: 'No meta descriptions · Not in Google Maps · Missing sitemap' },
-  ];
+  const ICONS: Record<string, React.ReactNode> = {
+    Performance:     <Zap className="w-3.5 h-3.5" />,
+    Accessibility:   <Eye className="w-3.5 h-3.5" />,
+    'Student Privacy': <ShieldCheck className="w-3.5 h-3.5" />,
+    Security:        <Lock className="w-3.5 h-3.5" />,
+    Usability:       <Monitor className="w-3.5 h-3.5" />,
+    Content:         <FileText className="w-3.5 h-3.5" />,
+    Discoverability: <Search className="w-3.5 h-3.5" />,
+  };
+
+  const categories = L.categories.map(cat => ({
+    icon: ICONS[cat.key], label: cat.label,
+    score: catScores[cat.key], detail: cat.beforeDetail,
+  }));
 
   const criticalCount = issues.filter(i => i.tag === 'blocker' || i.tag === 'privacy').length;
   const warningCount  = issues.filter(i => i.tag === 'high').length;
-  const tagStyle: Record<string, string> = {
-    blocker: 'bg-red-50 border-red-200 text-red-600',
-    privacy: 'bg-red-50 border-red-200 text-red-600',
-    high:    'bg-orange-50 border-orange-200 text-orange-600',
-  };
-  const compliance = [
-    { law: 'ADA Title II · WCAG 2.1 AA', sub: 'Digital accessibility for public entities', status: 'non-compliant' as ComplianceStatus },
-    { law: 'FERPA',                       sub: 'Directory info, annual notice, consent',     status: 'partial' as ComplianceStatus },
-    { law: 'COPPA',                       sub: 'Third-party services for under-13 users',    status: 'at-risk' as ComplianceStatus },
-    { law: 'CIPA',                        sub: 'Internet safety policy disclosure',          status: 'compliant' as ComplianceStatus },
-  ];
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 p-6 bg-white animate-in fade-in duration-700">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">Site Audit Report</h2>
-          <p className="text-slate-400 text-[11px] mt-0.5">oakwoodhigh.org · April 2026</p>
+          <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">{L.auditTitle}</h2>
+          <p className="text-slate-400 text-[11px] mt-0.5">{L.domain}</p>
         </div>
         <span className="bg-red-50 border border-red-200 text-red-500 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
-          Needs Improvement
+          {L.needsImprovement}
         </span>
       </div>
 
@@ -466,37 +570,37 @@ export function AuditCanvasV2() {
           </div>
         </div>
         <div className="space-y-1">
-          <div className="text-sm font-bold text-slate-700">Health Score</div>
+          <div className="text-sm font-bold text-slate-700">{L.healthScore}</div>
           <div className="flex gap-3 text-[11px]">
-            <span className="text-red-500 font-bold">● {criticalCount} critical</span>
-            <span className="text-orange-500 font-bold">● {warningCount} warning{warningCount !== 1 ? 's' : ''}</span>
+            <span className="text-red-500 font-bold">● {criticalCount} {L.critical}</span>
+            <span className="text-orange-500 font-bold">● {warningCount} {warningCount !== 1 ? L.warnings : L.warning}</span>
           </div>
         </div>
       </div>
 
       <div className="space-y-2">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Category Scores</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{L.categoryScoresTitle}</div>
         <div className="space-y-2">
           {categories.map(cat => <CategoryRow key={cat.label} {...cat} />)}
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Compliance</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{L.complianceTitle}</div>
         <div className="border border-slate-100 rounded-lg px-3 py-0.5">
-          {compliance.map(r => <ComplianceRow key={r.law} {...r} />)}
+          {L.complianceBefore.map(r => <ComplianceRow key={r.law} {...r} />)}
         </div>
       </div>
 
       <div className="flex gap-2 pt-1">
         <button className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-          <Save className="w-3.5 h-3.5" /> Save
+          <Save className="w-3.5 h-3.5" /> {L.saveLbl}
         </button>
         <button className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-          <Share2 className="w-3.5 h-3.5" /> Share
+          <Share2 className="w-3.5 h-3.5" /> {L.shareLbl}
         </button>
         <button className="flex items-center gap-1.5 text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition-colors ml-auto">
-          <ExternalLink className="w-3.5 h-3.5" /> View Full Report
+          <ExternalLink className="w-3.5 h-3.5" /> {L.viewFullReportLbl}
         </button>
       </div>
     </div>
@@ -504,47 +608,51 @@ export function AuditCanvasV2() {
 }
 
 // ─── V2: New site audit — full canvas ────────────────────────────────────────
-export function PostAuditCanvasV2() {
+export function PostAuditCanvasV2({ lang = 'en' }: { lang?: AuditLang }) {
+  const L = AUDIT_LOCALE[lang];
   const SCORE = 97;
   const PREV_SCORE = 46;
   const c = scoreColor(SCORE);
   const cp = scoreColor(PREV_SCORE);
-  const categories = [
-    { icon: <Zap className="w-3.5 h-3.5" />,        label: 'Performance',     score: 98,  prevScore: 38, detail: 'LCP 1.2s · No blocking resources · WebP images · CDN enabled' },
-    { icon: <Eye className="w-3.5 h-3.5" />,         label: 'Accessibility',   score: 96,  prevScore: 31, detail: 'All images have alt text · WCAG 2.1 AA · All PDFs tagged' },
-    { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'Student Privacy', score: 95,  prevScore: 45, detail: 'No trackers on student pages · FERPA notice published · COPPA compliant' },
-    { icon: <Lock className="w-3.5 h-3.5" />,        label: 'Security',        score: 99,  prevScore: 72, detail: 'HTTPS enforced · No mixed content · No vulnerabilities' },
-    { icon: <Monitor className="w-3.5 h-3.5" />,     label: 'Usability',       score: 94,  prevScore: 42, detail: 'Mobile-friendly · nav OK · avg 1.4 clicks to CTA' },
-    { icon: <FileText className="w-3.5 h-3.5" />,    label: 'Content',         score: 97,  prevScore: 40, detail: 'All pages current · 0 dead links' },
-    { icon: <Search className="w-3.5 h-3.5" />,      label: 'Discoverability', score: 100, prevScore: 52, detail: 'Meta descriptions on all pages · Google Maps verified · Sitemap live' },
-  ];
-  const passed = [
-    'LCP 1.2s — down from 8.4s · all images WebP-optimized',
-    '19 PDFs fully tagged and screen-reader accessible',
-    'Accessibility statement with complaint contact published',
-    'All tracking pixels removed from student-facing pages',
-  ];
-  const compliance = [
-    { law: 'ADA Title II · WCAG 2.1 AA', sub: 'Digital accessibility for public entities', status: 'compliant' as ComplianceStatus },
-    { law: 'FERPA',                       sub: 'Directory info, annual notice, consent',     status: 'compliant' as ComplianceStatus },
-    { law: 'COPPA',                       sub: 'Third-party services for under-13 users',    status: 'compliant' as ComplianceStatus },
-    { law: 'CIPA',                        sub: 'Internet safety policy disclosure',          status: 'compliant' as ComplianceStatus },
-  ];
+
+  const ICONS: Record<string, React.ReactNode> = {
+    Performance:     <Zap className="w-3.5 h-3.5" />,
+    Accessibility:   <Eye className="w-3.5 h-3.5" />,
+    'Student Privacy': <ShieldCheck className="w-3.5 h-3.5" />,
+    Security:        <Lock className="w-3.5 h-3.5" />,
+    Usability:       <Monitor className="w-3.5 h-3.5" />,
+    Content:         <FileText className="w-3.5 h-3.5" />,
+    Discoverability: <Search className="w-3.5 h-3.5" />,
+  };
+
+  const AFTER_SCORES: Record<string, number> = {
+    Performance: 98, Accessibility: 96, 'Student Privacy': 95,
+    Security: 99, Usability: 94, Content: 97, Discoverability: 100,
+  };
+  const PREV_SCORES: Record<string, number> = {
+    Performance: 38, Accessibility: 31, 'Student Privacy': 45,
+    Security: 72, Usability: 42, Content: 40, Discoverability: 52,
+  };
+
+  const categories = L.categories.map(cat => ({
+    icon: ICONS[cat.key], label: cat.label,
+    score: AFTER_SCORES[cat.key], prevScore: PREV_SCORES[cat.key], detail: cat.afterDetail,
+  }));
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 p-6 bg-white animate-in fade-in duration-700">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">New Site Audit Report</h2>
-          <p className="text-slate-400 text-[11px] mt-0.5">oakwoodhigh.org · April 2026</p>
+          <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">{L.newAuditTitle}</h2>
+          <p className="text-slate-400 text-[11px] mt-0.5">{L.domain}</p>
         </div>
         <span className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
-          Excellent
+          {L.excellent}
         </span>
       </div>
 
       {/* ── Before / Now gauges ── */}
       <div className="flex items-center gap-3">
-        {/* Before */}
         <div className="flex flex-col items-center gap-1">
           <div className="relative shrink-0">
             <AuditGauge score={PREV_SCORE} maxScore={100} size={64} strokeWidth={7} color={cp.hex} />
@@ -553,10 +661,9 @@ export function PostAuditCanvasV2() {
               <span className="text-slate-400 text-[9px]">/100</span>
             </div>
           </div>
-          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Before</span>
+          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">{L.before}</span>
         </div>
 
-        {/* Arrow + delta */}
         <div className="flex flex-col items-center gap-0.5 flex-1">
           <span className="text-emerald-500 font-extrabold text-base">+{SCORE - PREV_SCORE}</span>
           <div className="flex items-center gap-1 w-full">
@@ -564,10 +671,9 @@ export function PostAuditCanvasV2() {
             <span className="text-slate-300 text-xs">→</span>
             <div className="flex-1 h-px bg-emerald-300" />
           </div>
-          <span className="text-[9px] text-slate-400">pts improvement</span>
+          <span className="text-[9px] text-slate-400">{L.ptsImprovement}</span>
         </div>
 
-        {/* Now */}
         <div className="flex flex-col items-center gap-1">
           <div className="relative shrink-0">
             <AuditGauge score={SCORE} maxScore={100} size={64} strokeWidth={7} color={c.hex} />
@@ -576,22 +682,21 @@ export function PostAuditCanvasV2() {
               <span className="text-slate-400 text-[9px]">/100</span>
             </div>
           </div>
-          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Now</span>
+          <span className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">{L.now}</span>
         </div>
 
-        {/* All-clear badge */}
         <div className="ml-1 space-y-1 border-l border-slate-100 pl-3">
-          <div className="text-[10px] font-bold text-slate-700">Health Score</div>
-          <div className="text-[11px] text-emerald-600 font-bold">● All checks passed</div>
+          <div className="text-[10px] font-bold text-slate-700">{L.healthScore}</div>
+          <div className="text-[11px] text-emerald-600 font-bold">{L.allChecksPassed}</div>
         </div>
       </div>
 
       <div className="space-y-3">
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Category Scores</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{L.categoryScoresTitle}</div>
           <div className="flex items-center gap-1.5 mt-1">
             <div className="w-0.5 h-3 bg-slate-500 rounded-sm shrink-0" />
-            <span className="text-[10px] text-slate-500">Previous score · current score in green</span>
+            <span className="text-[10px] text-slate-500">{L.comparisonLegend}</span>
           </div>
         </div>
         <div className="space-y-4">
@@ -600,16 +705,16 @@ export function PostAuditCanvasV2() {
       </div>
 
       <div className="space-y-1.5">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Compliance</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{L.complianceTitle}</div>
         <div className="border border-slate-100 rounded-lg px-3 py-0.5">
-          {compliance.map(r => <ComplianceRow key={r.law} {...r} />)}
+          {L.complianceAfter.map(r => <ComplianceRow key={r.law} {...r} />)}
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Key Improvements</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{L.keyImprovementsTitle}</div>
         <div className="space-y-1.5">
-          {passed.map((item, i) => (
+          {L.passed.map((item, i) => (
             <div key={i} className="flex items-start gap-2">
               <CheckCircle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-500" />
               <span className="text-[11px] text-slate-600 leading-tight">{item}</span>
@@ -620,13 +725,13 @@ export function PostAuditCanvasV2() {
 
       <div className="flex gap-2 pt-1">
         <button className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-          <Save className="w-3.5 h-3.5" /> Save
+          <Save className="w-3.5 h-3.5" /> {L.saveLbl}
         </button>
         <button className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-          <Share2 className="w-3.5 h-3.5" /> Share
+          <Share2 className="w-3.5 h-3.5" /> {L.shareLbl}
         </button>
         <button className="flex items-center gap-1.5 text-[11px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition-colors ml-auto">
-          <ExternalLink className="w-3.5 h-3.5" /> View Full Report
+          <ExternalLink className="w-3.5 h-3.5" /> {L.viewFullReportLbl}
         </button>
       </div>
     </div>
@@ -663,16 +768,32 @@ export function AuditPreviewPage() {
           </div>
         </div>
 
+        {/* EN canvases */}
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Full canvas panels</p>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇺🇸 English — full canvas panels</p>
           <div className="flex gap-6 flex-wrap items-start">
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
-              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">AuditCanvasV2 — 46/100</div>
-              <AuditCanvasV2 />
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">AuditCanvasV2 lang="en" — 46/100</div>
+              <AuditCanvasV2 lang="en" />
             </div>
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
-              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">PostAuditCanvasV2 — 97/100</div>
-              <PostAuditCanvasV2 />
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">PostAuditCanvasV2 lang="en" — 97/100</div>
+              <PostAuditCanvasV2 lang="en" />
+            </div>
+          </div>
+        </div>
+
+        {/* DE canvases */}
+        <div className="space-y-2">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">🇩🇪 Deutsch — Vollansicht</p>
+          <div className="flex gap-6 flex-wrap items-start">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">AuditCanvasV2 lang="de" — 46/100</div>
+              <AuditCanvasV2 lang="de" />
+            </div>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col" style={{ width: 480, minHeight: 540 }}>
+              <div className="bg-slate-800 text-slate-400 text-[10px] font-mono px-4 py-2 shrink-0">PostAuditCanvasV2 lang="de" — 97/100</div>
+              <PostAuditCanvasV2 lang="de" />
             </div>
           </div>
         </div>

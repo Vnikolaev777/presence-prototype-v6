@@ -1,21 +1,28 @@
-import { useState } from 'react';
-import { Bot, CheckCircle, Clock, Zap, Database, BarChart2, FileText, Link2, ShieldCheck, Users, Rss, ExternalLink, CalendarDays } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bot, CheckCircle, Clock, Zap, Database, BarChart2, FileText, Link2, ShieldCheck, Users, Rss, ExternalLink, CalendarDays, X, Bell, ClipboardCheck, Signal, Wifi, BatteryFull, Loader2, Globe, MessageSquare, Mail, AlertTriangle, Eye } from 'lucide-react';
 import type { AiAction } from '../data/mockData';
 import { AiReviewModal } from './AiReviewModal';
 import { AutoUpdatePreviewModal } from './AutoUpdatePreviewModal';
 import { cn } from '../lib/utils';
+import { useT, useRegion } from '../lib/i18n';
 
 // ─── Auto-update feed data ──────────────────────────────────────────────────
 // Realistic items driven by the 3 connected systems + the two web agents
 
 type AutoUpdate = {
   id: string;
+  /** Source label as a literal (used for brand names like "PowerSchool"). */
   source: string;
+  /** Optional translation key — overrides `source` for non-brand sources (e.g. "Web Admin Agent"). */
+  sourceKey?: string;
   sourceDomain?: string;
   sourceDomains?: string[]; // when multiple sources contributed (e.g. SIS + LMS)
-  title: string;
-  detail: string;
-  time: string;
+  /** Translation key for the title — resolved via useT() in AutoUpdateRow. */
+  titleKey: string;
+  /** Translation key for the body. */
+  detailKey: string;
+  /** Translation key for the time label (typically a shared `tasks.time.*` key). */
+  timeKey: string;
   icon: React.ReactNode;
   iconBg: string;
 };
@@ -27,9 +34,9 @@ const VACATION_UPDATE: AutoUpdate = {
   id: 'au_vacation',
   source: 'PowerSchool + Canvas LMS',
   sourceDomains: ['powerschool.com', 'canvas.instructure.com'],
-  title: 'Vacation Schedule & Holiday Programs Published',
-  detail: 'Spring Break (Apr 13–17) added to the Calendar. New Holiday Programs hub with lesson and club schedules during the break is live.',
-  time: 'Just now',
+  titleKey: 'dashboard.fixture.vacation.title',
+  detailKey: 'dashboard.fixture.vacation.detail',
+  timeKey: 'tasks.time.justNow',
   icon: <CalendarDays className="w-3.5 h-3.5" />,
   iconBg: 'bg-amber-100 text-amber-600',
 };
@@ -39,9 +46,9 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_0',
     source: 'PowerSchool',
     sourceDomain: 'powerschool.com',
-    title: 'New Teacher Profile Published',
-    detail: 'Mr. James Holloway joined as 10th Grade History teacher. Profile page created and added to the Faculty Directory.',
-    time: 'Just now',
+    titleKey: 'dashboard.fixture.autoUpdate.0.title',
+    detailKey: 'dashboard.fixture.autoUpdate.0.detail',
+    timeKey: 'tasks.time.justNow',
     icon: <Users className="w-3.5 h-3.5" />,
     iconBg: 'bg-blue-100 text-blue-600',
   },
@@ -49,9 +56,9 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_1',
     source: 'PowerSchool',
     sourceDomain: 'powerschool.com',
-    title: 'Faculty Directory Updated',
-    detail: 'Ms. Emily Chen added as AP Biology teacher. Faculty page updated and re-indexed automatically.',
-    time: '2 min ago',
+    titleKey: 'dashboard.fixture.autoUpdate.1.title',
+    detailKey: 'dashboard.fixture.autoUpdate.1.detail',
+    timeKey: 'tasks.time.2MinAgo',
     icon: <Users className="w-3.5 h-3.5" />,
     iconBg: 'bg-blue-100 text-blue-600',
   },
@@ -59,9 +66,9 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_2',
     source: 'Google Analytics',
     sourceDomain: 'analytics.google.com',
-    title: 'Athletics Page SEO Improved',
-    detail: 'Low search visibility detected for the Athletics schedule. Meta titles & descriptions auto-updated.',
-    time: '19 min ago',
+    titleKey: 'dashboard.fixture.autoUpdate.2.title',
+    detailKey: 'dashboard.fixture.autoUpdate.2.detail',
+    timeKey: 'tasks.time.19MinAgo',
     icon: <BarChart2 className="w-3.5 h-3.5" />,
     iconBg: 'bg-amber-100 text-amber-600',
   },
@@ -69,9 +76,9 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_3',
     source: 'Google Workspace',
     sourceDomain: 'workspace.google.com',
-    title: 'Parent Handbook 2026 Published',
-    detail: "New PDF detected in Principal's Drive. Old version replaced on the Resources page.",
-    time: '41 min ago',
+    titleKey: 'dashboard.fixture.autoUpdate.3.title',
+    detailKey: 'dashboard.fixture.autoUpdate.3.detail',
+    timeKey: 'tasks.time.41MinAgo',
     icon: <FileText className="w-3.5 h-3.5" />,
     iconBg: 'bg-indigo-100 text-indigo-600',
   },
@@ -79,18 +86,19 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_4',
     source: 'PowerSchool',
     sourceDomain: 'powerschool.com',
-    title: 'Class Schedule Synced',
-    detail: 'Mr. Davis assigned to Advanced Calculus (Period 3). Academic Calendar page updated.',
-    time: '1 hr ago',
+    titleKey: 'dashboard.fixture.autoUpdate.4.title',
+    detailKey: 'dashboard.fixture.autoUpdate.4.detail',
+    timeKey: 'tasks.time.1HrAgo',
     icon: <Database className="w-3.5 h-3.5" />,
     iconBg: 'bg-blue-100 text-blue-600',
   },
   {
     id: 'au_5',
     source: 'Web Admin Agent',
-    title: 'Broken Links Repaired',
-    detail: '3 broken navigation links detected and fixed across the Events and Contact pages.',
-    time: '3 hrs ago',
+    sourceKey: 'dashboard.fixture.source.webAdmin',
+    titleKey: 'dashboard.fixture.autoUpdate.5.title',
+    detailKey: 'dashboard.fixture.autoUpdate.5.detail',
+    timeKey: 'tasks.time.3HrAgo',
     icon: <Link2 className="w-3.5 h-3.5" />,
     iconBg: 'bg-purple-100 text-purple-600',
   },
@@ -98,9 +106,9 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_6',
     source: 'ClassDojo',
     sourceDomain: 'classdojo.com',
-    title: 'Engagement Digest Synced',
-    detail: 'Weekly parent engagement stats published. 94% read rate on last newsletter.',
-    time: '5 hrs ago',
+    titleKey: 'dashboard.fixture.autoUpdate.6.title',
+    detailKey: 'dashboard.fixture.autoUpdate.6.detail',
+    timeKey: 'tasks.time.5HrsAgo',
     icon: <Rss className="w-3.5 h-3.5" />,
     iconBg: 'bg-emerald-100 text-emerald-600',
   },
@@ -108,18 +116,19 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_7',
     source: 'Google Analytics',
     sourceDomain: 'analytics.google.com',
-    title: 'Lunch Menu Page Boosted',
-    detail: 'Traffic spike detected (+180%) from parent searches. Quick-link widget added to homepage.',
-    time: 'Yesterday',
+    titleKey: 'dashboard.fixture.autoUpdate.7.title',
+    detailKey: 'dashboard.fixture.autoUpdate.7.detail',
+    timeKey: 'tasks.time.yesterday',
     icon: <BarChart2 className="w-3.5 h-3.5" />,
     iconBg: 'bg-amber-100 text-amber-600',
   },
   {
     id: 'au_8',
     source: 'Web Crawler α',
-    title: 'Accessibility Scan Passed',
-    detail: 'Full site scan completed — 0 WCAG violations found. Report saved to Knowledge Model.',
-    time: 'Yesterday',
+    sourceKey: 'dashboard.fixture.source.webCrawler',
+    titleKey: 'dashboard.fixture.autoUpdate.8.title',
+    detailKey: 'dashboard.fixture.autoUpdate.8.detail',
+    timeKey: 'tasks.time.yesterday',
     icon: <ShieldCheck className="w-3.5 h-3.5" />,
     iconBg: 'bg-emerald-100 text-emerald-600',
   },
@@ -127,9 +136,9 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_9',
     source: 'PowerSchool',
     sourceDomain: 'powerschool.com',
-    title: 'Enrollment Numbers Updated',
-    detail: 'Q2 enrollment data synced. "About Our School" page stats refreshed automatically.',
-    time: '2 days ago',
+    titleKey: 'dashboard.fixture.autoUpdate.9.title',
+    detailKey: 'dashboard.fixture.autoUpdate.9.detail',
+    timeKey: 'tasks.time.2DaysAgo',
     icon: <Users className="w-3.5 h-3.5" />,
     iconBg: 'bg-blue-100 text-blue-600',
   },
@@ -137,6 +146,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
 
 // ─── Auto-update row component ──────────────────────────────────────────────
 function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void }) {
+  const t = useT();
   return (
     <div className="flex gap-3 items-start py-3 px-4 hover:bg-slate-50 transition-colors rounded-xl group">
       {/* Source favicon(s) or fallback icon */}
@@ -187,18 +197,396 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-semibold text-slate-800 leading-tight">{item.title}</p>
-          <span className="text-xs text-slate-400 shrink-0 mt-0.5 whitespace-nowrap">{item.time}</span>
+          <p className="text-sm font-semibold text-slate-800 leading-tight">{t(item.titleKey)}</p>
+          <span className="text-xs text-slate-400 shrink-0 mt-0.5 whitespace-nowrap">{t(item.timeKey)}</span>
         </div>
-        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{item.detail}</p>
+        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{t(item.detailKey)}</p>
         <div className="flex items-center justify-between mt-1.5">
-          <span className="text-xs text-slate-400 font-medium">{item.source}</span>
+          <span className="text-xs text-slate-400 font-medium">{item.sourceKey ? t(item.sourceKey) : item.source}</span>
           {onView && (
             <button onClick={onView} className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity">
-              View <ExternalLink className="w-3 h-3" />
+              {t('dashboard.feed.row.view')} <ExternalLink className="w-3 h-3" />
             </button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Compact consent phone preview ──────────────────────────────────────────
+function ConsentPhonePreview() {
+  const t = useT();
+  const [stage, setStage] = useState<0 | 1 | 2 | 3>(0);
+  useEffect(() => {
+    if (stage >= 3) return;
+    const t = setTimeout(() => setStage(s => (s + 1) as 0 | 1 | 2 | 3), stage === 0 ? 900 : 1400);
+    return () => clearTimeout(t);
+  }, [stage]);
+
+  return (
+    <div className="flex items-center justify-center py-8 bg-slate-100">
+      {/* Compact phone frame */}
+      <div className="w-[230px] bg-slate-900 rounded-[32px] p-2 shadow-2xl border border-slate-800">
+        <div className="w-full bg-white rounded-[24px] overflow-hidden flex flex-col" style={{ height: 420 }}>
+          {/* Status bar */}
+          <div className="shrink-0 h-6 px-5 flex items-center justify-between text-[10px] font-bold text-slate-900 bg-white relative">
+            <span>5:32</span>
+            <div className="absolute left-1/2 -translate-x-1/2 top-1 w-16 h-3.5 bg-slate-900 rounded-full" />
+            <div className="flex items-center gap-0.5">
+              <Signal className="w-2.5 h-2.5" />
+              <Wifi className="w-2.5 h-2.5" />
+              <BatteryFull className="w-3 h-3" />
+            </div>
+          </div>
+
+          {/* Content */}
+          {stage === 0 && (
+            <div className="flex-1 flex flex-col items-center justify-center gap-2 bg-slate-50 px-4 text-center">
+              <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
+              <p className="text-[10px] text-slate-500">{t('dashboard.consentPreview.sending')}</p>
+            </div>
+          )}
+
+          {stage >= 1 && stage < 3 && (
+            <div className="flex-1 flex flex-col bg-slate-50 min-h-0">
+              <div className="px-4 py-2 flex items-center gap-2 bg-white border-b border-slate-200 shrink-0">
+                <img src="https://www.google.com/s2/favicons?domain=sdui.de&sz=64" alt="Sdui" className="w-4 h-4 object-contain" />
+                <p className="text-[11px] font-bold text-slate-900">Sdui</p>
+                <span className="ml-auto text-[9px] text-slate-400">{t('dashboard.consentPreview.timeNow')}</span>
+              </div>
+              <div className="p-3 space-y-2 flex-1 overflow-hidden">
+                <div className="bg-white border border-slate-200 rounded-xl p-2.5 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                  <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5">{t('dashboard.consentPreview.permissionSlipBadge')}</p>
+                  <p className="text-[11px] font-bold text-slate-900 leading-snug">{t('dashboard.consentPreview.permissionSlipTitle')}</p>
+                  <p className="text-[9px] text-slate-500 mt-0.5">{t('dashboard.consentPreview.permissionSlipBody')}</p>
+                  <button className="mt-2 w-full text-[10px] font-bold py-1.5 rounded-lg bg-blue-600 text-white">
+                    {t('dashboard.consentPreview.openForm')}
+                  </button>
+                </div>
+
+                {stage >= 2 && (
+                  <div className="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{t('dashboard.consentPreview.prefilled')}</p>
+                    {['Student: Lina M.', 'Class: 10b', 'Emergency: +49 …'].map(line => (
+                      <div key={line} className="flex items-center gap-1.5 text-[10px] text-slate-700">
+                        <CheckCircle className="w-2.5 h-2.5 text-emerald-500 shrink-0" /> {line}
+                      </div>
+                    ))}
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-1.5 flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-2 h-2 text-white" />
+                      </div>
+                      <span className="text-[10px] font-semibold text-emerald-800">{t('dashboard.consentPreview.iAgree')}</span>
+                    </div>
+                    <div className="rounded-lg border border-dashed border-slate-300 bg-white h-7 flex items-center justify-center">
+                      <span className="text-slate-400 italic text-xs" style={{ fontFamily: 'Caveat, cursive' }}>M. Müller</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {stage === 3 && (
+            <div className="flex-1 flex flex-col bg-emerald-50 items-center justify-center gap-2 px-6 text-center animate-in fade-in zoom-in duration-500">
+              <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                <CheckCircle className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-bold text-emerald-900">{t('dashboard.consentPreview.submitted.title')}</p>
+              <p className="text-[10px] text-emerald-700 leading-relaxed">{t('dashboard.consentPreview.submitted.body')}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Weather alert preview modal ─────────────────────────────────────────────
+function WeatherAlertModal({ onClose }: { onClose: () => void }) {
+  const t = useT();
+  const region = useRegion();
+  const [tab, setTab] = useState<'website' | 'sdui' | 'email'>('website');
+  const [autoApply, setAutoApply] = useState(false);
+
+  const tabs = [
+    { id: 'website' as const, label: t('dashboard.review.weather.preview.tab.website'), icon: <Globe className="w-3.5 h-3.5" /> },
+    { id: 'sdui'    as const, label: t('dashboard.review.weather.preview.tab.sdui'),    icon: <MessageSquare className="w-3.5 h-3.5" /> },
+    { id: 'email'   as const, label: t('dashboard.review.weather.preview.tab.email'),   icon: <Mail className="w-3.5 h-3.5" /> },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full h-full max-w-[1400px] bg-white border border-slate-200 shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row">
+
+        {/* Close */}
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 text-slate-500 hover:text-slate-800 bg-white/80 backdrop-blur hover:bg-slate-100 rounded-full p-2 shadow-sm transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* ── Left panel ── */}
+        <div className="w-full md:w-[400px] lg:w-[440px] flex flex-col shrink-0 bg-white z-0 relative">
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+            <div className="flex items-center gap-2 text-red-600 text-xs font-bold tracking-wide uppercase mb-2">
+              <AlertTriangle className="w-4 h-4" />
+              {t('dashboard.review.weather.badge')}
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 leading-tight">{t('dashboard.review.weather.title')}</h2>
+          </div>
+
+          <div className="p-6 flex-1 overflow-y-auto space-y-7">
+            {/* Source */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source</h3>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                  <img src="https://www.google.com/s2/favicons?domain=dwd.de&sz=64" alt="DWD" className="w-5 h-5 object-contain" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">Deutscher Wetterdienst</p>
+                  <p className="text-xs text-slate-400">Unwetterwarnung Stufe 2 erkannt · Gerade eben</p>
+                </div>
+              </div>
+            </div>
+
+            {/* What was prepared */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Prepared</h3>
+              <ul className="space-y-3 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                {[
+                  { icon: <Globe className="w-4 h-4 text-blue-500" />,    label: 'Announcement banner for the school website' },
+                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: 'Sdui push notification to all parents' },
+                  { icon: <Mail className="w-4 h-4 text-slate-400" />,    label: 'Email fallback for parents without Sdui' },
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-3 text-slate-700 items-start">
+                    <span className="shrink-0 mt-0.5">{item.icon}</span>
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Footer — same layout as AiReviewModal */}
+          <div className="p-5 border-t border-slate-100 bg-white space-y-3">
+            <div className="flex gap-2">
+              <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors">
+                {t('aiReviewModal.action.reject')}
+              </button>
+              <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors flex items-center gap-1.5">
+                {t('aiReviewModal.action.edit')}
+              </button>
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-slate-900 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+                <CheckCircle className="w-4 h-4" /> {t('aiReviewModal.action.approve')}
+              </button>
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-xs text-slate-500 font-medium pr-4">{t('aiReviewModal.autoApply')}</span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={autoApply}
+                onClick={() => setAutoApply(v => !v)}
+                className="shrink-0 focus:outline-none"
+              >
+                <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${autoApply ? 'bg-emerald-500' : 'bg-slate-200'}`}>
+                  <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${autoApply ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right panel ── */}
+        <div className="hidden md:flex flex-1 flex-col bg-slate-100 relative">
+          {/* Toolbar with tabs */}
+          <div className="h-14 bg-white border-b border-l border-slate-200 flex items-center justify-between px-6 shrink-0">
+            <div className="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-blue-500" /> {t('dashboard.review.weather.preview.title')}
+            </div>
+            {/* Tab switcher */}
+            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 gap-0.5">
+              {tabs.map(tb => (
+                <button
+                  key={tb.id}
+                  onClick={() => setTab(tb.id)}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition-all',
+                    tab === tb.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  )}
+                >
+                  {tb.icon} {tb.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab content */}
+          <div className="flex-1 relative overflow-hidden">
+            {/* Website tab */}
+            {tab === 'website' && (
+              <iframe
+                key="weather-website"
+                src={`${import.meta.env.BASE_URL}lerchenberg/good.html?highlight=announcement&state=after`}
+                className="w-full h-full border-0"
+                title="Website preview"
+              />
+            )}
+
+            {/* Sdui tab */}
+            {tab === 'sdui' && (
+              <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                <div className="relative">
+                  {/* Phone frame */}
+                  <div className="w-[260px] bg-slate-900 rounded-[36px] p-2.5 shadow-2xl border border-slate-800">
+                    <div className="w-full bg-white rounded-[28px] overflow-hidden flex flex-col" style={{ height: 500 }}>
+                      {/* Status bar */}
+                      <div className="shrink-0 h-7 px-5 flex items-center justify-between text-[11px] font-bold text-slate-900 bg-white relative">
+                        <span>7:14</span>
+                        <div className="absolute left-1/2 -translate-x-1/2 top-1.5 w-20 h-4 bg-slate-900 rounded-full" />
+                        <div className="flex items-center gap-0.5"><Signal className="w-3 h-3" /><Wifi className="w-3 h-3" /><BatteryFull className="w-3.5 h-3.5" /></div>
+                      </div>
+                      {/* App bar */}
+                      <div className="px-5 py-2.5 flex items-center gap-2 bg-white border-b border-slate-100 shrink-0">
+                        <img src="https://www.google.com/s2/favicons?domain=sdui.de&sz=64" alt="Sdui" className="w-5 h-5 object-contain" />
+                        <p className="text-xs font-bold text-slate-900">Sdui</p>
+                        <span className="ml-auto text-[10px] text-slate-400">jetzt</span>
+                      </div>
+                      {/* Notification */}
+                      <div className="flex-1 bg-slate-50 p-3 space-y-2">
+                        <div className="bg-red-50 border border-red-200 rounded-2xl p-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-red-600 bg-red-100 px-2 py-0.5 rounded-full">⚠ Unwetter</span>
+                          </div>
+                          <p className="text-[12px] font-extrabold text-slate-900 leading-snug">Unwetterwarnung Stufe 2 — Donnerstag, 7. Mai</p>
+                          <p className="text-[11px] text-slate-600 mt-1 leading-snug">Starkregen &amp; Gewitter erwartet. Schulbetrieb läuft — Sportunterricht findet in der Halle statt.</p>
+                          <div className="flex gap-2 mt-2.5">
+                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-red-600 text-white">Zur Schule</button>
+                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600">DWD-Warnung</button>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-slate-400 text-center pt-1">Gesendet an 312 Eltern</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full whitespace-nowrap">
+                    Eltern · Sdui-App
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Email tab */}
+            {tab === 'email' && (
+              <div className="w-full h-full flex items-center justify-center bg-slate-100 p-8">
+                <div className="w-full max-w-[520px] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-sm">
+                  {/* Email client header */}
+                  <div className="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                      <AlertTriangle className="w-4 h-4 text-red-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900 text-xs leading-tight">Primarschule Rosenbach &lt;info@ps-rosenbach.ch&gt;</p>
+                      <p className="text-[10px] text-slate-400">An: Alle Eltern · Do, 7. Mai 2026, 07:14</p>
+                    </div>
+                  </div>
+                  {/* Email body */}
+                  <div className="p-6 space-y-4">
+                    <p className="text-base font-extrabold text-slate-900">⚠ Unwetterwarnung — Donnerstag, 7. Mai</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Liebe Eltern,</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">der Deutsche Wetterdienst hat für den heutigen Donnerstag eine <strong>Unwetterwarnung der Stufe 2</strong> (Starkregen und Gewitter) ausgegeben.</p>
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                      <p className="text-sm font-bold text-red-800 mb-1">Was bedeutet das für den Schulbetrieb?</p>
+                      <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
+                        <li>Der Unterricht findet <strong>wie gewohnt</strong> statt</li>
+                        <li>Sportunterricht wird in die <strong>Sporthalle verlegt</strong></li>
+                        <li>Bitte schicken Sie Ihr Kind mit regenfester Kleidung</li>
+                      </ul>
+                    </div>
+                    <p className="text-sm text-slate-600 leading-relaxed">Bei weiteren Fragen stehen wir Ihnen gerne zur Verfügung.</p>
+                    <p className="text-sm text-slate-600">Mit freundlichen Grüßen,<br /><strong>Schulleitung Primarschule Rosenbach</strong></p>
+                    <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-400">
+                      Gesendet an 312 Empfänger · Diese E-Mail wurde automatisch von Presence AI erstellt
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ─── Comm notification preview modal ────────────────────────────────────────
+function PhoneNotifModal({ type, onClose }: { type: 'consent' | 'event'; onClose: () => void }) {
+  const t = useT();
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden w-full max-w-md">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <div>
+            <p className="text-sm font-bold text-slate-900">
+              {type === 'consent' ? t('dashboard.consentPreview.title') : t('dashboard.eventPreview.title')}
+            </p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {type === 'consent' ? t('dashboard.consentPreview.subtitle') : t('dashboard.eventPreview.subtitle')}
+            </p>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {type === 'consent' ? (
+          <ConsentPhonePreview />
+        ) : (
+          // Event notification — simple phone push mockup
+          <div className="flex items-center justify-center py-8 bg-slate-100 p-10">
+            <div className="w-[220px] rounded-[2.5rem] border-[6px] border-slate-800 shadow-2xl overflow-hidden bg-slate-50 flex flex-col" style={{ height: 420 }}>
+              {/* Status bar */}
+              <div className="bg-slate-800 px-4 pt-2 pb-1 flex justify-between items-center shrink-0">
+                <span className="text-[10px] text-white font-semibold">9:41</span>
+                <div className="flex gap-1 items-center">
+                  <div className="w-3 h-1.5 rounded-sm bg-white/60" />
+                  <div className="w-1 h-1 rounded-full bg-white/60" />
+                </div>
+              </div>
+              {/* Lock screen */}
+              <div className="flex-1 bg-gradient-to-b from-slate-700 to-slate-900 flex flex-col items-center px-3 py-4 gap-3">
+                <p className="text-[10px] text-white/60 font-medium">{t('dashboard.eventPreview.dateLabel')}</p>
+                <p className="text-3xl font-light text-white">9:41</p>
+                {/* Notification bubble */}
+                <div className="w-full bg-white/15 backdrop-blur rounded-2xl p-3 mt-2 animate-in fade-in slide-in-from-top-2 duration-700">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="w-5 h-5 rounded-md bg-white overflow-hidden flex items-center justify-center shrink-0">
+                      <img src="https://www.google.com/s2/favicons?domain=sdui.de&sz=64" className="w-4 h-4 object-contain" alt="Sdui" />
+                    </div>
+                    <span className="text-[10px] font-bold text-white/90 uppercase tracking-widest">{t('dashboard.eventPreview.sduiLabel')}</span>
+                  </div>
+                  <p className="text-[11px] font-bold text-white leading-snug">{t('dashboard.eventPreview.sduiTitle')}</p>
+                  <p className="text-[10px] text-white/75 mt-0.5 leading-snug">{t('dashboard.eventPreview.sduiBody')}</p>
+                </div>
+                <div className="w-full bg-white/10 backdrop-blur rounded-2xl p-3 animate-in fade-in slide-in-from-top-2 duration-700 delay-500">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="w-5 h-5 rounded-md bg-blue-600 flex items-center justify-center shrink-0">
+                      <span className="text-[9px] font-bold text-white">@</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-white/90 uppercase tracking-widest">{t('dashboard.eventPreview.emailLabel')}</span>
+                  </div>
+                  <p className="text-[11px] font-bold text-white leading-snug">{t('dashboard.eventPreview.emailTitle')}</p>
+                  <p className="text-[10px] text-white/75 mt-0.5">{t('dashboard.eventPreview.emailBody')}</p>
+                </div>
+                <p className="text-[10px] text-white/40 mt-auto">{t('dashboard.eventPreview.footer')}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -209,6 +597,10 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
   const [selectedAction, setSelectedAction] = useState<AiAction | null>(null);
   const [removedActions, setRemovedActions] = useState<string[]>([]);
   const [previewVariant, setPreviewVariant] = useState<'teacher' | 'vacation' | null>(null);
+  const [commPreview, setCommPreview] = useState<'consent' | 'event' | null>(null);
+  const [showWeatherModal, setShowWeatherModal] = useState(false);
+  const t = useT();
+  const region = useRegion();
 
   // When the auto-updates scenario has been completed, add the vacation
   // schedule + holiday programs item at the top of the feed.
@@ -216,38 +608,59 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
     ? [VACATION_UPDATE, ...AUTO_UPDATES]
     : AUTO_UPDATES;
 
+  // Action fixtures are built per-render so t() resolves in the active language.
+  // When the user clicks "Review", `selectedAction` snapshots the current
+  // language — switching locales while the modal is open won't retranslate it,
+  // matching the same chat-snapshot pattern used elsewhere in the prototype.
+  const isDACH = region.id === 'DACH';
   const CC_ACTION: AiAction = {
     id: 'cc_dash_1',
     isInternal: false,
-    timestamp: 'Just now',
-    title: 'Publish: State Science Fair Results',
-    summary: "I found Oakwood students listed as participants in the State Science Fair via PowerSchool, then cross-referenced with a Springfield Tribune article confirming 3 gold medals. The official results on sciencefair.state.gov matched — I connected all three and drafted a blog post.",
+    timestamp: t('tasks.time.justNow'),
+    title: t(isDACH ? 'dashboard.fixture.cc.dach.title' : 'dashboard.fixture.cc.title'),
+    summary: t(isDACH ? 'dashboard.fixture.cc.dach.summary' : 'dashboard.fixture.cc.summary'),
     proposedChanges: [
-      "Create new Blog Post: 'Oakwood Excels at State Science Fair'",
-      "Publish to Homepage Feed",
-      "Send notification email to Parents"
+      t(isDACH ? 'dashboard.fixture.cc.dach.change.0' : 'dashboard.fixture.cc.change.0'),
+      t('dashboard.fixture.cc.change.1'),
+      t('dashboard.fixture.cc.change.2'),
     ],
     requiresUserInput: false,
     previewType: 'science_fair_blog',
     status: 'pending',
-    source: 'PowerSchool',
+    source: isDACH ? 'WebUntis' : 'PowerSchool',
     sourceType: 'sis',
     confidence: 0.95,
-    sources: [
+    sources: isDACH ? [
+      {
+        website: 'WebUntis',
+        url: 'https://webuntis.com',
+        detail: t('dashboard.fixture.cc.dach.source.0.detail'),
+      },
+      {
+        website: 'Badische Zeitung',
+        url: 'https://badische-zeitung.de',
+        detail: t('dashboard.fixture.cc.dach.source.1.detail'),
+      },
+      {
+        website: 'Jugend forscht',
+        url: 'https://jugendforscht.de',
+        detail: t('dashboard.fixture.cc.dach.source.2.detail'),
+      },
+    ] : [
       {
         website: 'PowerSchool',
         url: 'https://powerschool.com',
-        detail: 'Found 4 Oakwood students registered as Science Fair participants',
+        detail: t('dashboard.fixture.cc.source.0.detail'),
       },
       {
         website: 'Springfield Tribune',
         url: 'https://springfieldtribune.com',
-        detail: 'Article: "Local Students Sweep Regional Science Fair" — 3 gold medals confirmed',
+        detail: t('dashboard.fixture.cc.source.1.detail'),
       },
       {
         website: 'State Science Fair',
         url: 'https://sciencefair.state.gov',
-        detail: 'Official results page — Oakwood listed in top 3 schools statewide',
+        detail: t('dashboard.fixture.cc.source.2.detail'),
       },
     ],
   };
@@ -255,28 +668,35 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
   const WA_ACTION: AiAction = {
     id: 'wa_dash_1',
     isInternal: false,
-    timestamp: '1m ago',
-    title: 'ADA Compliance Update Required',
-    summary: "The U.S. Department of Justice finalized new ADA Title II rules requiring public school websites to meet WCAG 2.1 AA standards by April 2026. I've identified 4 pages on your site that need updates to stay compliant.",
+    timestamp: t('dashboard.fixture.wa.timestamp'),
+    title: t(isDACH ? 'dashboard.fixture.wa.dach.title' : 'dashboard.fixture.wa.title'),
+    summary: t(isDACH ? 'dashboard.fixture.wa.dach.summary' : 'dashboard.fixture.wa.summary'),
     proposedChanges: [
-      "Add alt text to 12 images missing descriptions on the Athletics and Events pages.",
-      "Increase color contrast ratio on the navigation menu to meet 4.5:1 minimum.",
-      "Add keyboard focus indicators to all interactive elements.",
-      "Update contact form with proper ARIA labels for screen reader support."
+      t(isDACH ? 'dashboard.fixture.wa.dach.change.0' : 'dashboard.fixture.wa.change.0'),
+      t(isDACH ? 'dashboard.fixture.wa.dach.change.1' : 'dashboard.fixture.wa.change.1'),
+      t(isDACH ? 'dashboard.fixture.wa.dach.change.2' : 'dashboard.fixture.wa.change.2'),
+      t(isDACH ? 'dashboard.fixture.wa.dach.change.3' : 'dashboard.fixture.wa.change.3'),
     ],
     requiresUserInput: false,
     previewType: 'ada_compliance',
     status: 'pending',
-    source: 'Web Admin Agent',
+    source: t('dashboard.fixture.source.webAdmin'),
     sourceType: 'district',
-    sourceUrl: 'https://www.ada.gov/resources/web-guidance/',
-    sourceWebsite: 'ADA.gov',
+    sourceUrl: isDACH ? 'https://www.bmas.de/DE/Soziales/Teilhabe-und-Inklusion/Barrierefreiheit/barrierefreiheit.html' : 'https://www.ada.gov/resources/web-guidance/',
+    sourceWebsite: isDACH ? t('dashboard.fixture.wa.dach.sourceWebsite') : 'ADA.gov',
     confidence: 0.97
   };
 
-  const isCCPending = !removedActions.includes(CC_ACTION.id);
-  const isWAPending = !removedActions.includes(WA_ACTION.id);
-  const pendingCount = [isCCPending, isWAPending].filter(Boolean).length;
+  const isCCPending      = !removedActions.includes(CC_ACTION.id);
+  const isWAPending      = !removedActions.includes(WA_ACTION.id);
+  const isConsentPending = !removedActions.includes('consent_1');
+  const isEventPending   = !removedActions.includes('event_1');
+  const pendingCount = [
+    hasMonitoringSetup && isCCPending,
+    hasMonitoringSetup && isWAPending,
+    hasHiredAgents && isConsentPending,
+    hasHiredAgents && isEventPending,
+  ].filter(Boolean).length;
 
   return (
     <div className="animate-in fade-in duration-700 max-w-6xl space-y-6">
@@ -284,16 +704,16 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
       {/* Header */}
       <div>
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-3xl font-light tracking-tight text-black">Automations</h1>
+          <h1 className="text-3xl font-light tracking-tight text-black">{t('dashboard.title')}</h1>
           <button
             onClick={() => onNavigate?.('workspace')}
             className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all"
           >
             <Zap className="w-4 h-4 text-indigo-500" />
-            Add more automations
+            {t('dashboard.cta.addAutomations')}
           </button>
         </div>
-        <p className="text-slate-500 text-sm mt-1">AI-driven updates to your school website — review proposals or see what was already handled.</p>
+        <p className="text-slate-500 text-sm mt-1">{t('dashboard.subtitle')}</p>
 
         {/* Status bar — only once agents are hired and content is live */}
         {hasHiredAgents && (
@@ -305,7 +725,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="font-semibold text-emerald-700">Connected</span>
+              <span className="font-semibold text-emerald-700">{t('dashboard.status.connected')}</span>
               <span className="text-slate-400 text-xs">oakwoodhigh.org</span>
             </div>
 
@@ -314,7 +734,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
             {/* Last sync */}
             <div className="flex items-center gap-1.5 text-sm text-slate-500">
               <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Last sync <span className="font-semibold text-slate-700">2 min ago</span></span>
+              <span>{t('dashboard.status.lastSync')} <span className="font-semibold text-slate-700">{t('dashboard.status.lastSyncValue')}</span></span>
             </div>
 
             <div className="w-px h-3.5 bg-slate-200" />
@@ -323,25 +743,25 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
             <div className="relative group flex items-center gap-1.5 text-sm text-slate-500 cursor-default">
               <Zap className="w-3.5 h-3.5 text-indigo-500" />
               <span>
-                <span className="font-semibold text-slate-700 underline underline-offset-2 decoration-dashed decoration-slate-300">6.5 hrs</span> saved this week
+                <span className="font-semibold text-slate-700 underline underline-offset-2 decoration-dashed decoration-slate-300">6.5 hrs</span> {t('dashboard.status.timeSavedSuffix')}
               </span>
 
               {/* Tooltip — appears below */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-slate-900 text-white text-xs rounded-xl shadow-xl p-3.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
                 {/* Arrow */}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-900" />
-                <p className="font-bold text-white mb-2.5">How we calculate this</p>
+                <p className="font-bold text-white mb-2.5">{t('dashboard.status.tooltip.title')}</p>
                 <div className="space-y-1.5 text-slate-300">
                   <div className="flex justify-between">
-                    <span>Updates auto-handled</span>
+                    <span>{t('dashboard.status.tooltip.updates')}</span>
                     <span className="font-semibold text-white">10</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Avg. time per update</span>
+                    <span>{t('dashboard.status.tooltip.avg')}</span>
                     <span className="font-semibold text-white">~39 min</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Total time saved</span>
+                    <span>{t('dashboard.status.tooltip.total')}</span>
                     <span className="font-semibold text-indigo-300">6.5 hrs</span>
                   </div>
                 </div>
@@ -353,7 +773,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
             {/* Auto-handled */}
             <div className="flex items-center gap-1.5 text-sm text-slate-500">
               <BarChart2 className="w-3.5 h-3.5 text-slate-400" />
-              <span><span className="font-semibold text-slate-700">10 updates</span> auto-handled</span>
+              <span><span className="font-semibold text-slate-700">{t('dashboard.status.autoHandledCount')}</span> {t('dashboard.status.autoHandledSuffix')}</span>
             </div>
 
           </div>
@@ -364,8 +784,8 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
       {!hasHiredAgents ? (
         <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-16 text-center text-slate-400 space-y-3 flex flex-col items-center justify-center">
           <Bot className="w-10 h-10 opacity-30" />
-          <p className="font-medium text-sm">Nothing here yet.</p>
-          <p className="text-xs leading-relaxed max-w-xs">Complete the setup in Presence Assistant to start seeing automated updates here.</p>
+          <p className="font-medium text-sm">{t('dashboard.empty.title')}</p>
+          <p className="text-xs leading-relaxed max-w-xs">{t('dashboard.empty.body')}</p>
         </div>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -377,8 +797,8 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
             <div className="p-1.5 bg-amber-100 text-amber-600 rounded-lg">
               <Clock className="w-4 h-4" />
             </div>
-            <h2 className="text-sm font-bold text-slate-700">Needs Your Review</h2>
-            {hasMonitoringSetup && pendingCount > 0 && (
+            <h2 className="text-sm font-bold text-slate-700">{t('dashboard.review.heading')}</h2>
+            {hasHiredAgents && pendingCount > 0 && (
               <span className="ml-auto bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 {pendingCount}
               </span>
@@ -386,51 +806,109 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
           </div>
 
           {/* Column body */}
-          {hasMonitoringSetup ? (
+          {hasHiredAgents ? (
             <div className="space-y-3">
-              {isCCPending && (
+
+              {/* Consent form card — appears after first scenario */}
+              {isConsentPending && (
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 animate-in fade-in">
-                  <div>
-                    <h3 className="font-semibold text-slate-800 text-sm">New post: Celebrate our Science Fair winners</h3>
-                    <p className="text-sm text-slate-600 mt-1">"{CC_ACTION.summary}"</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <ClipboardCheck className="w-2.5 h-2.5" /> {t('dashboard.review.consent.badge')}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.consent.title')}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.consent.body')}</p>
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
                     <button
-                      onClick={() => setSelectedAction(CC_ACTION)}
-                      className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                      onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
+                      className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
-                      Review Draft
+                      {t('dashboard.review.consent.action')}
+                    </button>
+                    <button
+                      onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
+                      className="text-xs font-bold bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      {t('dashboard.review.consent.actionSms')}
+                    </button>
+                    <button
+                      onClick={() => setCommPreview('consent')}
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                    >
+                      {t('dashboard.review.action.preview')}
+                    </button>
+                    <button
+                      onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
+                      className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors ml-auto"
+                    >
+                      {t('dashboard.review.action.dismiss')}
                     </button>
                   </div>
                 </div>
               )}
 
-              {isWAPending && (
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 animate-in fade-in">
-                  <div>
-                    <h3 className="font-semibold text-slate-800 text-sm">Your site needs updates to meet new ADA standards</h3>
-                    <p className="text-sm text-slate-600 mt-1">"{WA_ACTION.summary}"</p>
+              {/* Weather alert card — appears after first scenario */}
+              {isEventPending && (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-red-200 animate-in fade-in">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <AlertTriangle className="w-2.5 h-2.5" /> {t('dashboard.review.weather.badge')}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.weather.title')}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.weather.body')}</p>
+                  <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setSelectedAction(WA_ACTION)}
-                      className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                      onClick={() => setShowWeatherModal(true)}
+                      className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
-                      Review ADA Updates
+                      Review Alert
                     </button>
                   </div>
                 </div>
               )}
 
-              {(!isCCPending && !isWAPending) && (
+              {/* Science Fair + ADA cards — appear after second (monitoring) scenario */}
+              {hasMonitoringSetup && isCCPending && (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 animate-in fade-in">
+                  <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.scienceFair.title')}</h3>
+                  <p className="text-sm text-slate-600 mt-1">"{CC_ACTION.summary}"</p>
+                  <button
+                    onClick={() => setSelectedAction(CC_ACTION)}
+                    className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                  >
+                    {t('dashboard.review.scienceFair.action')}
+                  </button>
+                </div>
+              )}
+
+              {hasMonitoringSetup && isWAPending && (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 animate-in fade-in">
+                  <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.ada.title')}</h3>
+                  <p className="text-sm text-slate-600 mt-1">"{WA_ACTION.summary}"</p>
+                  <button
+                    onClick={() => setSelectedAction(WA_ACTION)}
+                    className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                  >
+                    {t('dashboard.review.ada.action')}
+                  </button>
+                </div>
+              )}
+
+              {!isConsentPending && !isEventPending && !(hasMonitoringSetup && isCCPending) && !(hasMonitoringSetup && isWAPending) && (
                 <div className="py-10 text-center text-slate-400 space-y-2">
                   <CheckCircle className="w-8 h-8 mx-auto opacity-40" />
-                  <p className="text-sm font-medium">All caught up!</p>
-                  <p className="text-xs">No pending suggestions from your agents.</p>
+                  <p className="text-sm font-medium">{t('dashboard.review.allCaughtUp.title')}</p>
+                  <p className="text-xs">{t('dashboard.review.allCaughtUp.body')}</p>
                 </div>
               )}
             </div>
           ) : (
             <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-10 text-center text-slate-400 space-y-2 flex flex-col items-center justify-center min-h-[180px]">
               <Clock className="w-8 h-8 opacity-25" />
-              <p className="text-sm font-medium">No review requests yet.</p>
-              <p className="text-xs leading-relaxed max-w-xs">Set up internet monitoring in Presence Assistant to receive proposals that need your approval.</p>
+              <p className="text-sm font-medium">{t('dashboard.review.empty.title')}</p>
+              <p className="text-xs leading-relaxed max-w-xs">{t('dashboard.review.empty.body')}</p>
             </div>
           )}
         </div>
@@ -442,10 +920,10 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
             <div className="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
               <Zap className="w-4 h-4" />
             </div>
-            <h2 className="text-sm font-bold text-slate-700">Automatic Updates</h2>
+            <h2 className="text-sm font-bold text-slate-700">{t('dashboard.feed.heading')}</h2>
             <span className="ml-auto text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-              Live
+              {t('dashboard.feed.live')}
             </span>
           </div>
 
@@ -468,7 +946,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                 ))}
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Handled automatically by your connected systems
+                {t('dashboard.feed.subheading')}
               </p>
             </div>
 
@@ -489,8 +967,8 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
 
             {/* Footer */}
             <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
-              <p className="text-xs text-slate-400">{autoUpdates.length} updates this week</p>
-              <button className="text-xs font-semibold text-blue-600 hover:underline">View full history →</button>
+              <p className="text-xs text-slate-400">{t('dashboard.feed.footer.count', { count: autoUpdates.length })}</p>
+              <button className="text-xs font-semibold text-blue-600 hover:underline">{t('dashboard.feed.footer.viewAll')}</button>
             </div>
           </div>
         </div>}
@@ -503,6 +981,14 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
           variant={previewVariant}
           onClose={() => setPreviewVariant(null)}
         />
+      )}
+
+      {commPreview && (
+        <PhoneNotifModal type={commPreview} onClose={() => setCommPreview(null)} />
+      )}
+
+      {showWeatherModal && (
+        <WeatherAlertModal onClose={() => setShowWeatherModal(false)} />
       )}
 
       {/* Review modal — unchanged */}

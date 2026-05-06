@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Grundschule Lerchenberg – 286 Kinder, 14 Klassen, Schwerpunktschule für gemeinsames Lernen. Hindemithstraße 1–5, 55127 Mainz." />
+  <title>Grundschule Lerchenberg – Mainz</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-900: #1a2e1e;
+      --green-800: #2d5a3d;
+      --green-700: #3a7050;
+      --green-600: #40916c;
+      --green-500: #52b788;
+      --green-400: #74c69d;
+      --green-200: #b7e4c7;
+      --green-100: #d8f3dc;
+      --green-50:  #f1faf5;
+      --amber:     #e9c46a;
+      --amber-dk:  #c09b35;
+      --red:       #e63946;
+      --slate-50:  #f8faf9;
+      --slate-100: #eef1ee;
+      --slate-200: #d8ddd8;
+      --slate-400: #8c9c8d;
+      --slate-600: #4a5c4b;
+      --slate-900: #1a2e1e;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--slate-900);
+      background: var(--slate-50);
+    }
+
+    /* ── SKIP LINK ──────────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      background: var(--green-800);
+      color: white;
+      padding: .5rem 1rem;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 9999;
+      transition: top .15s;
+    }
+    .skip-link:focus { top: 0; }
+
+    /* ── NAV ───────────────────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--green-800);
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      width: 36px;
+      height: 36px;
+      background: var(--green-500);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -.5px;
+    }
+    .nav-logo-text {
+      line-height: 1.2;
+    }
+    .nav-logo-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+    }
+    .nav-logo-text span {
+      font-size: 11px;
+      color: var(--green-400);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      padding: .4rem .75rem;
+      border-radius: var(--radius-sm);
+      transition: color .15s, background .15s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: white;
+      background: rgba(255,255,255,.12);
+    }
+    .nav-cta {
+      background: var(--green-500) !important;
+      color: white !important;
+      padding: .4rem .9rem !important;
+    }
+    .nav-cta:hover { background: var(--green-400) !important; }
+
+    .nav-burger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .5rem;
+      color: white;
+    }
+    .nav-burger svg { display: block; }
+
+    /* mobile nav */
+    @media (max-width: 768px) {
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: var(--green-900); padding: 1rem 1.5rem; gap: .25rem; }
+      .nav-links.open { display: flex; }
+      .nav-burger { display: block; }
+    }
+
+    /* ── HERO ──────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--green-900) 0%, var(--green-800) 50%, var(--green-700) 100%);
+      padding: 80px 1.5rem 96px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 80% 60%, rgba(82,183,136,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 100px;
+      padding: .35rem 1rem;
+      font-size: 13px;
+      color: var(--green-200);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green-400); flex-shrink: 0; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -.5px;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 span { color: var(--green-400); }
+    .hero p {
+      font-size: 17px;
+      color: rgba(255,255,255,.75);
+      max-width: 520px;
+      margin: 0 auto 2.25rem;
+      line-height: 1.65;
+    }
+    .hero-btns {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--green-500);
+      color: white;
+      border: none;
+      padding: .75rem 1.75rem;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .btn-primary:hover { background: var(--green-400); transform: translateY(-1px); }
+    .btn-secondary {
+      background: rgba(255,255,255,.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,.25);
+      padding: .75rem 1.75rem;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,.18); }
+
+    /* ── QUICK ACCESS STRIP ─────────────────────────────────── */
+    .quick-strip {
+      background: white;
+      border-bottom: 1px solid var(--slate-200);
+      padding: 0 1.5rem;
+    }
+    .quick-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .quick-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: 1rem 1.25rem;
+      border-right: 1px solid var(--slate-200);
+      text-decoration: none;
+      color: var(--slate-600);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .quick-item:hover { background: var(--green-50); color: var(--green-800); }
+    .quick-item:first-child { border-left: 1px solid var(--slate-200); }
+    .quick-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--green-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    /* ── GENERAL SECTION ────────────────────────────────────── */
+    .section { padding: 72px 1.5rem; }
+    .section.alt { background: white; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--green-600);
+      margin-bottom: .5rem;
+    }
+    .section-title {
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -.3px;
+      color: var(--slate-900);
+      margin-bottom: 1rem;
+    }
+    .section-lead {
+      font-size: 17px;
+      color: var(--slate-600);
+      max-width: 580px;
+      line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── NEWS ───────────────────────────────────────────────── */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .news-card {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: box-shadow .2s, transform .15s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+    .news-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .news-card-img {
+      height: 160px;
+      background: var(--green-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      flex-shrink: 0;
+    }
+    .news-card-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+    .news-meta {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .6rem;
+    }
+    .news-cat {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+    .news-date { font-size: 12px; color: var(--slate-400); }
+    .news-card h3 { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: .5rem; color: var(--slate-900); }
+    .news-card p { font-size: 14px; color: var(--slate-600); line-height: 1.6; flex: 1; }
+    .news-link { font-size: 14px; font-weight: 600; color: var(--green-700); margin-top: .75rem; display: flex; align-items: center; gap: .25rem; }
+
+    /* ── STATS ──────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    .stat-card {
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--green-800);
+      line-height: 1;
+      margin-bottom: .25rem;
+    }
+    .stat-label { font-size: 13px; color: var(--slate-600); }
+
+    /* ── FEATURE CARDS ──────────────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .feature-card {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--green-50);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 1rem;
+    }
+    .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: .5rem; }
+    .feature-card p { font-size: 14px; color: var(--slate-600); line-height: 1.65; }
+
+    /* ── ZWEI SPALTEN LAYOUT ───────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; gap: 2rem; } }
+    .two-col-img {
+      background: var(--green-100);
+      border-radius: var(--radius-xl);
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+      border: 1px solid var(--green-200);
+    }
+    .two-col-img img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-xl); }
+    .check-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+      margin: 1.5rem 0;
+    }
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      font-size: 15px;
+      color: var(--slate-600);
+    }
+    .check-list li::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: var(--green-500);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 2px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* ── TEAM ───────────────────────────────────────────────── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+    .team-card {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+      transition: box-shadow .2s;
+    }
+    .team-card:hover { box-shadow: var(--shadow-md); }
+    .team-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto .75rem;
+      object-fit: cover;
+      background: var(--green-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--green-700);
+      overflow: hidden;
+    }
+    .team-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .team-name { font-size: 15px; font-weight: 700; color: var(--slate-900); margin-bottom: .25rem; }
+    .team-role { font-size: 13px; color: var(--green-700); font-weight: 500; margin-bottom: .25rem; }
+    .team-dept { font-size: 12px; color: var(--slate-400); }
+
+    /* ── KONTAKT ────────────────────────────────────────────── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 2.5rem;
+    }
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-info-card {
+      background: var(--green-800);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      color: white;
+    }
+    .contact-info-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 1.5rem; }
+    .contact-row {
+      display: flex;
+      gap: .9rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+    .contact-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,.12);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .contact-detail-label { font-size: 12px; color: rgba(255,255,255,.55); margin-bottom: 2px; }
+    .contact-detail-val { font-size: 14px; color: white; font-weight: 500; }
+    .contact-detail-val a { color: var(--green-300, #95d5b2); text-decoration: none; }
+    .contact-detail-val a:hover { text-decoration: underline; }
+
+    .contact-form {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+    }
+    .contact-form h3 { font-size: 18px; font-weight: 700; margin-bottom: 1.25rem; }
+    .form-row { margin-bottom: 1rem; }
+    .form-row label { display: block; font-size: 13px; font-weight: 600; color: var(--slate-600); margin-bottom: .4rem; }
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      width: 100%;
+      padding: .65rem .9rem;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--slate-900);
+      background: white;
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+    }
+    .form-row input:focus,
+    .form-row select:focus,
+    .form-row textarea:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(82,183,136,.18);
+    }
+    .form-row textarea { resize: vertical; min-height: 110px; }
+    .form-two { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    @media (max-width: 500px) { .form-two { grid-template-columns: 1fr; } }
+    .form-submit {
+      width: 100%;
+      padding: .8rem;
+      background: var(--green-600);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+    .form-submit:hover { background: var(--green-700); }
+    .form-note { font-size: 11px; color: var(--slate-400); margin-top: .6rem; line-height: 1.5; }
+
+    /* ── MAP PLACEHOLDER ────────────────────────────────────── */
+    .map-placeholder {
+      height: 200px;
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: .5rem;
+      margin-top: 1.5rem;
+      font-size: 13px;
+      color: var(--slate-400);
+    }
+    .map-placeholder span { font-size: 28px; }
+
+    /* ── BANNER ─────────────────────────────────────────────── */
+    .info-banner {
+      background: var(--amber);
+      padding: 14px 1.5rem;
+    }
+    .info-banner-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--amber-dk);
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: var(--green-900);
+      color: rgba(255,255,255,.65);
+      padding: 48px 1.5rem 32px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    .footer-brand p { font-size: 13px; line-height: 1.65; margin-top: .75rem; max-width: 260px; }
+    .footer-col h4 { font-size: 13px; font-weight: 700; color: white; margin-bottom: .75rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+    .footer-col ul a { font-size: 13px; color: rgba(255,255,255,.55); text-decoration: none; transition: color .15s; }
+    .footer-col ul a:hover { color: var(--green-400); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; font-size: 12px; }
+    .footer-bottom-links { display: flex; gap: 1.25rem; }
+    .footer-bottom-links a { color: rgba(255,255,255,.5); text-decoration: none; transition: color .15s; }
+    .footer-bottom-links a:hover { color: var(--green-400); }
+
+    /* ── ACCESSIBILITY ──────────────────────────────────────── */
+    .accessibility-notice {
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      font-size: 14px;
+      color: var(--green-800);
+    }
+    .accessibility-notice strong { font-weight: 700; display: block; margin-bottom: .25rem; }
+
+    /* Focus rings */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--green-500);
+      outline-offset: 2px;
+    }
+
+    /* ── PAGE SECTIONS ──────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Zum Hauptinhalt springen</a>
+
+  <!-- INFO BANNER -->
+  <div class="info-banner" role="banner" aria-label="Aktuelle Mitteilung">
+    <div class="info-banner-inner">
+      <span>📢</span>
+      <span>Sommerferienbetreuung 2026 — Anmeldung ab sofort möglich. <a href="#" style="color:var(--amber-dk);text-decoration:underline;">Mehr erfahren →</a></span>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav" aria-label="Hauptnavigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" onclick="showPage('home')" aria-label="Grundschule Lerchenberg – Startseite">
+        <div class="nav-logo-mark" aria-hidden="true">GS</div>
+        <div class="nav-logo-text">
+          <strong>GS Lerchenberg</strong>
+          <span>Mainz-Lerchenberg</span>
+        </div>
+      </a>
+
+      <ul class="nav-links" id="nav-links" role="list">
+        <li><a href="#" onclick="showPage('home')" id="nav-home" class="active">Start</a></li>
+        <li><a href="#" onclick="showPage('schule')" id="nav-schule">Unsere Schule</a></li>
+        <li><a href="#" onclick="showPage('unterricht')" id="nav-unterricht">Unterricht</a></li>
+        <li><a href="#" onclick="showPage('ganztag')" id="nav-ganztag">Ganztag</a></li>
+        <li><a href="#" onclick="showPage('team')" id="nav-team">Kollegium</a></li>
+        <li><a href="#" onclick="showPage('kontakt')" id="nav-kontakt" class="nav-cta">Kontakt</a></li>
+      </ul>
+
+      <button class="nav-burger" id="burger" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav-links">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="19" y2="6"/><line x1="3" y1="11" x2="19" y2="11"/><line x1="3" y1="16" x2="19" y2="16"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- ═══════════════════════ HOME ═══════════════════════ -->
+    <div class="page active" id="page-home">
+
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="hero-badge">Schwerpunktschule · Mainz-Lerchenberg</div>
+          <h1>Herzlich willkommen an der<br><span>Grundschule Lerchenberg</span></h1>
+          <p>286 Kinder aus 14 Klassen lernen gemeinsam in einem offenen, inklusiven Umfeld. Seit 2011 Schwerpunktschule für Inklusion.</p>
+          <div class="hero-btns">
+            <a href="#" onclick="showPage('schule')" class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 1l7 7-7 7M1 8h14"/></svg>
+              Unsere Schule
+            </a>
+            <a href="#" onclick="showPage('kontakt')" class="btn-secondary">Anmeldung &amp; Kontakt</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick access -->
+      <div class="quick-strip" aria-label="Schnellzugriff">
+        <div class="quick-inner">
+          <a href="#" class="quick-item"><div class="quick-icon">📅</div>Stundenplan</a>
+          <a href="#" class="quick-item"><div class="quick-icon">✉</div>Elternbriefe</a>
+          <a href="#" class="quick-item"><div class="quick-icon">🍽</div>Mensaplan</a>
+          <a href="#" class="quick-item"><div class="quick-icon">🔔</div>Vertretungsplan</a>
+          <a href="#" class="quick-item"><div class="quick-icon">📋</div>Formulare</a>
+          <a href="#" class="quick-item"><div class="quick-icon">🗓</div>Schulkalender</a>
+        </div>
+      </div>
+
+      <!-- News -->
+      <section class="section" aria-labelledby="news-heading">
+        <div class="section-inner">
+          <div class="section-tag">Neuigkeiten</div>
+          <h2 class="section-title" id="news-heading">Aktuelles aus der Schule</h2>
+          <p class="section-lead">Neuigkeiten, Veranstaltungen und Berichte aus dem Schulleben der Grundschule Lerchenberg.</p>
+
+          <div class="news-grid">
+            <a href="#" class="news-card" aria-label="Neuer Schulelternbeirat gewählt – 28. April 2026">
+              <div class="news-card-img" aria-hidden="true">🗳</div>
+              <div class="news-card-body">
+                <div class="news-meta">
+                  <span class="news-cat">Schule</span>
+                  <span class="news-date">28. April 2026</span>
+                </div>
+                <h3>Neuer Schulelternbeirat (SEB) gewählt</h3>
+                <p>In der Sitzung vom 24. April wurde der neue Schulelternbeirat gewählt. Herzlichen Glückwunsch an alle gewählten Vertreterinnen und Vertreter!</p>
+                <span class="news-link">Weiterlesen <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7h8M8 4l3 3-3 3"/></svg></span>
+              </div>
+            </a>
+
+            <a href="#" class="news-card" aria-label="Grundschule auf Weltreise – Projektwoche April 2026">
+              <div class="news-card-img" aria-hidden="true">🌍</div>
+              <div class="news-card-body">
+                <div class="news-meta">
+                  <span class="news-cat">Projekte</span>
+                  <span class="news-date">14. April 2026</span>
+                </div>
+                <h3>GS Lerchenberg auf Weltreise</h3>
+                <p>In der Projektwoche haben unsere Klassen verschiedene Länder und Kulturen erkundet. Mit Musik, Basteln, Kochen und Tanz ging es rund um die Welt.</p>
+                <span class="news-link">Weiterlesen <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7h8M8 4l3 3-3 3"/></svg></span>
+              </div>
+            </a>
+
+            <a href="#" class="news-card" aria-label="Osterferien und Betreuungsangebot – April 2026">
+              <div class="news-card-img" aria-hidden="true">🌷</div>
+              <div class="news-card-body">
+                <div class="news-meta">
+                  <span class="news-cat">Info</span>
+                  <span class="news-date">2. April 2026</span>
+                </div>
+                <h3>Osterferien &amp; Ferienbetreuung</h3>
+                <p>Die Osterferien laufen vom 15. bis 26. April. Für angemeldete Kinder bieten wir eine Ferienbetreuung an. Anmeldeschluss war der 28. März.</p>
+                <span class="news-link">Weiterlesen <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7h8M8 4l3 3-3 3"/></svg></span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="section alt" aria-labelledby="schule-zahlen-heading">
+        <div class="section-inner">
+          <div class="section-tag">Die Schule in Zahlen</div>
+          <h2 class="section-title" id="schule-zahlen-heading">Eine Schule, die verbindet</h2>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-number">286</div><div class="stat-label">Schülerinnen &amp; Schüler</div></div>
+            <div class="stat-card"><div class="stat-number">14</div><div class="stat-label">Klassen</div></div>
+            <div class="stat-card"><div class="stat-number">30+</div><div class="stat-label">Nationen</div></div>
+            <div class="stat-card"><div class="stat-number">2011</div><div class="stat-label">Schwerpunktschule seit</div></div>
+          </div>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon" aria-hidden="true">🤝</div>
+              <h3>Inklusion &amp; Vielfalt</h3>
+              <p>Als Schwerpunktschule lernen Kinder mit und ohne Förderbedarf gemeinsam. Individuelles Lerntempo wird gefördert und wertgeschätzt.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon" aria-hidden="true">🌞</div>
+              <h3>Ganztagsangebot</h3>
+              <p>Montag bis Donnerstag von 8 bis 16 Uhr: Hausaufgabenbetreuung, AGs und Freizeitangebote in einer sicheren Umgebung.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon" aria-hidden="true">📚</div>
+              <h3>Moderner Unterricht</h3>
+              <p>Digitale Medien, Leseförderung und handlungsorientiertes Lernen sind fester Bestandteil unseres pädagogischen Konzepts.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /home -->
+
+
+    <!-- ═══════════════════════ UNSERE SCHULE ═══════════════════════ -->
+    <div class="page" id="page-schule">
+      <section class="hero" style="padding:60px 1.5rem 72px;">
+        <div class="hero-inner">
+          <div class="hero-badge">Unsere Schule</div>
+          <h1>Lernen in Gemeinschaft</h1>
+          <p>Die Grundschule Lerchenberg ist ein Ort, an dem Kinder unterschiedlicher Herkunft und Fähigkeiten gemeinsam wachsen und lernen.</p>
+        </div>
+      </section>
+      <section class="section alt" aria-labelledby="konzept-heading">
+        <div class="section-inner">
+          <div class="two-col">
+            <div>
+              <div class="section-tag">Unser Profil</div>
+              <h2 class="section-title" id="konzept-heading">Vielfalt als Stärke</h2>
+              <p style="color:var(--slate-600);line-height:1.7;margin-bottom:1rem;">Seit über 35 Jahren begleiten wir Kinder aus Mainz-Lerchenberg auf ihrem Bildungsweg. Unser Schulhaus an der Hindemithstraße bietet Raum für Neugier, Kreativität und Zusammenhalt.</p>
+              <ul class="check-list">
+                <li>Schwerpunktschule für gemeinsames Lernen seit 2011</li>
+                <li>Schulgemeinschaft mit über 30 verschiedenen Nationalitäten</li>
+                <li>Enge Zusammenarbeit mit Eltern und Förderverein</li>
+                <li>Betreuende Grundschule mit Früh- und Hortbetreuung</li>
+                <li>Regelmäßige Fortbildungen für das gesamte Kollegium</li>
+              </ul>
+            </div>
+            <div class="two-col-img" aria-label="Außenansicht der Grundschule Lerchenberg" role="img">🏫</div>
+          </div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="lage-heading">
+        <div class="section-inner">
+          <div class="section-tag">Lage &amp; Ausstattung</div>
+          <h2 class="section-title" id="lage-heading">Mitten in Lerchenberg</h2>
+          <p class="section-lead">Die Schule liegt zentral im Mainzer Stadtteil Lerchenberg, gut erreichbar mit Bus und zu Fuß.</p>
+          <div class="feature-grid">
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🔬</div><h3>Computerraum &amp; Tablets</h3><p>Digitales Lernen ist bei uns selbstverständlich. Jede Klasse verfügt über Tabletkoffer für den flexiblen Einsatz im Unterricht.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">⚽</div><h3>Schulgarten &amp; Pausenhof</h3><p>Ein großzügiger Pausenhof und ein kleiner Schulgarten bieten Raum zum Toben, Entdecken und Entspannen.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">📖</div><h3>Schulbücherei</h3><p>Unsere Schulbücherei lädt zum Schmökern ein. Schülerinnen und Schüler können Bücher ausleihen und in Leseklubs stöbern.</p></div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /schule -->
+
+
+    <!-- ═══════════════════════ UNTERRICHT ═══════════════════════ -->
+    <div class="page" id="page-unterricht">
+      <section class="hero" style="padding:60px 1.5rem 72px;">
+        <div class="hero-inner">
+          <div class="hero-badge">Unterricht</div>
+          <h1>Lernen mit Freude</h1>
+          <p>Unser Unterricht verbindet Grundlagenwissen mit kreativen Methoden und fördert jedes Kind entsprechend seinen individuellen Stärken.</p>
+        </div>
+      </section>
+      <section class="section alt" aria-labelledby="faecher-heading">
+        <div class="section-inner">
+          <div class="section-tag">Fächer &amp; Angebote</div>
+          <h2 class="section-title" id="faecher-heading">Was wir unterrichten</h2>
+          <p class="section-lead">Von Deutsch und Mathematik über Sachunterricht und Kunst bis hin zu Musik und Sport — bei uns kommt jedes Fach zu seinem Recht.</p>
+          <div class="feature-grid">
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">✏</div><h3>Deutsch &amp; Lesen</h3><p>Lesen, Schreiben und Sprechen stehen im Mittelpunkt. Durch gezielte Leseförderung begleiten wir alle Kinder zu sicheren Lesern.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🔢</div><h3>Mathematik</h3><h3></h3><p>Handlungsorientiertes Rechnen, Problemlösen und das Verstehen mathematischer Zusammenhänge — spielerisch und systematisch.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🌐</div><h3>Englisch ab Klasse 1</h3><p>Früh Englisch lernen macht Spaß. Lieder, Spiele und kleine Dialoge machen den Einstieg in die Fremdsprache leicht.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🎨</div><h3>Kunst &amp; Musik</h3><p>Kreativität wird bei uns großgeschrieben. Regelmäßige Schulkonzerte und Kunstausstellungen zeigen, was unsere Kinder können.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🌱</div><h3>Sachunterricht</h3><p>Natur, Technik und Gesellschaft — im Sachunterricht entdecken die Kinder die Welt durch Experimente und Erkundungen.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">⚡</div><h3>Digitale Medien</h3><p>Tablet-AGs, Programmier-Einheiten und verantwortungsvoller Medienumgang bereiten auf eine digitale Welt vor.</p></div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /unterricht -->
+
+
+    <!-- ═══════════════════════ GANZTAG ═══════════════════════ -->
+    <div class="page" id="page-ganztag">
+      <section class="hero" style="padding:60px 1.5rem 72px;">
+        <div class="hero-inner">
+          <div class="hero-badge">Ganztagsschule</div>
+          <h1>Mehr Zeit zum Lernen und Leben</h1>
+          <p>Unser freiwilliges Ganztagsangebot (Mo–Do, 8–16 Uhr) bietet Hausaufgabenbetreuung, AGs und Freizeitgestaltung in sicherer Umgebung.</p>
+        </div>
+      </section>
+      <section class="section alt" aria-labelledby="ganztag-heading">
+        <div class="section-inner">
+          <div class="two-col">
+            <div>
+              <div class="section-tag">Unser Angebot</div>
+              <h2 class="section-title" id="ganztag-heading">Ein langer Tag, viele Möglichkeiten</h2>
+              <p style="color:var(--slate-600);line-height:1.7;margin-bottom:1rem;">Die Ganztagsschule in angebotsgebundener Form läuft seit dem Schuljahr 2009/10. Angemeldete Schülerinnen und Schüler nehmen verbindlich teil.</p>
+              <ul class="check-list">
+                <li>Montag bis Donnerstag von 8:00 bis 16:00 Uhr</li>
+                <li>Mittagessen in der Schulkantine inklusive</li>
+                <li>Betreute Hausaufgabenzeit täglich</li>
+                <li>Kreativ-, Sport- und Förder-AGs</li>
+                <li>Ausflüge und Projekte in den Ferienzeiten</li>
+              </ul>
+            </div>
+            <div class="two-col-img" aria-label="Kinder beim Mittagessen in der Ganztagsschule" role="img">🍽</div>
+          </div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="zeiten-heading">
+        <div class="section-inner">
+          <div class="section-tag">Zeiten &amp; Organisation</div>
+          <h2 class="section-title" id="zeiten-heading">Tagesablauf</h2>
+          <div class="feature-grid">
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🌅</div><h3>Frühbetreuung ab 7:00</h3><p>Für Familien, die früh starten müssen: Die Frühbetreuung beginnt um 7:00 Uhr und geht bis zum Unterrichtsbeginn um 8:00 Uhr.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🥗</div><h3>Mittagspause 12:15–13:15</h3><p>Gemeinsames Mittagessen, Spielzeit auf dem Hof und eine kurze Erholungsphase bevor es nachmittags weitergeht.</p></div>
+            <div class="feature-card"><div class="feature-icon" aria-hidden="true">🏆</div><h3>Nachmittag bis 16:00</h3><p>AGs, Hausaufgaben und freies Spiel. Freitags endet der Unterricht um 12:00 Uhr — kein Ganztagsbetrieb.</p></div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /ganztag -->
+
+
+    <!-- ═══════════════════════ TEAM ═══════════════════════ -->
+    <div class="page" id="page-team">
+      <section class="hero" style="padding:60px 1.5rem 72px;">
+        <div class="hero-inner">
+          <div class="hero-badge">Kollegium</div>
+          <h1>Unser Team</h1>
+          <p>Engagierte Lehrerinnen, Lehrer, Sozialpädagoginnen und Betreuerinnen begleiten die Kinder täglich mit Herzblut.</p>
+        </div>
+      </section>
+      <section class="section alt" aria-labelledby="leitung-heading">
+        <div class="section-inner">
+          <div class="section-tag">Schulleitung</div>
+          <h2 class="section-title" id="leitung-heading">Leitung &amp; Verwaltung</h2>
+          <div class="team-grid" style="margin-bottom:3rem;">
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt="" /></div>
+              <div class="team-name">Martina Schäfer</div>
+              <div class="team-role">Schulleiterin</div>
+              <div class="team-dept">m.schaefer@gs-lerchenberg.org</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/men/41.jpg" alt="" /></div>
+              <div class="team-name">Klaus Berger</div>
+              <div class="team-role">Konrektor</div>
+              <div class="team-dept">k.berger@gs-lerchenberg.org</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/women/33.jpg" alt="" /></div>
+              <div class="team-name">Sabine Holler</div>
+              <div class="team-role">Sekretariat</div>
+              <div class="team-dept">Mo–Fr 7:30–12:30 Uhr</div>
+            </div>
+          </div>
+
+          <div class="section-tag">Lehrerinnen &amp; Lehrer</div>
+          <h2 class="section-title" style="margin-bottom:1.5rem;">Kollegium</h2>
+          <div class="team-grid">
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="" /></div>
+              <div class="team-name">Sarah Johnson</div>
+              <div class="team-role">Klassenlehrerin 3a</div>
+              <div class="team-dept">Deutsch · Sachunterricht</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="" /></div>
+              <div class="team-name">Robert Davis</div>
+              <div class="team-role">Klassenlehrer 4b</div>
+              <div class="team-dept">Mathematik · Sport</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/women/23.jpg" alt="" /></div>
+              <div class="team-name">Elena Müller</div>
+              <div class="team-role">Klassenlehrerin 1c</div>
+              <div class="team-dept">Deutsch · Kunst · Musik</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/men/54.jpg" alt="" /></div>
+              <div class="team-name">Thomas Weiß</div>
+              <div class="team-role">Klassenlehrer 2a</div>
+              <div class="team-dept">Mathematik · Englisch</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/women/67.jpg" alt="" /></div>
+              <div class="team-name">Aisha Yilmaz</div>
+              <div class="team-role">Sonderpädagogin</div>
+              <div class="team-dept">Inklusion · Förderung</div>
+            </div>
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true"><img src="https://randomuser.me/api/portraits/men/18.jpg" alt="" /></div>
+              <div class="team-name">Marco Bauer</div>
+              <div class="team-role">Sozialpädagoge</div>
+              <div class="team-dept">Ganztag · Beratung</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /team -->
+
+
+    <!-- ═══════════════════════ KONTAKT ═══════════════════════ -->
+    <div class="page" id="page-kontakt">
+      <section class="hero" style="padding:60px 1.5rem 72px;">
+        <div class="hero-inner">
+          <div class="hero-badge">Kontakt</div>
+          <h1>Wir sind für Sie da</h1>
+          <p>Haben Sie Fragen zur Anmeldung, zum Schulalltag oder zum Ganztagsangebot? Unser Team hilft Ihnen gern weiter.</p>
+        </div>
+      </section>
+      <section class="section alt" aria-labelledby="kontakt-heading">
+        <div class="section-inner">
+          <h2 class="section-title" id="kontakt-heading" style="margin-bottom:2rem;">Kontakt aufnehmen</h2>
+          <div class="contact-grid">
+            <div>
+              <div class="contact-info-card" aria-label="Kontaktinformationen">
+                <h3>Grundschule Lerchenberg</h3>
+                <div class="contact-row">
+                  <div class="contact-icon" aria-hidden="true">📍</div>
+                  <div>
+                    <div class="contact-detail-label">Adresse</div>
+                    <div class="contact-detail-val">Hindemithstraße 1–5<br>55127 Mainz-Lerchenberg</div>
+                  </div>
+                </div>
+                <div class="contact-row">
+                  <div class="contact-icon" aria-hidden="true">📞</div>
+                  <div>
+                    <div class="contact-detail-label">Telefon</div>
+                    <div class="contact-detail-val"><a href="tel:+496131364660">06131 / 36 46 60</a></div>
+                  </div>
+                </div>
+                <div class="contact-row">
+                  <div class="contact-icon" aria-hidden="true">📠</div>
+                  <div>
+                    <div class="contact-detail-label">Fax</div>
+                    <div class="contact-detail-val">06131 / 33 82 66</div>
+                  </div>
+                </div>
+                <div class="contact-row">
+                  <div class="contact-icon" aria-hidden="true">✉</div>
+                  <div>
+                    <div class="contact-detail-label">E-Mail</div>
+                    <div class="contact-detail-val"><a href="mailto:schule@gs-lerchenberg.org">schule@gs-lerchenberg.org</a></div>
+                  </div>
+                </div>
+                <div class="contact-row">
+                  <div class="contact-icon" aria-hidden="true">🕐</div>
+                  <div>
+                    <div class="contact-detail-label">Sekretariat</div>
+                    <div class="contact-detail-val">Mo–Fr, 7:30–12:30 Uhr</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="map-placeholder" role="img" aria-label="Kartenplatzhalter – Hindemithstraße 1–5, 55127 Mainz">
+                <span aria-hidden="true">🗺</span>
+                <span>Hindemithstraße 1–5, 55127 Mainz-Lerchenberg</span>
+              </div>
+            </div>
+
+            <div class="contact-form">
+              <h3>Nachricht schreiben</h3>
+              <form onsubmit="handleForm(event)" novalidate aria-label="Kontaktformular">
+                <div class="form-two">
+                  <div class="form-row">
+                    <label for="vorname">Vorname</label>
+                    <input type="text" id="vorname" name="vorname" autocomplete="given-name" required />
+                  </div>
+                  <div class="form-row">
+                    <label for="nachname">Nachname</label>
+                    <input type="text" id="nachname" name="nachname" autocomplete="family-name" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <label for="email">E-Mail-Adresse</label>
+                  <input type="email" id="email" name="email" autocomplete="email" required />
+                </div>
+                <div class="form-row">
+                  <label for="betreff">Betreff</label>
+                  <select id="betreff" name="betreff">
+                    <option value="">Bitte wählen…</option>
+                    <option>Anmeldung / Aufnahme</option>
+                    <option>Ganztagsbetreuung</option>
+                    <option>Allgemeine Anfrage</option>
+                    <option>Presse &amp; Kooperationen</option>
+                    <option>Sonstiges</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label for="nachricht">Ihre Nachricht</label>
+                  <textarea id="nachricht" name="nachricht" required placeholder="Wie können wir Ihnen helfen?"></textarea>
+                </div>
+                <button type="submit" class="form-submit">Nachricht senden</button>
+                <p class="form-note">Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet und nicht an Dritte weitergegeben. Weitere Informationen in unserer <a href="#" style="color:var(--green-700);">Datenschutzerklärung</a>.</p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /kontakt -->
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo" style="display:flex;align-items:center;gap:.6rem;">
+            <div class="nav-logo-mark">GS</div>
+            <div class="nav-logo-text"><strong>GS Lerchenberg</strong><span>Mainz-Lerchenberg</span></div>
+          </div>
+          <p>Grundschule Lerchenberg · Hindemithstraße 1–5 · 55127 Mainz<br>Schwerpunktschule für gemeinsames Lernen seit 2011.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="#" onclick="showPage('home')">Startseite</a></li>
+            <li><a href="#" onclick="showPage('schule')">Unsere Schule</a></li>
+            <li><a href="#" onclick="showPage('unterricht')">Unterricht</a></li>
+            <li><a href="#" onclick="showPage('ganztag')">Ganztagsschule</a></li>
+            <li><a href="#" onclick="showPage('team')">Kollegium</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Eltern &amp; Schüler</h4>
+          <ul>
+            <li><a href="#">Stundenplan</a></li>
+            <li><a href="#">Elternbriefe</a></li>
+            <li><a href="#">Mensaplan</a></li>
+            <li><a href="#">Schulkalender</a></li>
+            <li><a href="#">Formulare</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kontakt</h4>
+          <ul>
+            <li><a href="tel:+496131364660">06131 / 36 46 60</a></li>
+            <li><a href="mailto:schule@gs-lerchenberg.org">schule@gs-lerchenberg.org</a></li>
+            <li><a href="#">Sekretariat: Mo–Fr 7:30–12:30</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Grundschule Lerchenberg · Stadt Mainz</span>
+        <div class="footer-bottom-links">
+          <a href="#">Impressum</a>
+          <a href="#">Datenschutzerklärung</a>
+          <a href="#">Barrierefreiheitserklärung</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      const page = document.getElementById('page-' + id);
+      const navLink = document.getElementById('nav-' + id);
+      if (page) page.classList.add('active');
+      if (navLink) navLink.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const links = document.getElementById('nav-links');
+      if (links.classList.contains('open')) {
+        links.classList.remove('open');
+        document.getElementById('burger').setAttribute('aria-expanded', 'false');
+      }
+      return false;
+    }
+
+    document.getElementById('burger').addEventListener('click', function() {
+      const links = document.getElementById('nav-links');
+      const open = links.classList.toggle('open');
+      this.setAttribute('aria-expanded', open.toString());
+    });
+
+    function handleForm(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.form-submit');
+      btn.textContent = '✓ Nachricht gesendet!';
+      btn.style.background = 'var(--green-800)';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'Nachricht senden';
+        btn.style.background = '';
+        btn.disabled = false;
+        e.target.reset();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

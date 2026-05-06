@@ -6,6 +6,7 @@ import {
   CheckCircle2, Link2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useT, useRegion } from '../lib/i18n';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,11 +47,13 @@ interface KnowledgeBaseViewProps {
 }
 
 export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actions, setActions, onNavigate }: KnowledgeBaseViewProps) {
+  const t = useT();
+  const region = useRegion();
   const [activeTab, setActiveTab] = useState<MainTab>('website');
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([
-    { id: '1', name: 'Parent_Handbook_2026.pdf', size: 2_450_000, uploadedAt: 'Apr 10, 2026' },
-    { id: '2', name: 'Emergency_Contact_Form.pdf', size: 312_000, uploadedAt: 'Mar 28, 2026' },
-    { id: '3', name: 'School_Calendar_2025-26.xlsx', size: 88_000, uploadedAt: 'Sep 1, 2025' },
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>(() => [
+    { id: '1', name: 'Parent_Handbook_2026.pdf',     size: 2_450_000, uploadedAt: t('knowledge.files.seeded.0.date') },
+    { id: '2', name: 'Emergency_Contact_Form.pdf',   size: 312_000,   uploadedAt: t('knowledge.files.seeded.1.date') },
+    { id: '3', name: 'School_Calendar_2025-26.xlsx', size: 88_000,    uploadedAt: t('knowledge.files.seeded.2.date') },
   ]);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +66,7 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
           id: Date.now().toString() + file.name,
           name: file.name,
           size: file.size,
-          uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          uploadedAt: new Date().toLocaleDateString(region.intlLocale, { month: 'short', day: 'numeric', year: 'numeric' }),
         },
         ...prev,
       ]);
@@ -79,11 +82,11 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
   const removeFile = (id: string) =>
     setUploadedFiles(prev => prev.filter(f => f.id !== id));
 
-  const TABS: { id: MainTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'website',      label: 'Website Profile', icon: <Globe className="w-4 h-4" /> },
-    { id: 'school',       label: 'School Profile',  icon: <School className="w-4 h-4" /> },
-    { id: 'files',        label: 'School Files',    icon: <Upload className="w-4 h-4" /> },
-    { id: 'integrations', label: 'Integrations',    icon: <Link2 className="w-4 h-4" /> },
+  const TABS: { id: MainTab; labelKey: string; icon: React.ReactNode }[] = [
+    { id: 'website',      labelKey: 'knowledge.tab.website',      icon: <Globe className="w-4 h-4" /> },
+    { id: 'school',       labelKey: 'knowledge.tab.school',       icon: <School className="w-4 h-4" /> },
+    { id: 'files',        labelKey: 'knowledge.tab.files',        icon: <Upload className="w-4 h-4" /> },
+    { id: 'integrations', labelKey: 'knowledge.tab.integrations', icon: <Link2 className="w-4 h-4" /> },
   ];
 
   return (
@@ -91,8 +94,8 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
 
       {/* ── Page header + tabs ── */}
       <div className="mb-6">
-        <h1 className="text-3xl font-light tracking-tight text-black mb-1">Memory</h1>
-        <p className="text-slate-500 text-sm mb-5">Everything the Presence Assistant knows about your institution — its memory. The richer this context, the more accurately AI agents write, update, and make decisions on your behalf.</p>
+        <h1 className="text-3xl font-light tracking-tight text-black mb-1">{t('knowledge.title')}</h1>
+        <p className="text-slate-500 text-sm mb-5">{t('knowledge.subtitle')}</p>
 
         {/* Top tab bar */}
         <div className="flex bg-slate-100 p-1.5 rounded-xl w-max border border-slate-200 shadow-sm gap-1">
@@ -108,7 +111,7 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
               )}
             >
               {tab.icon}
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           ))}
         </div>
@@ -148,6 +151,7 @@ export function KnowledgeBaseView({ connectedSystems, setConnectedSystems, actio
 
 
 function WebsiteProfileTab() {
+  const t = useT();
   const previewUrl = `${window.location.origin}/presence-prototype/preview.html`;
 
   return (
@@ -166,8 +170,8 @@ function WebsiteProfileTab() {
             <Globe className="w-5 h-5 text-blue-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-slate-900">Live Website Preview</p>
-            <p className="text-xs text-slate-600 mt-0.5 truncate">oakwoodhigh.org · Current version</p>
+            <p className="text-sm font-bold text-slate-900">{t('knowledge.website.preview.title')}</p>
+            <p className="text-xs text-slate-600 mt-0.5 truncate">{t('knowledge.website.preview.subtitle')}</p>
           </div>
           <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-500 shrink-0 transition-colors" />
         </a>
@@ -183,8 +187,8 @@ function WebsiteProfileTab() {
             <Palette className="w-5 h-5 text-indigo-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-slate-900">Design Scheme</p>
-            <p className="text-xs text-slate-600 mt-0.5">Magic theme · AI-generated layout</p>
+            <p className="text-sm font-bold text-slate-900">{t('knowledge.website.scheme.title')}</p>
+            <p className="text-xs text-slate-600 mt-0.5">{t('knowledge.website.scheme.subtitle')}</p>
           </div>
           <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 shrink-0 transition-colors" />
         </a>
@@ -208,19 +212,10 @@ const TONE_TRAITS = [
   { label: 'Professional', desc: 'Respectful and polished — reflects positively on the institution.',   color: 'slate'   },
 ];
 
-const TONE_EXAMPLES = [
-  {
-    do:   'Join us for Family Night — everyone is welcome!',
-    dont: 'All guardians must attend the mandatory event.',
-  },
-  {
-    do:   'Our students achieved incredible results this semester.',
-    dont: 'Test score metrics exceeded baseline performance indicators.',
-  },
-  {
-    do:   "Questions? Reach out — we're here to help.",
-    dont: 'Contact the administrative office during business hours.',
-  },
+const TONE_EXAMPLE_KEYS = [
+  { do: 'knowledge.tone.example.0.do', dont: 'knowledge.tone.example.0.dont' },
+  { do: 'knowledge.tone.example.1.do', dont: 'knowledge.tone.example.1.dont' },
+  { do: 'knowledge.tone.example.2.do', dont: 'knowledge.tone.example.2.dont' },
 ];
 
 const TRAIT_COLORS: Record<string, { pill: string; dot: string }> = {
@@ -230,12 +225,14 @@ const TRAIT_COLORS: Record<string, { pill: string; dot: string }> = {
   emerald: { pill: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-400' },
   slate:   { pill: 'bg-slate-100 text-slate-700 border-slate-200',   dot: 'bg-slate-400'   },
 };
+// `TONE_TRAITS` and `TRAIT_COLORS` are kept for future use; not currently rendered.
+void TONE_TRAITS;
+void TRAIT_COLORS;
 
 function ToneOfVoiceCard() {
+  const t = useT();
   const [editing, setEditing] = useState(false);
-  const [description, setDescription] = useState(
-    "We speak as a trusted guide — warm and approachable, never corporate. Our voice celebrates students, includes every family, and communicates clearly. We inspire without pressure, inform without jargon, and always lead with community."
-  );
+  const [description, setDescription] = useState(() => t('knowledge.tone.description'));
   const [draft, setDraft] = useState(description);
 
   const save = () => { setDescription(draft); setEditing(false); };
@@ -247,12 +244,12 @@ function ToneOfVoiceCard() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <MessageSquare className="w-4 h-4 text-slate-500" />
-        <h2 className="text-sm font-bold text-slate-900">Tone of Voice</h2>
+        <h2 className="text-sm font-bold text-slate-900">{t('knowledge.tone.heading')}</h2>
         <button
           onClick={() => setEditing(true)}
           className="ml-auto flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-600 transition-colors"
         >
-          <Pencil className="w-3 h-3" /> Edit
+          <Pencil className="w-3 h-3" /> {t('common.action.edit')}
         </button>
       </div>
 
@@ -267,8 +264,8 @@ function ToneOfVoiceCard() {
             className="w-full text-sm text-slate-700 leading-relaxed border border-blue-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-400/40 resize-none"
           />
           <div className="flex gap-2">
-            <button onClick={save} className="text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-500 transition-colors">Save</button>
-            <button onClick={cancel} className="text-xs font-semibold text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">Cancel</button>
+            <button onClick={save} className="text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-500 transition-colors">{t('common.action.save')}</button>
+            <button onClick={cancel} className="text-xs font-semibold text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">{t('common.action.cancel')}</button>
           </div>
         </div>
       ) : (
@@ -278,19 +275,19 @@ function ToneOfVoiceCard() {
       {/* Do / Don't examples */}
       <div>
         <div className="mb-3">
-          <p className="text-sm font-semibold text-slate-800">Do's and Don'ts</p>
-          <p className="text-xs text-slate-400 mt-0.5">How we write vs. what to avoid</p>
+          <p className="text-sm font-semibold text-slate-800">{t('knowledge.tone.dosDonts.heading')}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{t('knowledge.tone.dosDonts.subtitle')}</p>
         </div>
         <div className="space-y-2">
-          {TONE_EXAMPLES.map((ex, i) => (
+          {TONE_EXAMPLE_KEYS.map((ex, i) => (
             <div key={i} className="grid grid-cols-2 gap-2">
               <div className="flex items-start gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2.5">
                 <ThumbsUp className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                <p className="text-xs text-emerald-800 leading-relaxed">{ex.do}</p>
+                <p className="text-xs text-emerald-800 leading-relaxed">{t(ex.do)}</p>
               </div>
               <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5">
                 <ThumbsDown className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-red-700 leading-relaxed">{ex.dont}</p>
+                <p className="text-xs text-red-700 leading-relaxed">{t(ex.dont)}</p>
               </div>
             </div>
           ))}
@@ -302,21 +299,26 @@ function ToneOfVoiceCard() {
 
 // ─── School Profile Tab ───────────────────────────────────────────────────────
 
-const INITIAL_MEMORIES = [
-  { id: '1', text: 'Oakwood High School, founded 1987, public school in Springfield District.' },
-  { id: '2', text: '1,240 students enrolled across grades 9–12.' },
-  { id: '3', text: '32 teachers and staff with an average of 12 years of experience.' },
-  { id: '4', text: 'Average GPA of 4.1 across all grade levels.' },
-  { id: '5', text: '96% graduation rate for the class of 2025.' },
-  { id: '6', text: '18 academic and athletic awards received this year.' },
-  { id: '7', text: '24 AP courses offered — one of the broadest in the district.' },
-  { id: '8', text: 'Signature programs: Advanced Mathematics, Sciences & Research, Varsity Athletics, Fine Arts & Music.' },
+const FACT_KEYS = [
+  'knowledge.school.fact.0',
+  'knowledge.school.fact.1',
+  'knowledge.school.fact.2',
+  'knowledge.school.fact.3',
+  'knowledge.school.fact.4',
+  'knowledge.school.fact.5',
+  'knowledge.school.fact.6',
+  'knowledge.school.fact.7',
 ];
 
 interface Memory { id: string; text: string }
 
 function SchoolProfileTab() {
-  const [memories, setMemories] = useState<Memory[]>(INITIAL_MEMORIES);
+  const t = useT();
+  // Snapshot the seeded facts in the active language at first render. New
+  // user-added memories are stored as plain text.
+  const [memories, setMemories] = useState<Memory[]>(() =>
+    FACT_KEYS.map((k, i) => ({ id: String(i + 1), text: t(k) }))
+  );
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const [adding, setAdding] = useState(false);
@@ -356,8 +358,8 @@ function SchoolProfileTab() {
                 className="w-full text-sm text-slate-800 leading-relaxed border border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400/40 resize-none"
               />
               <div className="flex gap-2">
-                <button onClick={saveEdit} className="text-xs font-semibold bg-slate-900 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700 transition-colors">Save</button>
-                <button onClick={cancelEdit} className="text-xs font-semibold text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">Cancel</button>
+                <button onClick={saveEdit} className="text-xs font-semibold bg-slate-900 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700 transition-colors">{t('common.action.save')}</button>
+                <button onClick={cancelEdit} className="text-xs font-semibold text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">{t('common.action.cancel')}</button>
               </div>
             </div>
           ) : (
@@ -384,13 +386,13 @@ function SchoolProfileTab() {
             value={newText}
             onChange={e => setNewText(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addMemory(); } if (e.key === 'Escape') { setAdding(false); setNewText(''); } }}
-            placeholder="Add a fact about your school..."
+            placeholder={t('knowledge.school.addPlaceholder')}
             rows={2}
             className="w-full text-sm text-slate-800 leading-relaxed focus:outline-none resize-none placeholder:text-slate-400"
           />
           <div className="flex gap-2">
-            <button onClick={addMemory} className="text-xs font-semibold bg-slate-900 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700 transition-colors">Add</button>
-            <button onClick={() => { setAdding(false); setNewText(''); }} className="text-xs font-semibold text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">Cancel</button>
+            <button onClick={addMemory} className="text-xs font-semibold bg-slate-900 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700 transition-colors">{t('common.action.add')}</button>
+            <button onClick={() => { setAdding(false); setNewText(''); }} className="text-xs font-semibold text-slate-500 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors">{t('common.action.cancel')}</button>
           </div>
         </div>
       ) : (
@@ -398,7 +400,7 @@ function SchoolProfileTab() {
           onClick={() => setAdding(true)}
           className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-slate-200 text-sm text-slate-400 hover:text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all"
         >
-          <span className="text-lg leading-none">+</span> Add fact
+          <span className="text-lg leading-none">+</span> {t('knowledge.school.addFact')}
         </button>
       )}
     </div>
@@ -410,34 +412,35 @@ function SchoolProfileTab() {
 const ALL_INTEGRATIONS = [
   {
     name: 'PowerSchool',
-    type: 'Student Information System',
-    description: 'Sync class schedules, teacher directories, and student records directly to your website. Changes reflect automatically.',
+    typeKey: 'knowledge.integrations.type.sis',
+    descKey: 'knowledge.integrations.powerschool.desc',
     domain: 'powerschool.com',
     defaultLive: true,
   },
   {
     name: 'Google Analytics',
-    type: 'Website Analytics',
-    description: 'Track visitor behaviour, page performance, and traffic sources. AI agents use this data to suggest content improvements.',
+    typeKey: 'knowledge.integrations.type.analytics',
+    descKey: 'knowledge.integrations.googleAnalytics.desc',
     domain: 'analytics.google.com',
     defaultLive: true,
   },
   {
     name: 'ClassDojo',
-    type: 'Parent & Student Engagement',
-    description: 'Connect ClassDojo to surface school announcements and parent communications directly on the website.',
+    typeKey: 'knowledge.integrations.type.engagement',
+    descKey: 'knowledge.integrations.classdojo.desc',
     domain: 'classdojo.com',
     defaultLive: true,
   },
 ];
 
-function IntegrationsTab({ connectedSystems, setConnectedSystems, actions, setActions, onNavigate }: {
+function IntegrationsTab({ connectedSystems, setConnectedSystems, onNavigate }: {
   connectedSystems: any[];
   setConnectedSystems: (s: any[]) => void;
   actions: any[];
   setActions: (a: any[]) => void;
   onNavigate: (tab: string) => void;
 }) {
+  const t = useT();
   const [connecting, setConnecting] = useState<string | null>(null);
 
   const handleConnect = (name: string, type: string) => {
@@ -459,12 +462,11 @@ function IntegrationsTab({ connectedSystems, setConnectedSystems, actions, setAc
           <IntegrationCard
             key={intg.name}
             name={intg.name}
-            type={intg.type}
-            description={intg.description}
+            description={t(intg.descKey)}
             domain={intg.domain}
             isConnected={isConnected(intg.name)}
             isConnecting={connecting === intg.name}
-            onConnect={() => handleConnect(intg.name, intg.type)}
+            onConnect={() => handleConnect(intg.name, t(intg.typeKey))}
           />
         ))}
       </div>
@@ -472,7 +474,7 @@ function IntegrationsTab({ connectedSystems, setConnectedSystems, actions, setAc
         onClick={() => onNavigate('utilities')}
         className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors px-1"
       >
-        <span className="text-lg leading-none">+</span> Add more integrations
+        <span className="text-lg leading-none">+</span> {t('knowledge.integrations.addMore')}
       </button>
     </div>
   );
@@ -482,6 +484,7 @@ function IntegrationCard({ name, description, domain, isConnected, isConnecting,
   name: string; description: string; domain: string;
   isConnected: boolean; isConnecting: boolean; onConnect: () => void;
 }) {
+  const t = useT();
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
@@ -494,7 +497,7 @@ function IntegrationCard({ name, description, domain, isConnected, isConnecting,
         </div>
         {isConnected && (
           <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Connected
+            <CheckCircle2 className="w-3.5 h-3.5" /> {t('knowledge.integrations.connected')}
           </span>
         )}
       </div>
@@ -507,12 +510,12 @@ function IntegrationCard({ name, description, domain, isConnected, isConnecting,
           className="w-full py-2 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isConnecting ? (
-            <><div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-slate-600 rounded-full animate-spin" /> Authenticating...</>
-          ) : 'Connect'}
+            <><div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-slate-600 rounded-full animate-spin" /> {t('knowledge.integrations.authenticating')}</>
+          ) : t('knowledge.integrations.connect')}
         </button>
       ) : (
         <button className="w-full py-2 rounded-lg text-xs font-bold text-slate-400 border border-slate-200 cursor-not-allowed">
-          Manage Settings
+          {t('knowledge.integrations.manageSettings')}
         </button>
       )}
     </div>
@@ -536,6 +539,7 @@ function SchoolFilesTab({
   files, onRemove, onFiles, dragOver,
   onDragOver, onDragLeave, onDrop, fileInputRef
 }: SchoolFilesTabProps) {
+  const t = useT();
   return (
     <div className="max-w-3xl space-y-5">
 
@@ -557,9 +561,9 @@ function SchoolFilesTab({
         </div>
         <div className="text-center">
           <p className="text-sm font-semibold text-slate-700">
-            {dragOver ? 'Drop to upload' : 'Drag & drop files here'}
+            {dragOver ? t('knowledge.files.dropOnDragOver') : t('knowledge.files.dropZone')}
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">or click to browse — PDF, DOCX, XLSX, images</p>
+          <p className="text-xs text-slate-400 mt-0.5">{t('knowledge.files.browseHint')}</p>
         </div>
         <input
           ref={fileInputRef}
@@ -574,9 +578,9 @@ function SchoolFilesTab({
       {files.length > 0 && (
         <div className="flex items-center justify-between px-1">
           <p className="text-sm font-semibold text-slate-700">
-            {files.length} file{files.length !== 1 ? 's' : ''} uploaded
+            {t(files.length === 1 ? 'knowledge.files.uploadedCount.one' : 'knowledge.files.uploadedCount.other', { count: files.length })}
           </p>
-          <p className="text-xs text-slate-400">Hover a file to remove it</p>
+          <p className="text-xs text-slate-400">{t('knowledge.files.uploadedHover')}</p>
         </div>
       )}
 
@@ -584,7 +588,7 @@ function SchoolFilesTab({
       {files.length === 0 ? (
         <div className="text-center py-16 text-slate-400">
           <File className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm font-medium">No files uploaded yet</p>
+          <p className="text-sm font-medium">{t('knowledge.files.empty')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -598,12 +602,12 @@ function SchoolFilesTab({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-800 truncate">{file.name}</p>
-                <p className="text-xs text-slate-400">{formatFileSize(file.size)} · Uploaded {file.uploadedAt}</p>
+                <p className="text-xs text-slate-400">{formatFileSize(file.size)} · {t('knowledge.files.uploadedAt', { date: file.uploadedAt })}</p>
               </div>
               <button
                 onClick={() => onRemove(file.id)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 hover:text-red-500 text-slate-400"
-                title="Remove file"
+                title={t('knowledge.files.removeTooltip')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -616,7 +620,7 @@ function SchoolFilesTab({
       <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
         <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
         <p className="text-sm text-slate-700">
-          <span className="font-semibold">Tip:</span> Files uploaded here are available to AI agents as reference material when generating content and answering questions about your school.
+          <span className="font-semibold">{t('knowledge.files.tipPrefix')}</span>{' '}{t('knowledge.files.tipBody')}
         </p>
       </div>
     </div>

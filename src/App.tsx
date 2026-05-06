@@ -7,11 +7,15 @@ import { HiredAgentsChatView } from './components/HiredAgentsChatView';
 import { UtilitiesHubView } from './components/UtilitiesHubView';
 import { KnowledgeBaseView } from './components/KnowledgeBaseView';
 import { AppsForSchoolsView } from './components/AppsForSchoolsView';
+import { CommunicationsHubView } from './components/CommunicationsHubView';
+import type { CommPlatformId } from './components/CommunicationHubViews';
 import {
-  Sparkles, Users, Layers, BookOpen, Zap,
+  Sparkles, Users, Layers, BookOpen, Zap, Bell,
   ListTodo, ChevronDown, ChevronRight, Menu, X, LayoutGrid,
 } from 'lucide-react';
 import { cn } from './lib/utils';
+import { LocaleProvider, useT } from './lib/i18n';
+import { LocaleSwitchers } from './components/LocaleSwitchers';
 import type { AiAction } from './data/mockData';
 import { MOCK_AI_ACTIONS, MOCK_STATS, MOCK_AGENTS } from './data/mockData';
 
@@ -23,9 +27,19 @@ export type TabType =
   | 'hired_agents'
   | 'utilities'
   | 'knowledge_base'
-  | 'apps_for_schools';
+  | 'apps_for_schools'
+  | 'communications_hub';
 
 function App() {
+  return (
+    <LocaleProvider>
+      <AppShell />
+    </LocaleProvider>
+  );
+}
+
+function AppShell() {
+  const t = useT();
   const [activeTab, setActiveTab] = useState<TabType>('workspace');
   const [teamExpanded, setTeamExpanded] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -39,7 +53,10 @@ function App() {
   const [hasHiredAgents, setHasHiredAgents] = useState(false);       // true after migrate scenario
   const [hasMonitoringSetup, setHasMonitoringSetup] = useState(false); // true after monitoring scenario
   const [hasAutoUpdatesSetup, setHasAutoUpdatesSetup] = useState(false); // true after auto-updates scenario
+  const [hasCommHubSetup, setHasCommHubSetup] = useState(false);     // true after comm hub scenario
+  const [commConnectedPlatforms, setCommConnectedPlatforms] = useState<CommPlatformId[]>([]); // channels wired in Phase 1
   const showTeamNav = false; // hidden for now, re-enable when ready
+  const showCommHub = false; // hidden for now — re-enable to expose Communications Hub nav + quick action
 
   return (
     <div className="h-screen bg-slate-50 text-slate-900 relative selection:bg-blue-500/20 flex flex-col overflow-hidden">
@@ -59,10 +76,11 @@ function App() {
             <h1 className="font-bold text-base tracking-tight text-slate-900 leading-tight">
               Presence <span className="text-blue-600 font-semibold">by IONOS</span>
             </h1>
-            <span className="text-xs text-slate-500 font-medium tracking-wide">AI Autonomous websites for K–12</span>
+            <span className="text-xs text-slate-500 font-medium tracking-wide">{t('app.brand.tagline')}</span>
           </div>
         </div>
         <div className="flex items-center space-x-3">
+          <LocaleSwitchers />
           <div className="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 items-center justify-center text-sm font-semibold text-slate-700 hidden md:flex">
             JD
           </div>
@@ -78,15 +96,16 @@ function App() {
       {/* Mobile nav dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-slate-200 z-30 p-3 space-y-1 shrink-0">
-          <NavItem active={activeTab === 'workspace'} onClick={() => { setActiveTab('workspace'); setMobileMenuOpen(false); }} icon={<Sparkles className="w-5 h-5" />} label="Presence Assistant" />
-          <NavItem active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setMobileMenuOpen(false); }} icon={<Zap className="w-5 h-5" />} label="Automations" />
+          <NavItem active={activeTab === 'workspace'} onClick={() => { setActiveTab('workspace'); setMobileMenuOpen(false); }} icon={<Sparkles className="w-5 h-5" />} label={t('nav.workspace')} />
+          <NavItem active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setMobileMenuOpen(false); }} icon={<Zap className="w-5 h-5" />} label={t('nav.automations')} />
+          {showCommHub && <NavItem active={activeTab === 'communications_hub'} onClick={() => { setActiveTab('communications_hub'); setMobileMenuOpen(false); }} icon={<Bell className="w-5 h-5" />} label={t('nav.communicationsHub')} />}
           {showTeamNav && hasHiredAgents && <>
-            <NavItem active={activeTab === 'team'} onClick={() => { setActiveTab('team'); setMobileMenuOpen(false); }} icon={<Users className="w-5 h-5" />} label="Team" />
-            <NavItem active={activeTab === 'tasks'} onClick={() => { setActiveTab('tasks'); setMobileMenuOpen(false); }} icon={<ListTodo className="w-5 h-5" />} label="Tasks" />
+            <NavItem active={activeTab === 'team'} onClick={() => { setActiveTab('team'); setMobileMenuOpen(false); }} icon={<Users className="w-5 h-5" />} label={t('nav.team')} />
+            <NavItem active={activeTab === 'tasks'} onClick={() => { setActiveTab('tasks'); setMobileMenuOpen(false); }} icon={<ListTodo className="w-5 h-5" />} label={t('nav.tasks')} />
           </>}
-          <NavItem active={activeTab === 'knowledge_base'} onClick={() => { setActiveTab('knowledge_base'); setMobileMenuOpen(false); }} icon={<BookOpen className="w-5 h-5" />} label="Memory" />
-          <NavItem active={activeTab === 'utilities'} onClick={() => { setActiveTab('utilities'); setMobileMenuOpen(false); }} icon={<Layers className="w-5 h-5" />} label="Integrations" />
-          <NavItem active={activeTab === 'apps_for_schools'} onClick={() => { setActiveTab('apps_for_schools'); setMobileMenuOpen(false); }} icon={<LayoutGrid className="w-5 h-5" />} label="Recommended Apps" />
+          <NavItem active={activeTab === 'knowledge_base'} onClick={() => { setActiveTab('knowledge_base'); setMobileMenuOpen(false); }} icon={<BookOpen className="w-5 h-5" />} label={t('nav.memory')} />
+          <NavItem active={activeTab === 'utilities'} onClick={() => { setActiveTab('utilities'); setMobileMenuOpen(false); }} icon={<Layers className="w-5 h-5" />} label={t('nav.integrations')} />
+          <NavItem active={activeTab === 'apps_for_schools'} onClick={() => { setActiveTab('apps_for_schools'); setMobileMenuOpen(false); }} icon={<LayoutGrid className="w-5 h-5" />} label={t('nav.recommendedApps')} />
         </div>
       )}
 
@@ -100,14 +119,22 @@ function App() {
               active={activeTab === 'workspace'}
               onClick={() => setActiveTab('workspace')}
               icon={<Sparkles className="w-5 h-5" />}
-              label="Presence Assistant"
+              label={t('nav.workspace')}
             />
             <NavItem
               active={activeTab === 'dashboard'}
               onClick={() => setActiveTab('dashboard')}
               icon={<Zap className="w-5 h-5" />}
-              label="Automations"
+              label={t('nav.automations')}
             />
+            {showCommHub && (
+              <NavItem
+                active={activeTab === 'communications_hub'}
+                onClick={() => setActiveTab('communications_hub')}
+                icon={<Bell className="w-5 h-5" />}
+                label={t('nav.communicationsHub')}
+              />
+            )}
 
             {showTeamNav && hasHiredAgents && (
               <div className="space-y-0.5">
@@ -123,7 +150,7 @@ function App() {
                 >
                   <div className="flex items-center gap-3">
                     <Users className="w-5 h-5 text-indigo-500" />
-                    Our Team (AI)
+                    {t('nav.teamGroup')}
                   </div>
                   {teamExpanded
                     ? <ChevronDown className="w-4 h-4 opacity-50" />
@@ -137,14 +164,14 @@ function App() {
                       active={activeTab === 'team'}
                       onClick={() => setActiveTab('team')}
                       icon={<Users className="w-4 h-4" />}
-                      label="Team"
+                      label={t('nav.team')}
                       small
                     />
                     <NavItem
                       active={activeTab === 'tasks'}
                       onClick={() => setActiveTab('tasks')}
                       icon={<ListTodo className="w-4 h-4" />}
-                      label="Tasks"
+                      label={t('nav.tasks')}
                       small
                     />
                   </div>
@@ -156,20 +183,20 @@ function App() {
               active={activeTab === 'knowledge_base'}
               onClick={() => setActiveTab('knowledge_base')}
               icon={<BookOpen className="w-5 h-5" />}
-              label="Memory"
+              label={t('nav.memory')}
             />
             <NavItem
               active={activeTab === 'utilities'}
               onClick={() => setActiveTab('utilities')}
               icon={<Layers className="w-5 h-5" />}
-              label="Integrations"
+              label={t('nav.integrations')}
             />
             <hr className="border-slate-200 mx-2 my-3" />
             <NavItem
               active={activeTab === 'apps_for_schools'}
               onClick={() => setActiveTab('apps_for_schools')}
               icon={<LayoutGrid className="w-5 h-5" />}
-              label="Recommended Apps"
+              label={t('nav.recommendedApps')}
             />
           </nav>
         </aside>
@@ -185,6 +212,7 @@ function App() {
               hasHiredAgents={hasHiredAgents}
               hasMonitoringSetup={hasMonitoringSetup}
               hasAutoUpdatesSetup={hasAutoUpdatesSetup}
+              hasCommHubSetup={hasCommHubSetup}
             />
           )}
           {activeTab === 'hired_agents' && (
@@ -206,6 +234,18 @@ function App() {
                 setHasAutoUpdatesSetup(true);
                 setHasHiredAgents(true);
               }}
+              onCommHubComplete={(connected) => {
+                setCommConnectedPlatforms(connected);
+                setHasCommHubSetup(true);
+              }}
+              onOpenCommHub={() => setActiveTab('communications_hub')}
+              onSisConnected={(name, domain) => {
+                setConnectedSystems(prev =>
+                  prev.some(s => s.name === name)
+                    ? prev
+                    : [...prev, { name, domain, desc: 'School Management System', status: 'connected', lastSync: 'Just now' }]
+                );
+              }}
             />
           )}
           {activeTab === 'team' && (
@@ -216,7 +256,7 @@ function App() {
             />
           )}
           {activeTab === 'tasks' && <TasksView />}
-          {activeTab === 'utilities' && <UtilitiesHubView />}
+          {activeTab === 'utilities' && <UtilitiesHubView connectedSystems={connectedSystems} />}
           {activeTab === 'knowledge_base' && (
             <KnowledgeBaseView
               connectedSystems={connectedSystems}
@@ -227,6 +267,9 @@ function App() {
             />
           )}
           {activeTab === 'apps_for_schools' && <AppsForSchoolsView />}
+          {activeTab === 'communications_hub' && (
+            <CommunicationsHubView connectedPlatforms={commConnectedPlatforms.length > 0 ? commConnectedPlatforms : ['sdui', 'email']} />
+          )}
         </main>
       </div>
 

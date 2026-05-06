@@ -5,43 +5,122 @@ import {
   Server, Link as LinkIcon, Users, Loader2, AlertCircle,
   RefreshCw, FileText, Zap, ShieldCheck, ExternalLink,
   FolderOpen, BookOpen, ChevronDown, Plus,
-  Search, Star, Globe, Bell, TrendingUp, MessageSquare, Activity, MapPin, Eye
+  Search, Star, Globe, Bell, TrendingUp, MessageSquare, Activity, MapPin, Eye,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useT, useLocale, useRegion } from '../lib/i18n';
 import { SchoolBefore } from '../pages/SchoolBefore';
 import { SchoolAfterMagic } from '../pages/SchoolAfterMagic';
 import { AuditChatCardV2, PostAuditChatCardV2, AuditCanvasV2, PostAuditCanvasV2 } from './AuditPreviews';
+import {
+  COMM_PLATFORMS, CommProgressBar, CommPlatformPickerCanvas, CommConnectPlatformCanvas,
+  CommHubMapCanvas, CommHubStatusCard,
+  type CommPlatformId,
+} from './CommunicationHubViews';
+
+// ─── Region-aware school site preview ───────────────────────────────────────
+// US  → React components (SchoolBefore / SchoolAfterMagic)
+// Germany → static HTML files from public/lerchenberg/ served by Vite
+function DemoSiteBefore({ siteScale }: { siteScale: number }) {
+  const region = useRegion();
+  if (region.id === 'Germany') {
+    return (
+      <iframe
+        src={`${import.meta.env.BASE_URL}lerchenberg/bad.html`}
+        title="Schulwebsite (vorher)"
+        className="w-full border-0"
+        style={{ minHeight: '700px', display: 'block' }}
+      />
+    );
+  }
+  return (
+    <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none">
+      <SchoolBefore />
+    </div>
+  );
+}
+
+function DemoSiteAfter({ siteScale }: { siteScale: number }) {
+  const region = useRegion();
+  if (region.id === 'Germany') {
+    return (
+      <iframe
+        src={`${import.meta.env.BASE_URL}lerchenberg/good.html`}
+        title="Schulwebsite (nachher)"
+        className="w-full border-0"
+        style={{ minHeight: '700px', display: 'block' }}
+      />
+    );
+  }
+  return (
+    <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none">
+      <SchoolAfterMagic showAfter={true} />
+    </div>
+  );
+}
 
 type ScenarioStep = 'idle' | 'url_input' | 'audit' | 'orchestrator' | 'generation' | 'post_audit' | 'hiring'
   | 'mon_input' | 'mon_scanning' | 'mon_findings' | 'mon_configure' | 'mon_active'
-  | 'auto_url_input' | 'auto_analyze' | 'auto_cms' | 'auto_sis' | 'auto_lms' | 'auto_shared_folder' | 'auto_active';
+  | 'auto_url_input' | 'auto_analyze' | 'auto_cms' | 'auto_sis' | 'auto_lms' | 'auto_shared_folder' | 'auto_active'
+  | 'comm_select' | 'comm_connect_sdui' | 'comm_connect_email' | 'comm_hub_active';
 
 interface AiWorkspaceViewProps {
   onFinishScenario?: () => void;
   onAgentsHired?: () => void;
-  onMonitoringComplete?: () => void;  // called when monitoring scenario finishes
-  onAutoUpdatesComplete?: () => void; // called when auto-updates scenario finishes
+  onMonitoringComplete?: () => void;                        // called when monitoring scenario finishes
+  onAutoUpdatesComplete?: () => void;                       // called when auto-updates scenario finishes
+  onCommHubComplete?: (connected: CommPlatformId[]) => void; // called with channels wired in Phase 1
+  onOpenCommHub?: () => void;                                // navigate to the Communications Hub page
+  onSisConnected?: (name: string, domain: string) => void;  // called when a SIS is successfully authorized
 }
 
-const QUICK_ACTIONS = [
-  { icon: <Layers         className="w-4 h-4" />, label: 'Improve existing website',      color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: true  },
-  { icon: <RefreshCw      className="w-4 h-4" />, label: 'Set up internet monitoring',    color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, monitoringScenario: true },
-  { icon: <Zap            className="w-4 h-4" />, label: 'Set up automated updates',      color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, autoUpdatesScenario: true },
-  { icon: <LayoutTemplate className="w-4 h-4" />, label: 'Create a website',              color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
-  { icon: <ShieldAlert    className="w-4 h-4" />, label: 'Make a website audit',          color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
-  { icon: <Accessibility  className="w-4 h-4" />, label: 'Improve accessibility',         color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
-  { icon: <Users          className="w-4 h-4" />, label: 'Create a Family Hub',           color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
-  { icon: <Database       className="w-4 h-4" />, label: 'Create event pages',            color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+// Set to false to hide the parent-comms scenario quick action while it's
+// being iterated on. Flip back to true to expose it.
+const SHOW_COMM_SCENARIO_ACTION = false;
+
+const ALL_QUICK_ACTIONS = [
+  { icon: <Layers         className="w-4 h-4" />, labelKey: 'workspace.quickAction.improve',       color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: true  },
+  { icon: <RefreshCw      className="w-4 h-4" />, labelKey: 'workspace.quickAction.monitoring',    color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, monitoringScenario: true },
+  { icon: <Zap            className="w-4 h-4" />, labelKey: 'workspace.quickAction.automated',     color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, autoUpdatesScenario: true },
+  { icon: <Bell           className="w-4 h-4" />, labelKey: 'workspace.quickAction.commHub',       color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false, commScenario: true, hidden: !SHOW_COMM_SCENARIO_ACTION },
+  { icon: <LayoutTemplate className="w-4 h-4" />, labelKey: 'workspace.quickAction.create',        color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <ShieldAlert    className="w-4 h-4" />, labelKey: 'workspace.quickAction.audit',         color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <Accessibility  className="w-4 h-4" />, labelKey: 'workspace.quickAction.accessibility', color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <Users          className="w-4 h-4" />, labelKey: 'workspace.quickAction.familyHub',     color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
+  { icon: <Database       className="w-4 h-4" />, labelKey: 'workspace.quickAction.events',        color: 'bg-blue-50 text-blue-500 border-blue-100', scenario: false },
 ];
 
+const QUICK_ACTIONS = ALL_QUICK_ACTIONS.filter(a => !(a as any).hidden);
+
 const SIS_PROVIDERS = [
-  { name: 'PowerSchool',        domain: 'powerschool.com'          },
-  { name: 'FACTS SIS',          domain: 'factsmgt.com'             },
-  { name: 'Infinite Campus',    domain: 'infinitecampus.com'       },
-  { name: 'Skyward',            domain: 'skyward.com'              },
-  { name: 'Frontline SIS',      domain: 'frontlineeducation.com'   },
-  { name: 'Aeries SIS',         domain: 'aeries.com'               },
-  { name: 'Tyler SIS',          domain: 'tylertech.com'            },
+  { name: 'ASV Bayern',   domain: 'asv.bayern.de'      },
+  { name: 'SVWS-NRW',     domain: 'svws.nrw.de'        },
+  { name: 'LUSD',         domain: 'lusd.hessen.de'     },
+  { name: 'DaNiS',        domain: 'danis-hilfe.nibis.de' },
+  { name: 'SaxSVS',       domain: 'saxsvs.de'          },
+];
+
+// Germany-specific grouped SIS list
+const SIS_PROVIDERS_GERMANY = [
+  {
+    groupKey: 'workspace.sisSelect.group.government' as const,
+    providers: [
+      { name: 'DaNiS',      domain: 'danis-hilfe.nibis.de' },
+      { name: 'ASV Bayern', domain: 'asv.bayern.de'        },
+      { name: 'SVWS-NRW',   domain: 'svws.nrw.de'          },
+      { name: 'LUSD',       domain: 'lusd.hessen.de'       },
+      { name: 'SaxSVS',     domain: 'saxsvs.de'            },
+    ],
+  },
+  {
+    groupKey: 'workspace.sisSelect.group.commercial' as const,
+    providers: [
+      { name: 'WebUntis',  domain: 'webuntis.com'          },
+      { name: 'DaVinci',   domain: 'davinci.stueber.de'    },
+      { name: 'aSc',       domain: 'asctimetables.com'     },
+      { name: 'Indiware',  domain: 'indiware.de'           },
+    ],
+  },
 ];
 
 // ─── Shared circular gauge ──────────────────────────────────────────────────
@@ -118,16 +197,17 @@ function PostAuditChatCard() {
 
 // ─── Current site audit full canvas ─────────────────────────────────────────
 function AuditCanvas() {
+  const t = useT();
   const metrics = [
-    { label: 'Usability',    hint: 'Navigation & mobile experience', value: 32, color: 'text-red-500',   barColor: 'bg-red-500'   },
-    { label: 'Readability',  hint: 'How clearly content is presented', value: 45, color: 'text-amber-500', barColor: 'bg-amber-500' },
-    { label: 'Discoverability',  hint: 'Visibility in search results',    value: 20, color: 'text-red-500',   barColor: 'bg-red-500'   },
+    { labelKey: 'workspace.audit.metric.usability.label',       hintKey: 'workspace.audit.metric.usability.hint',       value: 32, color: 'text-red-500',   barColor: 'bg-red-500'   },
+    { labelKey: 'workspace.audit.metric.readability.label',     hintKey: 'workspace.audit.metric.readability.hint',     value: 45, color: 'text-amber-500', barColor: 'bg-amber-500' },
+    { labelKey: 'workspace.audit.metric.discoverability.label', hintKey: 'workspace.audit.metric.discoverability.hint', value: 20, color: 'text-red-500',   barColor: 'bg-red-500'   },
   ];
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-10 p-12 bg-white animate-in fade-in duration-700">
       <div className="text-center">
-        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">Site Audit</h2>
-        <p className="text-slate-400 mt-1 text-sm font-medium">How visitors experience your site today</p>
+        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">{t('workspace.audit.title')}</h2>
+        <p className="text-slate-400 mt-1 text-sm font-medium">{t('workspace.audit.subtitle')}</p>
       </div>
       <div className="relative">
         <CircularGauge score={4} maxScore={10} size={200} strokeWidth={20} color="#ef4444" />
@@ -139,10 +219,10 @@ function AuditCanvas() {
       </div>
       <div className="flex gap-8 w-full max-w-md">
         {metrics.map(m => (
-          <div key={m.label} className="flex-1 space-y-2">
+          <div key={m.labelKey} className="flex-1 space-y-2">
             <div className={cn("text-2xl font-extrabold", m.color)}>{m.value}%</div>
-            <div className="text-xs text-slate-700 font-bold">{m.label}</div>
-            <div className="text-[10px] text-slate-400 leading-tight">{m.hint}</div>
+            <div className="text-xs text-slate-700 font-bold">{t(m.labelKey)}</div>
+            <div className="text-[10px] text-slate-400 leading-tight">{t(m.hintKey)}</div>
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div className={cn("h-full rounded-full", m.barColor)} style={{ width: `${m.value}%` }} />
             </div>
@@ -150,8 +230,8 @@ function AuditCanvas() {
         ))}
       </div>
       <div className="flex gap-3 flex-wrap justify-center">
-        {['Missing images & favicon', 'Invisible in Google SEO & Maps search', 'Outdated content & info'].map(tag => (
-          <span key={tag} className="bg-red-50 border border-red-200 text-red-500 text-xs font-semibold px-4 py-2 rounded-full">{tag}</span>
+        {['workspace.audit.tag.0', 'workspace.audit.tag.1', 'workspace.audit.tag.2'].map(key => (
+          <span key={key} className="bg-red-50 border border-red-200 text-red-500 text-xs font-semibold px-4 py-2 rounded-full">{t(key)}</span>
         ))}
       </div>
     </div>
@@ -160,16 +240,17 @@ function AuditCanvas() {
 
 // ─── New site audit full canvas ─────────────────────────────────────────────
 function PostAuditCanvas() {
+  const t = useT();
   const metrics = [
-    { label: 'Usability',   value: 98, color: 'text-emerald-600', barColor: 'bg-emerald-500' },
-    { label: 'Readability', value: 96, color: 'text-emerald-600', barColor: 'bg-emerald-500' },
-    { label: 'Discoverability', value: 94, color: 'text-emerald-600', barColor: 'bg-emerald-500' },
+    { labelKey: 'workspace.audit.metric.usability.label',       value: 98, color: 'text-emerald-600', barColor: 'bg-emerald-500' },
+    { labelKey: 'workspace.audit.metric.readability.label',     value: 96, color: 'text-emerald-600', barColor: 'bg-emerald-500' },
+    { labelKey: 'workspace.audit.metric.discoverability.label', value: 94, color: 'text-emerald-600', barColor: 'bg-emerald-500' },
   ];
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-10 p-12 bg-white animate-in fade-in duration-700">
       <div className="text-center">
-        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">New Site Audit</h2>
-        <p className="text-slate-400 mt-1 text-sm font-medium">Web Performance Score</p>
+        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight">{t('workspace.postAudit.title')}</h2>
+        <p className="text-slate-400 mt-1 text-sm font-medium">{t('workspace.postAudit.subtitle')}</p>
       </div>
       <div className="relative">
         <CircularGauge score={10} maxScore={10} size={200} strokeWidth={20} color="#10b981" />
@@ -181,9 +262,9 @@ function PostAuditCanvas() {
       </div>
       <div className="flex gap-10 w-full max-w-sm">
         {metrics.map(m => (
-          <div key={m.label} className="flex-1 space-y-2">
+          <div key={m.labelKey} className="flex-1 space-y-2">
             <div className={cn("text-2xl font-extrabold", m.color)}>{m.value}%</div>
-            <div className="text-xs text-slate-500 font-medium">{m.label}</div>
+            <div className="text-xs text-slate-500 font-medium">{t(m.labelKey)}</div>
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div className={cn("h-full rounded-full transition-all duration-700", m.barColor)} style={{ width: `${m.value}%` }} />
             </div>
@@ -191,8 +272,8 @@ function PostAuditCanvas() {
         ))}
       </div>
       <div className="flex gap-3 flex-wrap justify-center">
-        {['Fully Optimized', 'WCAG Compliant', 'SEO Ready'].map(tag => (
-          <span key={tag} className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-semibold px-4 py-2 rounded-full">{tag}</span>
+        {['workspace.postAudit.tag.0', 'workspace.postAudit.tag.1', 'workspace.postAudit.tag.2'].map(key => (
+          <span key={key} className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-semibold px-4 py-2 rounded-full">{t(key)}</span>
         ))}
       </div>
     </div>
@@ -226,11 +307,12 @@ function AgentHireCard({ name, role, description, gradientClass, icon }: {
 
 // ─── Connection type picker (center canvas) ─────────────────────────────────
 function ConnectionTypeScreen({ onSelectSIS, onSkip }: { onSelectSIS: () => void; onSkip: () => void }) {
+  const t = useT();
   const types = [
     {
       id: 'sis',
       label: 'SIS',
-      sub: 'Student Information System',
+      sub: t('workspace.connectionType.sis.sub'),
       icon: <Database className="w-7 h-7" />,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
@@ -240,7 +322,7 @@ function ConnectionTypeScreen({ onSelectSIS, onSkip }: { onSelectSIS: () => void
     {
       id: 'lms',
       label: 'LMS',
-      sub: 'Learning Management System',
+      sub: t('workspace.connectionType.lms.sub'),
       icon: <BookOpen className="w-7 h-7" />,
       color: 'text-indigo-500',
       bg: 'bg-indigo-50',
@@ -249,25 +331,35 @@ function ConnectionTypeScreen({ onSelectSIS, onSkip }: { onSelectSIS: () => void
     },
     {
       id: 'folder',
-      label: 'Shared Folder',
-      sub: 'Google Drive, OneDrive & more',
+      label: t('workspace.connectionType.folder.label'),
+      sub: t('workspace.connectionType.folder.sub'),
       icon: <FolderOpen className="w-7 h-7" />,
       color: 'text-amber-500',
       bg: 'bg-amber-50',
       border: 'border-amber-200',
       active: false,
     },
+    {
+      id: 'comms',
+      label: t('workspace.connectionType.comms.label'),
+      sub: t('workspace.connectionType.comms.sub'),
+      icon: <MessageSquare className="w-7 h-7" />,
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-200',
+      active: false,
+    },
   ];
   return (
     <div className="flex-1 flex items-center justify-center bg-slate-100 p-8 animate-in fade-in duration-500">
-      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 w-full max-w-lg space-y-7">
+      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 w-full max-w-sm space-y-7">
 
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900">Connect a Data Source</h2>
-          <p className="text-slate-500 text-sm mt-1">Choose the type of integration to get started</p>
+          <h2 className="text-2xl font-bold text-slate-900">{t('workspace.connectionType.heading')}</h2>
+          <p className="text-slate-500 text-sm mt-1">{t('workspace.connectionType.subtitle')}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {types.map(t => (
             <button
               key={t.id}
@@ -284,21 +376,19 @@ function ConnectionTypeScreen({ onSelectSIS, onSkip }: { onSelectSIS: () => void
               </div>
               <div>
                 <p className="font-bold text-sm text-slate-900">{t.label}</p>
-                <p className="text-[11px] text-slate-400 leading-tight mt-0.5">{t.sub}</p>
+                <p className="text-[11px] text-slate-400 leading-tight mt-0.5 break-words hyphens-auto">{t.sub}</p>
               </div>
             </button>
           ))}
         </div>
 
         <div className="flex flex-col items-center gap-2">
-          <p className="text-center text-xs text-slate-400">
-            40+ integrations available · More can be added at any time
-          </p>
+          <p className="text-center text-xs text-slate-400">{t('workspace.connectionType.footer')}</p>
           <button
             onClick={onSkip}
             className="text-xs text-slate-400 hover:text-slate-600 underline underline-offset-2 transition-colors"
           >
-            Skip for now
+            {t('workspace.skipForNow')}
           </button>
         </div>
       </div>
@@ -308,75 +398,97 @@ function ConnectionTypeScreen({ onSelectSIS, onSkip }: { onSelectSIS: () => void
 
 // ─── SIS provider selector (center canvas) ──────────────────────────────────
 function SISSelectScreen({ onContinue }: { onContinue: (sis: string) => void }) {
-  const [selected, setSelected] = useState('PowerSchool');
+  const t = useT();
+  const region = useRegion();
+  const isGermany = region.id === 'Germany';
+  const [selected, setSelected] = useState('DaNiS');
+
+  const SisCard = ({ p }: { p: { name: string; domain: string } }) => {
+    const isSelected = selected === p.name;
+    return (
+      <button
+        key={p.name}
+        onClick={() => setSelected(p.name)}
+        className={cn(
+          'flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-3 text-center group',
+          isSelected
+            ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-200 shadow-sm'
+            : 'bg-white border-slate-200 hover:shadow-md hover:border-slate-300'
+        )}
+      >
+        <div className={cn(
+          'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border border-black/5 overflow-hidden bg-white transition-transform duration-200',
+          !isSelected && 'group-hover:scale-110'
+        )}>
+          <img
+            src={`https://www.google.com/s2/favicons?domain=${p.domain}&sz=128`}
+            alt={p.name}
+            className="w-8 h-8 object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              if (e.currentTarget.parentElement) {
+                e.currentTarget.parentElement.textContent = p.name.charAt(0);
+                e.currentTarget.parentElement.className = 'w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg bg-blue-100 text-blue-700 border border-black/5';
+              }
+            }}
+          />
+        </div>
+        <span className={cn(
+          'text-xs font-semibold leading-tight',
+          isSelected ? 'text-blue-700' : 'text-slate-700'
+        )}>{p.name}</span>
+        {isSelected && <CheckCircle className="w-3.5 h-3.5 text-blue-500 -mt-1" />}
+      </button>
+    );
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-slate-50 animate-in fade-in duration-500 overflow-auto">
       <div className="p-6 space-y-5 max-w-2xl w-full mx-auto">
 
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Select your SIS</h2>
-          <p className="text-slate-500 text-sm mt-0.5">Choose your Student Information System provider</p>
+          <h2 className="text-lg font-bold text-slate-900">{t('workspace.sisSelect.heading')}</h2>
+          <p className="text-slate-500 text-sm mt-0.5">{t('workspace.sisSelect.subtitle')}</p>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-          {SIS_PROVIDERS.map((p) => {
-            const isSelected = selected === p.name;
-            return (
-              <button
-                key={p.name}
-                onClick={() => setSelected(p.name)}
-                className={cn(
-                  'flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-3 text-center group',
-                  isSelected
-                    ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-200 shadow-sm'
-                    : 'bg-white border-slate-200 hover:shadow-md hover:border-slate-300'
-                )}
-              >
-                <div className={cn(
-                  'w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border border-black/5 overflow-hidden bg-white transition-transform duration-200',
-                  !isSelected && 'group-hover:scale-110'
-                )}>
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${p.domain}&sz=128`}
-                    alt={p.name}
-                    className="w-8 h-8 object-contain"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      if (e.currentTarget.parentElement) {
-                        e.currentTarget.parentElement.textContent = p.name.charAt(0);
-                        e.currentTarget.parentElement.className = 'w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg bg-blue-100 text-blue-700 border border-black/5';
-                      }
-                    }}
-                  />
+        {isGermany ? (
+          <div className="space-y-5">
+            {SIS_PROVIDERS_GERMANY.map(group => (
+              <div key={group.groupKey}>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  {t(group.groupKey)}
+                </p>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                  {group.providers.map(p => <SisCard key={p.name} p={p} />)}
                 </div>
-                <span className={cn(
-                  'text-xs font-semibold leading-tight',
-                  isSelected ? 'text-blue-700' : 'text-slate-700'
-                )}>{p.name}</span>
-                {isSelected && <CheckCircle className="w-3.5 h-3.5 text-blue-500 -mt-1" />}
-              </button>
-            );
-          })}
-        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            {SIS_PROVIDERS.map(p => <SisCard key={p.name} p={p} />)}
+          </div>
+        )}
 
         <button
           onClick={() => onContinue(selected)}
           className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
         >
-          Continue with {selected}
+          {t('workspace.sisSelect.continueWith', { name: selected })}
         </button>
       </div>
     </div>
   );
 }
 
-// ─── PowerSchool OAuth connect screen (center canvas) ──────────────────────
+// ─── WebUntis OAuth connect screen (center canvas) ──────────────────────────
 function ConnectPowerSchoolScreen({ onAuthorize }: { onAuthorize: () => void }) {
-  const permissions = [
-    'Student enrollment information',
-    'Class schedules and rosters',
-    'Academic calendar events',
-    'Student demographics (name, grade)',
+  const t = useT();
+  const permissionKeys = [
+    'workspace.webuntis.permission.0',
+    'workspace.webuntis.permission.1',
+    'workspace.webuntis.permission.2',
+    'workspace.webuntis.permission.3',
   ];
   return (
     <div className="flex-1 flex items-center justify-center bg-slate-100 p-8 animate-in fade-in duration-500">
@@ -388,8 +500,8 @@ function ConnectPowerSchoolScreen({ onAuthorize }: { onAuthorize: () => void }) 
             <Database className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Connect PowerSchool</h2>
-            <p className="text-slate-500 text-sm mt-0.5">Secure OAuth 2.0 Authorization</p>
+            <h2 className="text-2xl font-bold text-slate-900">{t('workspace.webuntis.title')}</h2>
+            <p className="text-slate-500 text-sm mt-0.5">{t('workspace.webuntis.subtitle')}</p>
           </div>
         </div>
 
@@ -398,27 +510,27 @@ function ConnectPowerSchoolScreen({ onAuthorize }: { onAuthorize: () => void }) 
           <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3">
             <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-slate-800">Secure Connection</p>
-              <p className="text-xs text-slate-500">Your credentials are never stored on our servers</p>
+              <p className="text-sm font-semibold text-slate-800">{t('workspace.security.secureTitle')}</p>
+              <p className="text-xs text-slate-500">{t('workspace.security.secureBody')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
             <CheckCircle className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-slate-800">Read-Only Access</p>
-              <p className="text-xs text-slate-500">We only request permission to view student data</p>
+              <p className="text-sm font-semibold text-slate-800">{t('workspace.security.readOnlyTitle')}</p>
+              <p className="text-xs text-slate-500">{t('workspace.security.readOnlyBody')}</p>
             </div>
           </div>
         </div>
 
         {/* Permissions list */}
         <div>
-          <p className="text-sm font-bold text-slate-800 mb-3">This integration will access:</p>
+          <p className="text-sm font-bold text-slate-800 mb-3">{t('workspace.webuntis.permissionsLabel')}</p>
           <div className="space-y-2">
-            {permissions.map(item => (
-              <div key={item} className="flex items-center gap-2 text-sm text-slate-700">
+            {permissionKeys.map(key => (
+              <div key={key} className="flex items-center gap-2 text-sm text-slate-700">
                 <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
-                {item}
+                {t(key)}
               </div>
             ))}
           </div>
@@ -431,11 +543,9 @@ function ConnectPowerSchoolScreen({ onAuthorize }: { onAuthorize: () => void }) 
             className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
           >
             <ExternalLink className="w-4 h-4" />
-            Authorize with PowerSchool
+            {t('workspace.webuntis.authorize')}
           </button>
-          <p className="text-center text-xs text-slate-400">
-            You'll be redirected to PowerSchool's secure login page
-          </p>
+          <p className="text-center text-xs text-slate-400">{t('workspace.webuntis.redirectNote')}</p>
         </div>
 
       </div>
@@ -444,13 +554,13 @@ function ConnectPowerSchoolScreen({ onAuthorize }: { onAuthorize: () => void }) 
 }
 
 // ─── Improvement progress path ──────────────────────────────────────────────
-const PROGRESS_STEPS: { label: string; detail: string }[] = [
-  { label: 'Audit',    detail: 'Analyze current website' },
-  { label: 'Connect',  detail: 'Connect data sources' },
-  { label: 'Build',    detail: 'Generate improved site' },
-  { label: 'Review',   detail: 'Review improved website' },
-  { label: 'Re-audit', detail: 'Analyzing new website' },
-  { label: 'Publish',  detail: 'Go live & set up automation' },
+const PROGRESS_STEPS: { labelKey: string; detailKey: string }[] = [
+  { labelKey: 'workspace.progress.audit.label',    detailKey: 'workspace.progress.audit.detail' },
+  { labelKey: 'workspace.progress.connect.label',  detailKey: 'workspace.progress.connect.detail' },
+  { labelKey: 'workspace.progress.build.label',    detailKey: 'workspace.progress.build.detail' },
+  { labelKey: 'workspace.progress.review.label',   detailKey: 'workspace.progress.review.detail' },
+  { labelKey: 'workspace.progress.reaudit.label',  detailKey: 'workspace.progress.reaudit.detail' },
+  { labelKey: 'workspace.progress.publish.label',  detailKey: 'workspace.progress.publish.detail' },
 ];
 
 function getProgressIndex(step: ScenarioStep, siteApproved: boolean): number {
@@ -466,6 +576,7 @@ function getProgressIndex(step: ScenarioStep, siteApproved: boolean): number {
 }
 
 function ScenarioProgressBar({ step, siteApproved }: { step: ScenarioStep; siteApproved: boolean }) {
+  const t = useT();
   const active = getProgressIndex(step, siteApproved);
   const [revealed, setRevealed] = useState(0);
 
@@ -482,9 +593,9 @@ function ScenarioProgressBar({ step, siteApproved }: { step: ScenarioStep; siteA
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 animate-in fade-in duration-300">
-      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Workflow</p>
+      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">{t('workspace.progress.workflow')}</p>
       <div>
-        {PROGRESS_STEPS.map(({ label, detail }, i) => {
+        {PROGRESS_STEPS.map(({ labelKey, detailKey }, i) => {
           const isComplete = i < active;
           const isActive   = i === active;
           const isLast     = i === PROGRESS_STEPS.length - 1;
@@ -521,13 +632,13 @@ function ScenarioProgressBar({ step, siteApproved }: { step: ScenarioStep; siteA
                   isActive   ? 'text-slate-900' :
                                'text-slate-400'
                 )}>
-                  {label}
+                  {t(labelKey)}
                 </p>
                 <p className={cn(
                   'text-[11px] mt-0.5 transition-colors duration-300',
                   isActive ? 'text-blue-600 font-medium' : 'text-slate-400'
                 )}>
-                  {detail}
+                  {t(detailKey)}
                 </p>
               </div>
             </div>
@@ -570,12 +681,12 @@ function MonitoringFoundItemsChatCard() {
 
 // ─── Monitoring: topic tiles + source config canvas ─────────────────────────
 const TOPIC_TILES = [
-  { id: 'sports',    label: 'Sport Events',           sub: 'IHSA results, league standings',       icon: <Activity    className="w-5 h-5" /> },
-  { id: 'science',   label: 'Science Events',          sub: 'STEM competitions, research fairs',    icon: <Search      className="w-5 h-5" /> },
-  { id: 'openhouse', label: 'Open Day Events',       sub: 'Admissions, tours, open days',         icon: <Users       className="w-5 h-5" /> },
-  { id: 'district',  label: 'District Announcements',  sub: 'Oakwood Public Schools feed',          icon: <FileText    className="w-5 h-5" /> },
-  { id: 'legal',     label: 'Legal News',              sub: 'Education law, regulatory changes',    icon: <ShieldCheck className="w-5 h-5" /> },
-  { id: 'health',    label: 'Health Standards',        sub: 'Accessibility, WCAG, web compliance',  icon: <Globe       className="w-5 h-5" /> },
+  { id: 'sports',    label: 'Sport Events',           sub: 'IHSA results, league standings',       labelKey: 'workspace.topic.sports.label',    subKey: 'workspace.topic.sports.sub',    icon: <Activity    className="w-5 h-5" /> },
+  { id: 'science',   label: 'Science Events',          sub: 'STEM competitions, research fairs',    labelKey: 'workspace.topic.science.label',   subKey: 'workspace.topic.science.sub',   icon: <Search      className="w-5 h-5" /> },
+  { id: 'openhouse', label: 'Open Day Events',         sub: 'Admissions, tours, open days',         labelKey: 'workspace.topic.openhouse.label', subKey: 'workspace.topic.openhouse.sub', icon: <Users       className="w-5 h-5" /> },
+  { id: 'district',  label: 'District Announcements',  sub: 'Oakwood Public Schools feed',          labelKey: 'workspace.topic.district.label',  subKey: 'workspace.topic.district.sub',  icon: <FileText    className="w-5 h-5" /> },
+  { id: 'legal',     label: 'Legal News',              sub: 'Education law, regulatory changes',    labelKey: 'workspace.topic.legal.label',     subKey: 'workspace.topic.legal.sub',     icon: <ShieldCheck className="w-5 h-5" /> },
+  { id: 'health',    label: 'Health Standards',        sub: 'Accessibility, WCAG, web compliance',  labelKey: 'workspace.topic.health.label',    subKey: 'workspace.topic.health.sub',    icon: <Globe       className="w-5 h-5" /> },
 ];
 
 const TOPIC_LABELS: Record<string, string> = Object.fromEntries(TOPIC_TILES.map(t => [t.id, t.label]));
@@ -589,24 +700,25 @@ function MonitoringSourcesCanvas({
   onToggle: (id: string) => void;
   showSelected: boolean;
 }) {
+  const t = useT();
   // Both phases use the same 6 tiles — after activation they show "Connected"
   return (
     <div className="flex-1 overflow-auto bg-white animate-in fade-in duration-700 p-8 space-y-6">
       <div>
-        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Choose Topics to Monitor</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{t('workspace.monitoringCanvas.heading')}</h2>
         <p className="text-slate-400 text-sm mt-1">
           {showSelected
-            ? `${selectedTopics.length} topics connected`
-            : 'Select the topics you\'d like AI to watch — tap to toggle'}
+            ? t('workspace.monitoringCanvas.connectedCount', { count: selectedTopics.length })
+            : t('workspace.monitoringCanvas.tapToggle')}
         </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        {TOPIC_TILES.map(t => {
-          const selected = selectedTopics.includes(t.id);
+        {TOPIC_TILES.map(tile => {
+          const selected = selectedTopics.includes(tile.id);
           return (
             <button
-              key={t.id}
-              onClick={() => !showSelected && onToggle(t.id)}
+              key={tile.id}
+              onClick={() => !showSelected && onToggle(tile.id)}
               disabled={showSelected}
               className={cn(
                 "rounded-2xl border-2 p-5 text-left space-y-3 transition-all duration-200",
@@ -621,10 +733,10 @@ function MonitoringSourcesCanvas({
                   "w-10 h-10 rounded-xl flex items-center justify-center",
                   selected ? "bg-blue-100 text-blue-600" : "bg-slate-100 text-slate-400"
                 )}>
-                  {t.icon}
+                  {tile.icon}
                 </div>
                 {showSelected && selected ? (
-                  <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Connected</span>
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">{t('workspace.monitoringCanvas.connectedBadge')}</span>
                 ) : (
                   <div className={cn(
                     "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200",
@@ -635,15 +747,15 @@ function MonitoringSourcesCanvas({
                 )}
               </div>
               <div>
-                <p className={cn("text-sm font-bold", selected ? "text-slate-900" : "text-slate-400")}>{t.label}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{t.sub}</p>
+                <p className={cn("text-sm font-bold", selected ? "text-slate-900" : "text-slate-400")}>{t(tile.labelKey)}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{t(tile.subKey)}</p>
               </div>
             </button>
           );
         })}
       </div>
       {!showSelected && (
-        <p className="text-xs text-slate-400 text-center">{selectedTopics.length} of {TOPIC_TILES.length} topics selected</p>
+        <p className="text-xs text-slate-400 text-center">{t('workspace.monitoringCanvas.selectedCount', { count: selectedTopics.length, total: TOPIC_TILES.length })}</p>
       )}
     </div>
   );
@@ -651,11 +763,12 @@ function MonitoringSourcesCanvas({
 
 // ─── Monitoring: setup animation canvas ─────────────────────────────────────
 function MonitoringSetupCanvas({ topics, extraSite }: { topics: string[]; extraSite?: string | null }) {
+  const t = useT();
   const [ticked, setTicked] = useState(0);
-  const baseTiles = topics.map(id => TOPIC_TILES.find(t => t.id === id)).filter(Boolean) as typeof TOPIC_TILES;
+  const baseTiles = topics.map(id => TOPIC_TILES.find(tt => tt.id === id)).filter(Boolean) as typeof TOPIC_TILES;
   const items = [
-    ...baseTiles,
-    ...(extraSite ? [{ id: 'extra', label: extraSite, sub: 'External website', icon: <Globe className="w-5 h-5" /> }] : []),
+    ...baseTiles.map(tile => ({ id: tile.id, label: t(tile.labelKey), sub: t(tile.subKey), icon: tile.icon })),
+    ...(extraSite ? [{ id: 'extra', label: extraSite, sub: t('workspace.monitoringSetup.externalWebsite'), icon: <Globe className="w-5 h-5" /> }] : []),
   ];
 
   useEffect(() => {
@@ -670,10 +783,10 @@ function MonitoringSetupCanvas({ topics, extraSite }: { topics: string[]; extraS
     <div className="flex-1 flex flex-col items-center justify-center gap-8 p-12 bg-white animate-in fade-in duration-700">
       <div className="text-center">
         <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          {allDone ? 'Monitoring is Live' : 'Setting Up Monitoring'}
+          {allDone ? t('workspace.monitoringSetup.headingLive') : t('workspace.monitoringSetup.headingActive')}
         </h2>
         <p className="text-slate-400 mt-1 text-sm font-medium">
-          {allDone ? 'All feeds are connected and active' : 'Connecting topic feeds for Oakwood High School'}
+          {allDone ? t('workspace.monitoringSetup.subtitleLive') : t('workspace.monitoringSetup.subtitleActive')}
         </p>
       </div>
       <div className="w-full max-w-md space-y-3">
@@ -700,7 +813,7 @@ function MonitoringSetupCanvas({ topics, extraSite }: { topics: string[]; extraS
                   isDone || isActive ? "text-slate-900" : "text-slate-400"
                 )}>{s.label}</p>
                 <p className="text-xs text-slate-400">
-                  {isDone ? 'Feed connected' : isActive ? 'Connecting...' : 'Waiting'}
+                  {isDone ? t('workspace.monitoringSetup.feedConnected') : isActive ? t('workspace.monitoringSetup.connecting') : t('workspace.monitoringSetup.waiting')}
                 </p>
               </div>
               <div className="shrink-0">
@@ -715,7 +828,7 @@ function MonitoringSetupCanvas({ topics, extraSite }: { topics: string[]; extraS
       {allDone && (
         <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-5 py-2.5 animate-in fade-in duration-500">
           <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
-          <span className="text-sm font-bold text-blue-700">All {items.length} feeds active</span>
+          <span className="text-sm font-bold text-blue-700">{t('workspace.monitoringSetup.allFeedsActive', { count: items.length })}</span>
         </div>
       )}
     </div>
@@ -837,10 +950,10 @@ function MonitoringDraftsCanvas() {
 }
 
 // ─── Monitoring workflow progress bar ────────────────────────────────────────
-const MONITORING_STEPS: { label: string; detail: string }[] = [
-  { label: 'Topics',  detail: 'Select topics to monitor'  },
-  { label: 'Setup',   detail: 'Connect source feeds'      },
-  { label: 'Active',  detail: 'Monitoring is live'        },
+const MONITORING_STEPS: { labelKey: string; detailKey: string }[] = [
+  { labelKey: 'workspace.monitoring.topics.label', detailKey: 'workspace.monitoring.topics.detail' },
+  { labelKey: 'workspace.monitoring.setup.label',  detailKey: 'workspace.monitoring.setup.detail' },
+  { labelKey: 'workspace.monitoring.active.label', detailKey: 'workspace.monitoring.active.detail' },
 ];
 
 function getMonitoringProgressIndex(step: ScenarioStep): number {
@@ -853,12 +966,13 @@ function getMonitoringProgressIndex(step: ScenarioStep): number {
 }
 
 function MonitoringProgressBar({ step }: { step: ScenarioStep }) {
+  const t = useT();
   const active = getMonitoringProgressIndex(step);
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 animate-in fade-in duration-300">
-      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Workflow</p>
+      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">{t('workspace.progress.workflow')}</p>
       <div>
-        {MONITORING_STEPS.map(({ label, detail }, i) => {
+        {MONITORING_STEPS.map(({ labelKey, detailKey }, i) => {
           const isComplete = i < active;
           const isActive   = i === active;
           const isLast     = i === MONITORING_STEPS.length - 1;
@@ -892,13 +1006,13 @@ function MonitoringProgressBar({ step }: { step: ScenarioStep }) {
                   isActive   ? 'text-slate-900' :
                                'text-slate-400'
                 )}>
-                  {label}
+                  {t(labelKey)}
                 </p>
                 <p className={cn(
                   'text-[11px] mt-0.5 transition-colors duration-300',
                   isActive ? 'text-blue-600 font-medium' : 'text-slate-400'
                 )}>
-                  {detail}
+                  {t(detailKey)}
                 </p>
               </div>
             </div>
@@ -916,73 +1030,76 @@ type AutoSourceId = 'cms' | 'sis' | 'lms' | 'shared_folder';
 type AutoSource = {
   id: AutoSourceId;
   label: string;
-  sub: string;
+  /** Translation key for the subtitle. */
+  subKey: string;
   domain: string;
-  permissions: string[];
-  cta: string;
+  /** Translation keys for permissions. */
+  permissionKeys: string[];
+  /** Translation key for the connect CTA. */
+  ctaKey: string;
   iconKey: 'globe' | 'database' | 'book' | 'folder';
-  // What part of the site this source feeds — used by the analysis canvas.
-  feeds: string;
+  /** Translation key for what part of the site this source feeds. */
+  feedsKey: string;
 };
 
 const AUTO_UPDATE_SOURCES: AutoSource[] = [
   {
     id: 'cms',
     label: 'WordPress',
-    sub: 'Content Management System (CMS)',
+    subKey: 'workspace.autoSource.cms.sub',
     domain: 'wordpress.com',
     iconKey: 'globe',
-    cta: 'Authorize with WordPress',
-    feeds: 'Pages, posts, navigation & media',
-    permissions: [
-      'Read & publish posts, pages, and media',
-      'Update navigation menus and widgets',
-      'Sync staff bios, calendars, and announcements',
-      'Manage SEO metadata and structured data',
+    ctaKey: 'workspace.autoSource.cms.cta',
+    feedsKey: 'workspace.autoSource.cms.feeds',
+    permissionKeys: [
+      'workspace.autoSource.cms.permission.0',
+      'workspace.autoSource.cms.permission.1',
+      'workspace.autoSource.cms.permission.2',
+      'workspace.autoSource.cms.permission.3',
     ],
   },
   {
     id: 'sis',
-    label: 'PowerSchool',
-    sub: 'Student Information System (SIS)',
-    domain: 'powerschool.com',
+    label: 'DaNiS',
+    subKey: 'workspace.autoSource.sis.sub',
+    domain: 'danis-hilfe.nibis.de',
     iconKey: 'database',
-    cta: 'Authorize with PowerSchool',
-    feeds: 'Faculty Directory, class schedules, calendar',
-    permissions: [
-      'Student enrollment & demographics',
-      'Class schedules and rosters',
-      'Academic calendar and key dates',
-      'Faculty and staff records',
+    ctaKey: 'workspace.autoSource.sis.cta',
+    feedsKey: 'workspace.autoSource.sis.feeds',
+    permissionKeys: [
+      'workspace.webuntis.permission.0',
+      'workspace.webuntis.permission.1',
+      'workspace.webuntis.permission.2',
+      'workspace.webuntis.permission.3',
     ],
   },
   {
     id: 'lms',
     label: 'Canvas LMS',
-    sub: 'Learning Management System (LMS)',
+    subKey: 'workspace.autoSource.lms.sub',
     domain: 'canvas.instructure.com',
     iconKey: 'book',
-    cta: 'Authorize with Canvas LMS',
-    feeds: 'Lesson plans, club & athletics calendars',
-    permissions: [
-      'Course catalog and lesson schedules',
-      'Club and after-school activity calendars',
-      'Assignment and event due dates',
-      'Teacher resource pages',
+    ctaKey: 'workspace.autoSource.lms.cta',
+    feedsKey: 'workspace.autoSource.lms.feeds',
+    permissionKeys: [
+      'workspace.autoSource.lms.permission.0',
+      'workspace.autoSource.lms.permission.1',
+      'workspace.autoSource.lms.permission.2',
+      'workspace.autoSource.lms.permission.3',
     ],
   },
   {
     id: 'shared_folder',
     label: 'Shared Folder',
-    sub: 'Google Drive, OneDrive, Dropbox',
+    subKey: 'workspace.autoSource.folder.sub',
     domain: 'drive.google.com',
     iconKey: 'folder',
-    cta: 'Connect a Shared Folder',
-    feeds: 'Optional: PDFs, handbooks, media files',
-    permissions: [
-      'Read PDFs, handbooks, and policy docs',
-      'Sync image and media assets',
-      'Watch shared folders for new files',
+    ctaKey: 'workspace.autoSource.folder.cta',
+    feedsKey: 'workspace.autoSource.folder.feeds',
+    permissionKeys: [
+      'workspace.autoSource.folder.permission.0',
+      'workspace.autoSource.folder.permission.1',
+      'workspace.autoSource.folder.permission.2',
     ],
   },
 ];
@@ -1050,9 +1167,7 @@ function AutoUpdatesAnalyzeCanvas({
       <div className="relative flex-1 min-h-0 overflow-hidden bg-slate-50">
         {/* Underlying site */}
         <div className="absolute inset-0 overflow-auto">
-          <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none">
-            <SchoolAfterMagic showAfter={true} />
-          </div>
+          <DemoSiteAfter siteScale={siteScale} />
         </div>
 
         {/* Scanning sweep */}
@@ -1141,6 +1256,7 @@ function ConnectAutoSourceCanvas({
   onAuthorize: () => void;
   onSkip: () => void;
 }) {
+  const t = useT();
   return (
     <div className="flex-1 flex items-center justify-center bg-slate-100 p-8 animate-in fade-in duration-500">
       <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 w-full max-w-sm space-y-6">
@@ -1148,7 +1264,7 @@ function ConnectAutoSourceCanvas({
         {/* Step pill */}
         <div className="flex items-center justify-center">
           <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
-            Step {stepIndex} of {totalSteps}
+            {t('workspace.autoSource.stepCount', { step: stepIndex, total: totalSteps })}
           </span>
         </div>
 
@@ -1158,11 +1274,11 @@ function ConnectAutoSourceCanvas({
             {autoSourceIcon(source.iconKey)}
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Connect {source.label}</h2>
+            <h2 className="text-2xl font-bold text-slate-900">{t('workspace.autoSource.connect', { label: source.label })}</h2>
             <p className="text-slate-500 text-sm mt-0.5">
               {source.id === 'cms'
-                ? <>Link your CMS to keep <span className="font-semibold">{websiteUrl}</span> in sync</>
-                : source.sub}
+                ? <>{t('workspace.autoSource.cmsHint.before')}<span className="font-semibold">{websiteUrl}</span>{t('workspace.autoSource.cmsHint.after')}</>
+                : t(source.subKey)}
             </p>
           </div>
         </div>
@@ -1172,27 +1288,27 @@ function ConnectAutoSourceCanvas({
           <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3">
             <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-slate-800">Secure Connection</p>
-              <p className="text-xs text-slate-500">OAuth 2.0 — credentials never stored on our servers</p>
+              <p className="text-sm font-semibold text-slate-800">{t('workspace.security.secureTitle')}</p>
+              <p className="text-xs text-slate-500">{t('workspace.security.oauthBody')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
             <CheckCircle className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-slate-800">Scoped Access</p>
-              <p className="text-xs text-slate-500">You can revoke this at any time from Integrations</p>
+              <p className="text-sm font-semibold text-slate-800">{t('workspace.security.scopedTitle')}</p>
+              <p className="text-xs text-slate-500">{t('workspace.security.scopedBody')}</p>
             </div>
           </div>
         </div>
 
         {/* Permissions list */}
         <div>
-          <p className="text-sm font-bold text-slate-800 mb-3">This integration will be able to:</p>
+          <p className="text-sm font-bold text-slate-800 mb-3">{t('workspace.autoSource.permissionsLabel')}</p>
           <div className="space-y-2">
-            {source.permissions.map(item => (
-              <div key={item} className="flex items-center gap-2 text-sm text-slate-700">
+            {source.permissionKeys.map(key => (
+              <div key={key} className="flex items-center gap-2 text-sm text-slate-700">
                 <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
-                {item}
+                {t(key)}
               </div>
             ))}
           </div>
@@ -1205,13 +1321,13 @@ function ConnectAutoSourceCanvas({
             className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
           >
             <ExternalLink className="w-4 h-4" />
-            {source.cta}
+            {t(source.ctaKey)}
           </button>
           <button
             onClick={onSkip}
             className="w-full text-xs text-slate-500 hover:text-slate-800 underline underline-offset-2 transition-colors py-1"
           >
-            Skip for now
+            {t('workspace.skipForNow')}
           </button>
         </div>
 
@@ -1226,12 +1342,13 @@ function AutoUpdatesActiveCanvas({ websiteUrl, connected, skipped }: {
   connected: AutoSourceId[];
   skipped: AutoSourceId[];
 }) {
+  const t = useT();
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-8 p-12 bg-white animate-in fade-in duration-700">
       <div className="text-center">
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Auto-Updates Are Live</h2>
+        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t('workspace.autoActive.heading')}</h2>
         <p className="text-slate-400 mt-1 text-sm font-medium">
-          <span className="font-semibold text-slate-700">{websiteUrl}</span> will stay in sync with the sources you connected.
+          <span className="font-semibold text-slate-700">{websiteUrl}</span>{t('workspace.autoActive.subtitleSuffix')}
         </p>
       </div>
       <div className="w-full max-w-md space-y-3">
@@ -1256,14 +1373,14 @@ function AutoUpdatesActiveCanvas({ websiteUrl, connected, skipped }: {
               <div className="flex-1 min-w-0">
                 <p className={cn("text-sm font-bold", isConnected ? "text-slate-900" : "text-slate-500")}>{s.label}</p>
                 <p className="text-xs text-slate-400">
-                  {isConnected ? 'Connected · syncing changes' :
-                   isSkipped   ? 'Skipped — connect later from Integrations' :
-                                 s.sub}
+                  {isConnected ? t('workspace.autoActive.connected') :
+                   isSkipped   ? t('workspace.autoActive.skipped') :
+                                 t(s.subKey)}
                 </p>
               </div>
               <div className="shrink-0">
                 {isConnected ? <CheckCircle className="w-5 h-5 text-blue-500" /> :
-                 isSkipped   ? <span className="text-[10px] font-bold text-slate-400 uppercase">Skipped</span> :
+                 isSkipped   ? <span className="text-[10px] font-bold text-slate-400 uppercase">{t('workspace.autoActive.skippedShort')}</span> :
                                <div className="w-5 h-5 rounded-full border-2 border-slate-200" />}
               </div>
             </div>
@@ -1273,7 +1390,7 @@ function AutoUpdatesActiveCanvas({ websiteUrl, connected, skipped }: {
       <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-5 py-2.5 animate-in fade-in duration-500">
         <CheckCircle className="w-4 h-4 text-blue-500 shrink-0" />
         <span className="text-sm font-bold text-blue-700">
-          {connected.length} of {AUTO_UPDATE_SOURCES.length} sources connected · Auto-updates active
+          {t('workspace.autoActive.summary', { count: connected.length, total: AUTO_UPDATE_SOURCES.length })}
         </span>
       </div>
     </div>
@@ -1281,14 +1398,14 @@ function AutoUpdatesActiveCanvas({ websiteUrl, connected, skipped }: {
 }
 
 // ─── Auto-updates workflow progress bar ──────────────────────────────────────
-const AUTO_STEPS: { label: string; detail: string }[] = [
-  { label: 'Site',          detail: 'Open the website to keep in sync' },
-  { label: 'Analyze',       detail: 'Spot what to automate' },
-  { label: 'CMS',           detail: 'Authorize WordPress' },
-  { label: 'SIS',           detail: 'Authorize PowerSchool' },
-  { label: 'LMS',           detail: 'Authorize Canvas LMS' },
-  { label: 'Shared Folder', detail: 'Optional — Drive, OneDrive…' },
-  { label: 'Active',        detail: 'Auto-updates running' },
+const AUTO_STEPS: { labelKey: string; detailKey: string }[] = [
+  { labelKey: 'workspace.auto.site.label',         detailKey: 'workspace.auto.site.detail' },
+  { labelKey: 'workspace.auto.analyze.label',      detailKey: 'workspace.auto.analyze.detail' },
+  { labelKey: 'workspace.auto.cms.label',          detailKey: 'workspace.auto.cms.detail' },
+  { labelKey: 'workspace.auto.sis.label',          detailKey: 'workspace.auto.sis.detail' },
+  { labelKey: 'workspace.auto.lms.label',          detailKey: 'workspace.auto.lms.detail' },
+  { labelKey: 'workspace.auto.sharedFolder.label', detailKey: 'workspace.auto.sharedFolder.detail' },
+  { labelKey: 'workspace.auto.active.label',       detailKey: 'workspace.auto.active.detail' },
 ];
 
 function getAutoProgressIndex(step: ScenarioStep): number {
@@ -1305,12 +1422,13 @@ function getAutoProgressIndex(step: ScenarioStep): number {
 }
 
 function AutoUpdatesProgressBar({ step }: { step: ScenarioStep }) {
+  const t = useT();
   const active = getAutoProgressIndex(step);
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 animate-in fade-in duration-300">
-      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Workflow</p>
+      <p className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">{t('workspace.progress.workflow')}</p>
       <div>
-        {AUTO_STEPS.map(({ label, detail }, i) => {
+        {AUTO_STEPS.map(({ labelKey, detailKey }, i) => {
           const isComplete = i < active;
           const isActive   = i === active;
           const isLast     = i === AUTO_STEPS.length - 1;
@@ -1344,13 +1462,13 @@ function AutoUpdatesProgressBar({ step }: { step: ScenarioStep }) {
                   isActive   ? 'text-slate-900' :
                                'text-slate-400'
                 )}>
-                  {label}
+                  {t(labelKey)}
                 </p>
                 <p className={cn(
                   'text-[11px] mt-0.5 transition-colors duration-300',
                   isActive ? 'text-blue-600 font-medium' : 'text-slate-400'
                 )}>
-                  {detail}
+                  {t(detailKey)}
                 </p>
               </div>
             </div>
@@ -1362,7 +1480,8 @@ function AutoUpdatesProgressBar({ step }: { step: ScenarioStep }) {
 }
 
 // ─── Main component ─────────────────────────────────────────────────────────
-export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringComplete, onAutoUpdatesComplete }: AiWorkspaceViewProps) {
+export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringComplete, onAutoUpdatesComplete, onCommHubComplete, onOpenCommHub, onSisConnected }: AiWorkspaceViewProps) {
+  const t = useT();
   const [scenarioStep, setScenarioStep] = useState<ScenarioStep>('idle');
   const [chatMessages, setChatMessages] = useState<{role: 'user' | 'agent', content: React.ReactNode}[]>([]);
   const [orchestratorTick, setOrchestratorTick] = useState<number>(-4);
@@ -1374,6 +1493,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const [postAuditReady, setPostAuditReady] = useState(false);
   const [siteApproved, setSiteApproved] = useState(false);
   const [connectionStep, setConnectionStep] = useState<'type_select' | 'sis_select' | 'powerschool_auth' | null>(null);
+  const [selectedSisInfo, setSelectedSisInfo] = useState<{ name: string; domain: string }>({ name: 'WebUntis', domain: 'webuntis.com' });
   const [centerTab, setCenterTab] = useState<'site' | 'audit'>('site');
   const [auditTab, setAuditTab] = useState<'site' | 'audit'>('site');
   const [showMoreActions, setShowMoreActions] = useState(false);
@@ -1394,7 +1514,16 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const [autoConnectedSources, setAutoConnectedSources] = useState<AutoSourceId[]>([]);
   const [autoSkippedSources, setAutoSkippedSources]     = useState<AutoSourceId[]>([]);
 
-  const TARGET_URL = 'https://oakwoodhigh.org';
+  // Communication-hub scenario state (Phase 1 only — emergency & consent live in the Communications Hub page)
+  const [commSelectedPlatforms, setCommSelectedPlatforms]   = useState<CommPlatformId[]>(['sdui', 'email']);
+  const [commConnectedPlatforms, setCommConnectedPlatforms] = useState<CommPlatformId[]>([]);
+  const [commPickerLocked, setCommPickerLocked]             = useState(false);
+
+  const { locale } = useLocale();
+  const region = useRegion();
+  const isGermany = region.id === 'Germany';
+  const TARGET_URL = isGermany ? 'https://rosenbach.de' : 'https://oakwoodhigh.org';
+  const auditLang = locale.language === 'de' ? 'de' : 'en';
 
   // Scale site previews to fit the center column
   const centerColRef = useRef<HTMLDivElement>(null);
@@ -1427,12 +1556,12 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   useEffect(() => {
     if (scenarioStep === 'orchestrator') {
       if (orchestratorTick === -3) {
-        agentMessage("I need to connect your school's data so the site stays accurate automatically — no manual updates.");
+        agentMessage(t('workspace.narration.orch.intro'));
       } else if (orchestratorTick === -1) {
-        agentMessage("To sync your directory, calendar, and announcements automatically, connect your SIS. You can also skip this and connect later.");
+        agentMessage(t('workspace.narration.orch.connectPrompt'));
         setConnectionStep('type_select');
       } else if (orchestratorTick === 4) {
-        agentMessage("Everything's in place — time to build your improved site.");
+        agentMessage(t('workspace.narration.orch.everythingInPlace'));
       }
     }
   }, [orchestratorTick, scenarioStep]);
@@ -1445,45 +1574,45 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     const FINDINGS_TOTAL = 3;
 
     if (autoAnalyzeTick === 0) {
-      const t = setTimeout(() => {
-        agentMessage("The site looks good — modern theme, content's all there. Let me see what's powering each section so I know what's worth automating.");
+      const tt = setTimeout(() => {
+        agentMessage(t('workspace.narration.auto.lookGood'));
         setAutoAnalyzeTick(1);
       }, 1200);
-      return () => clearTimeout(t);
+      return () => clearTimeout(tt);
     }
 
     if (autoAnalyzeTick === 1) {
-      const t = setTimeout(() => {
-        agentMessage(<span>Found your <strong>Faculty Directory</strong> — 47 staff entries. That's a great fit for your <strong>SIS</strong>, so new hires sync automatically.</span>);
+      const tt = setTimeout(() => {
+        agentMessage(t('workspace.narration.auto.foundFaculty'));
         setAutoAnalyzeTick(2);
       }, 1800);
-      return () => clearTimeout(t);
+      return () => clearTimeout(tt);
     }
 
     if (autoAnalyzeTick === 2) {
-      const t = setTimeout(() => {
-        agentMessage(<span>Calendars and club pages — these change every term. Your <strong>LMS</strong> already has the schedules; let's pipe them into the site.</span>);
+      const tt = setTimeout(() => {
+        agentMessage(t('workspace.narration.auto.calendarsClubs'));
         setAutoAnalyzeTick(3);
       }, 1800);
-      return () => clearTimeout(t);
+      return () => clearTimeout(tt);
     }
 
     if (autoAnalyzeTick === FINDINGS_TOTAL) {
-      const t = setTimeout(() => {
+      const tt = setTimeout(() => {
         agentMessage(
           <span>
-            And to publish updates back into pages, posts, and the homepage — your <strong>CMS</strong>. Here's the plan:
+            {t('workspace.narration.auto.planIntro')}
             <ul className="mt-2 ml-4 list-disc text-slate-700 space-y-0.5">
-              <li><strong>WordPress</strong> — pages, posts, navigation</li>
-              <li><strong>PowerSchool</strong> — Faculty Directory, schedules</li>
-              <li><strong>Canvas LMS</strong> — calendar &amp; club pages</li>
+              <li>{t('workspace.narration.auto.plan.wordpress')}</li>
+              <li>{t('workspace.narration.auto.plan.webuntis')}</li>
+              <li>{t('workspace.narration.auto.plan.canvas')}</li>
             </ul>
-            I'll also offer a <strong>Shared Folder</strong> at the end for PDFs and media — totally optional.
+            {t('workspace.narration.auto.planOutro')}
           </span>
         );
         setAutoPlanReady(true);
       }, 1500);
-      return () => clearTimeout(t);
+      return () => clearTimeout(tt);
     }
   }, [scenarioStep, autoAnalyzeTick]);
 
@@ -1503,9 +1632,9 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     setConnectionStep(null);
     setAuditTab('site');
     setCenterTab('site');
-    setChatMessages([{ role: 'user', content: 'Improve the existing website' }]);
+    setChatMessages([{ role: 'user', content: t('workspace.narration.improve.start') }]);
     setTimeout(() => {
-      agentMessage("Sure! To get started, please share the URL of your current school website and I'll analyze its structure, content, and performance.");
+      agentMessage(t('workspace.narration.improve.urlPrompt'));
       setUrlPromptReady(true);
     }, 800);
   };
@@ -1518,47 +1647,48 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
       setAuditTab('audit');
       agentMessage(
         <span>
-          Scanned <span className="font-bold text-blue-600">{typedUrl}</span>. Here's what we found:
+          {t('workspace.narration.improve.scannedPrefix')}<span className="font-bold text-blue-600">{typedUrl}</span>{t('workspace.narration.improve.scannedSuffix')}
           <ol className="mt-2 space-y-1 list-decimal list-inside text-slate-700">
-            <li>Current structure, page hierarchy, and assets are mapped — full report in the Audit tab.</li>
-            <li>Visitors struggle to navigate it on mobile and the content is hard to read.</li>
-            <li>The site is nearly invisible in search results.</li>
+            <li>{t('workspace.narration.improve.finding.0')}</li>
+            <li>{t('workspace.narration.improve.finding.1')}</li>
+            <li>{t('workspace.narration.improve.finding.2')}</li>
           </ol>
         </span>
       );
       // agentMessage(<AuditChatCardV2 />); // hidden for now
       setTimeout(() => {
-        agentMessage(
-          <span>We can fix all of this — want me to go ahead?</span>
-        );
+        agentMessage(t('workspace.narration.improve.fixOffer'));
         setTimeout(() => setAuditReady(true), 400);
       }, 900);
     }, 2500);
   };
 
   const handleTypeSelectSIS = () => {
-    userMessage('SIS — Student Information System');
+    userMessage(t('workspace.narration.improve.userPickSis'));
     setConnectionStep('sis_select');
   };
 
   const handleSISContinue = (sisName: string) => {
-    userMessage(`Connect via ${sisName}`);
+    userMessage(t('workspace.narration.improve.userConnectVia', { name: sisName }));
+    const provider = SIS_PROVIDERS.find(p => p.name === sisName);
+    setSelectedSisInfo({ name: sisName, domain: provider?.domain ?? 'webuntis.com' });
     setConnectionStep('powerschool_auth');
   };
 
   const handleAuthorize = () => {
     setConnectionStep(null);
-    agentMessage("PowerSchool connected! You can add more systems — Google Calendar, LMS, shared folders — anytime from the Integrations tab.");
+    onSisConnected?.(selectedSisInfo.name, selectedSisInfo.domain);
+    agentMessage(t('workspace.narration.improve.connected', { name: selectedSisInfo.name }));
   };
 
   const handleSkipConnection = () => {
     setConnectionStep(null);
-    userMessage("Skip for now.");
-    agentMessage("No problem — you can connect your data sources any time from Integrations.");
+    userMessage(t('workspace.narration.improve.userSkip'));
+    agentMessage(t('workspace.narration.improve.skipReply'));
   };
 
   const advanceToOrchestrator = () => {
-    userMessage("Let's fix it — improve the site.");
+    userMessage(t('workspace.narration.improve.userFixIt'));
     setTimeout(() => {
       setScenarioStep('orchestrator');
       setOrchestratorTick(-4);
@@ -1566,22 +1696,27 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const advanceToGeneration = () => {
-    userMessage("Let's go — improve the site.");
+    userMessage(t('workspace.narration.improve.userLetsGo'));
     setTimeout(() => {
       setScenarioStep('generation');
-      agentMessage("On it — building your improved website now.");
+      agentMessage(t('workspace.narration.improve.building'));
       // Auto-advance to post_audit after the site "loads"
       setTimeout(() => {
         setScenarioStep('post_audit');
         setTimeout(() => {
           agentMessage(
             <span>
-              Take a look — the site has been rebuilt and improved.{' '}
-              <a href={window.location.hostname === 'localhost' ? `${import.meta.env.BASE_URL}school-after-magic` : 'https://vnikolaev777.github.io/presence-prototype-v3/preview.html'} target="_blank" rel="noopener noreferrer"
+              {t('workspace.narration.improve.takeLookPrefix')}{' '}
+              <a href={isGermany
+                  ? `${import.meta.env.BASE_URL}lerchenberg/good.html`
+                  : window.location.hostname === 'localhost'
+                    ? `${import.meta.env.BASE_URL}school-after-magic`
+                    : 'https://vnikolaev777.github.io/presence-prototype-v3/preview.html'
+                } target="_blank" rel="noopener noreferrer"
                 className="text-blue-600 underline underline-offset-2 hover:text-blue-800 font-medium">
-                Open in new tab ↗
+                {t('workspace.narration.improve.openInNewTab')}
               </a>
-              . Does everything look right?
+              {t('workspace.narration.improve.takeLookSuffix')}
             </span>
           );
           setTimeout(() => setPostAuditReady(true), 400);
@@ -1591,38 +1726,36 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const approveSite = () => {
-    userMessage("Looks good — let's go!");
+    userMessage(t('workspace.narration.improve.userLooksGood'));
     setPostAuditReady(false);
     // agentMessage(<PostAuditChatCardV2 />); // hidden for now
     setTimeout(() => {
-      agentMessage(
-        <span>🎉 <strong>Your new site is live</strong> at a temporary Presence URL. Ready to connect your own domain and make it official?</span>
-      );
+      agentMessage(t('workspace.narration.improve.siteLive'));
       setTimeout(() => setSiteApproved(true), 500);
     }, 800);
   };
 
   const advanceToHiring = () => {
-    userMessage("Amazing — let's set it all up.");
+    userMessage(t('workspace.narration.improve.userAmazing'));
     setTimeout(() => {
       setScenarioStep('hiring');
-      agentMessage("Your website is live. I've also set up three automatic processes running in the background:");
+      agentMessage(t('workspace.narration.improve.hiringIntro'));
       onAgentsHired?.();
       setTimeout(() => {
         agentMessage(
           <div className="space-y-2 text-slate-600">
-            <p className="font-semibold text-slate-800 text-sm">On your Automations you can find:</p>
+            <p className="font-semibold text-slate-800 text-sm">{t('workspace.narration.improve.hiringHeading')}</p>
             <div className="flex items-start gap-2">
               <RefreshCw className="w-3.5 h-3.5 text-indigo-500 mt-0.5 shrink-0" />
-              <span>Automatic updates from PowerSchool — directory, schedules, and documents, ready to publish.</span>
+              <span>{t('workspace.narration.improve.hiringLine.0')}</span>
             </div>
             <div className="flex items-start gap-2">
               <PenTool className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
-              <span>News drafts and newsletters generated from external events and district feeds, waiting for your approval.</span>
+              <span>{t('workspace.narration.improve.hiringLine.1')}</span>
             </div>
             <div className="flex items-start gap-2">
               <Zap className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
-              <span>Accessibility reports flagging any issues against the latest standards.</span>
+              <span>{t('workspace.narration.improve.hiringLine.2')}</span>
             </div>
           </div>
         );
@@ -1648,9 +1781,9 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     setMonWebsiteReady(false);
     setMonWebsiteSubmitted(false);
     setMonExtraSite(null);
-    setChatMessages([{ role: 'user', content: 'Setup internet monitoring' }]);
+    setChatMessages([{ role: 'user', content: t('workspace.narration.mon.start') }]);
     setTimeout(() => {
-      agentMessage("I've pre-selected 6 relevant topic categories for Oakwood High. Tap to adjust, then activate when you're ready.");
+      agentMessage(t('workspace.narration.mon.preselected'));
     }, 800);
   };
 
@@ -1661,11 +1794,11 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const activateSources = () => {
-    const topicNames = monSelectedTopics.map(id => TOPIC_LABELS[id]).join(', ');
-    userMessage(`Activate: ${topicNames}`);
+    const topicNames = monSelectedTopics.map(id => t(`workspace.topic.${id}.label`)).join(', ');
+    userMessage(t('workspace.narration.mon.userActivate', { topics: topicNames }));
     setMonTopicsSubmitted(true);
     setTimeout(() => {
-      agentMessage("Topics confirmed! Would you also like me to monitor any specific websites?");
+      agentMessage(t('workspace.narration.mon.topicsConfirmed'));
       setTimeout(() => setMonWebsiteReady(true), 400);
     }, 800);
   };
@@ -1674,32 +1807,28 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     const totalSources = monSelectedTopics.length + (extraSite ? 1 : 0);
     setScenarioStep('mon_scanning');
     setTimeout(() => {
-      agentMessage(`Setting up ${totalSources} monitoring source${totalSources !== 1 ? 's' : ''} for Oakwood High — connecting feeds now...`);
+      agentMessage(t('workspace.narration.mon.settingUp', { count: totalSources, plural: totalSources !== 1 ? 's' : '' }));
       const setupDuration = totalSources * 520 + 1200;
       setTimeout(() => {
         setScenarioStep('mon_active');
-        agentMessage(
-          <span>
-            <strong>All feeds are live.</strong> I'll scan your {totalSources} source{totalSources !== 1 ? 's' : ''} daily and surface anything relevant — head to the Automations to see what I find.
-          </span>
-        );
+        agentMessage(t('workspace.narration.mon.allLive', { count: totalSources, plural: totalSources !== 1 ? 's' : '' }));
       }, setupDuration);
     }, 800);
   };
 
   const submitWebsite = () => {
-    const site = 'State Ministry of Education website';
+    const site = t('workspace.narration.mon.ministrySiteName');
     userMessage(
       <span>
-        Yes — add the{' '}
+        {t('workspace.narration.mon.userAddPrefix')}{' '}
         <a
-          href="https://www.education.gov/"
+          href={isGermany ? 'https://www.ausbildung.de' : 'https://www.education.gov/'}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 underline hover:text-blue-800"
         >
           {site}
-        </a>.
+        </a>{t('workspace.narration.mon.userAddSuffix')}
       </span>
     );
     setMonWebsiteSubmitted(true);
@@ -1708,7 +1837,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const skipWebsite = () => {
-    userMessage("No, that's all.");
+    userMessage(t('workspace.narration.mon.userNoMore'));
     setMonWebsiteSubmitted(true);
     startSetup(null);
   };
@@ -1724,9 +1853,9 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     setAutoPlanReady(false);
     setAutoConnectedSources([]);
     setAutoSkippedSources([]);
-    setChatMessages([{ role: 'user', content: 'Set up automated updates for my website' }]);
+    setChatMessages([{ role: 'user', content: t('workspace.narration.autoFlow.start') }]);
     setTimeout(() => {
-      agentMessage("Happy to. Share the URL of the website you want me to keep up to date and I'll take a look first.");
+      agentMessage(t('workspace.narration.autoFlow.urlPrompt'));
       setAutoUrlPromptReady(true);
     }, 800);
   };
@@ -1737,8 +1866,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     setTimeout(() => {
       agentMessage(
         <span>
-          Opening <span className="font-bold text-blue-600">{autoTypedUrl}</span> now — let me see what's on the site
-          and figure out where automated updates would help most.
+          {t('workspace.narration.autoFlow.openingPrefix')}<span className="font-bold text-blue-600">{autoTypedUrl}</span>{t('workspace.narration.autoFlow.openingSuffix')}
         </span>
       );
       setScenarioStep('auto_analyze');
@@ -1747,15 +1875,10 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   };
 
   const proceedAutoPlan = () => {
-    userMessage("Sounds good — let's set them up.");
+    userMessage(t('workspace.narration.autoFlow.userSetup'));
     setAutoPlanReady(false);
     setTimeout(() => {
-      agentMessage(
-        <span>
-          I'll walk through each source one at a time. Authorize the ones you want — or skip any you'd rather link later
-          from Integrations. First up: your <strong>CMS</strong>.
-        </span>
-      );
+      agentMessage(t('workspace.narration.autoFlow.walkthrough'));
       setScenarioStep('auto_cms');
     }, 600);
   };
@@ -1771,10 +1894,13 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     const nextStep = AUTO_STEP_ORDER[stepIdx + 1] ?? 'auto_active';
 
     if (action === 'authorize') {
-      userMessage(source.cta);
+      userMessage(t(source.ctaKey));
       setAutoConnectedSources(prev => prev.includes(sourceId) ? prev : [...prev, sourceId]);
+      if (sourceId === 'sis') {
+        onSisConnected?.(source.label, source.domain);
+      }
     } else {
-      userMessage('Skip for now');
+      userMessage(t('workspace.skipForNow'));
       setAutoSkippedSources(prev => prev.includes(sourceId) ? prev : [...prev, sourceId]);
     }
 
@@ -1793,25 +1919,23 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
         const willSkip    = action === 'skip'
           ? Array.from(new Set([...autoSkippedSources, sourceId]))
           : autoSkippedSources;
-        agentMessage(
-          <span>
-            <strong>All set.</strong> I'll auto-publish updates whenever{' '}
-            {willConnect.length > 0
-              ? <>your <strong>{willConnect.map(id => AUTO_UPDATE_SOURCES.find(s => s.id === id)?.label).join(', ')}</strong> change</>
-              : 'connected sources change'}
-            — new staff, schedules, lessons, clubs, vacation calendars.
-            {willSkip.length > 0 && <> You can connect <strong>{willSkip.map(id => AUTO_UPDATE_SOURCES.find(s => s.id === id)?.label).join(', ')}</strong> later from Integrations.</>}
-            {' '}Manage everything in the <strong>Automations</strong> tab.
-          </span>
-        );
+        const connectedNames = willConnect.map(id => AUTO_UPDATE_SOURCES.find(s => s.id === id)?.label).join(', ');
+        const skippedNames = willSkip.map(id => AUTO_UPDATE_SOURCES.find(s => s.id === id)?.label).join(', ');
+        const summary = willConnect.length > 0
+          ? t('workspace.narration.autoFlow.allSetWithConnected', { sources: connectedNames })
+          : t('workspace.narration.autoFlow.allSetGeneric');
+        const skipSuffix = willSkip.length > 0
+          ? ' ' + t('workspace.narration.autoFlow.skippedSuffix', { sources: skippedNames })
+          : '';
+        agentMessage(summary + skipSuffix + ' ' + t('workspace.narration.autoFlow.manageInTab'));
         return;
       }
 
       // Mid-flow — acknowledge and prompt for the next source
       agentMessage(
         action === 'authorize'
-          ? <span><strong>{source.label} connected.</strong> Next: {nextLabel}.</span>
-          : <span>Skipped <strong>{source.label}</strong>. You can connect it later from Integrations. Next: {nextLabel}.</span>
+          ? t('workspace.narration.autoFlow.midConnected', { name: source.label, next: nextLabel ?? '' })
+          : t('workspace.narration.autoFlow.midSkipped', { name: source.label, next: nextLabel ?? '' })
       );
       setScenarioStep(nextStep);
     }, 800);
@@ -1820,6 +1944,102 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const finishAutoUpdatesAndGoToDashboard = () => {
     onAutoUpdatesComplete?.();
     onFinishScenario?.();
+  };
+
+  // ── Communication-hub scenario handlers ──────────────────────────────────
+
+  const startCommScenario = () => {
+    setScenarioStep('comm_select');
+    setCommSelectedPlatforms(['sdui', 'email']);
+    setCommConnectedPlatforms([]);
+    setCommPickerLocked(false);
+    setChatMessages([{
+      role: 'user',
+      content: t('workspace.narration.comm.start'),
+    }]);
+    setTimeout(() => {
+      agentMessage(t('workspace.narration.comm.intro'));
+    }, 800);
+    setTimeout(() => {
+      agentMessage(t('workspace.narration.comm.preselected'));
+    }, 2000);
+  };
+
+  const toggleCommPlatform = (id: CommPlatformId) => {
+    setCommSelectedPlatforms(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
+  };
+
+  const confirmCommPlatforms = () => {
+    const labels = commSelectedPlatforms
+      .map(id => COMM_PLATFORMS.find(p => p.id === id)?.label)
+      .filter(Boolean)
+      .join(' + ');
+    userMessage(t('workspace.narration.comm.userUse', { platforms: labels }));
+    setCommPickerLocked(true);
+    setTimeout(() => {
+      const wantsSdui = commSelectedPlatforms.includes('sdui');
+      const wantsEmail = commSelectedPlatforms.includes('email');
+      if (wantsSdui) {
+        agentMessage(t('workspace.narration.comm.connectingSdui'));
+        setScenarioStep('comm_connect_sdui');
+      } else if (wantsEmail) {
+        agentMessage(t('workspace.narration.comm.connectingSmtp'));
+        setScenarioStep('comm_connect_email');
+      } else {
+        agentMessage(t('workspace.narration.comm.needChannel'));
+        setCommPickerLocked(false);
+      }
+    }, 700);
+  };
+
+  const advanceCommAfterPlatform = (platformId: CommPlatformId, action: 'authorize' | 'skip') => {
+    const platform = COMM_PLATFORMS.find(p => p.id === platformId)!;
+    if (action === 'authorize') {
+      userMessage(t('workspace.narration.comm.userAuthorize', { name: platform.label }));
+      setCommConnectedPlatforms(prev => prev.includes(platformId) ? prev : [...prev, platformId]);
+    } else {
+      userMessage(t('workspace.narration.comm.userSkip', { name: platform.label }));
+    }
+
+    setTimeout(() => {
+      // Sdui first, then email, then move to hub_active
+      if (platformId === 'sdui') {
+        const wantsEmail = commSelectedPlatforms.includes('email');
+        if (action === 'authorize') {
+          agentMessage(wantsEmail ? t('workspace.narration.comm.sduiConnectedNeedEmail') : t('workspace.narration.comm.sduiConnectedReady'));
+        } else {
+          agentMessage(wantsEmail ? t('workspace.narration.comm.sduiSkippedNeedEmail') : t('workspace.narration.comm.sduiSkippedReady'));
+        }
+        if (wantsEmail) {
+          setScenarioStep('comm_connect_email');
+        } else {
+          setScenarioStep('comm_hub_active');
+          setTimeout(() => promptHubLive(), 600);
+        }
+      } else if (platformId === 'email') {
+        if (action === 'authorize') {
+          agentMessage(t('workspace.narration.comm.smtpConnected'));
+        } else {
+          agentMessage(t('workspace.narration.comm.emailSkipped'));
+        }
+        setScenarioStep('comm_hub_active');
+        setTimeout(() => promptHubLive(), 600);
+      }
+    }, 700);
+  };
+
+  const promptHubLive = () => {
+    agentMessage(t('workspace.narration.comm.hubLive'));
+  };
+
+  const finishCommAndGoToDashboard = () => {
+    onCommHubComplete?.(commConnectedPlatforms);
+    onFinishScenario?.();
+  };
+
+  const openCommHubFromScenario = () => {
+    onCommHubComplete?.(commConnectedPlatforms);
+    onOpenCommHub?.();
   };
 
   // ── Derived booleans ──────────────────────────────────────────────────────
@@ -1850,6 +2070,22 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     : undefined;
   const currentAutoStepIdx  = AUTO_STEP_ORDER.indexOf(scenarioStep);
 
+  // Communication-hub derived booleans (Phase 1 only — emergency & consent live in the Communications Hub page)
+  const isCommSelect       = scenarioStep === 'comm_select';
+  const isCommConnectSdui  = scenarioStep === 'comm_connect_sdui';
+  const isCommConnectEmail = scenarioStep === 'comm_connect_email';
+  const isCommHubActive    = scenarioStep === 'comm_hub_active';
+  const isCommHub = isCommSelect || isCommConnectSdui || isCommConnectEmail || isCommHubActive;
+  const currentCommPlatform =
+    isCommConnectSdui  ? COMM_PLATFORMS.find(p => p.id === 'sdui')! :
+    isCommConnectEmail ? COMM_PLATFORMS.find(p => p.id === 'email')! :
+    null;
+  const commConnectStepIndex =
+    isCommConnectSdui  ? 1 :
+    isCommConnectEmail ? (commSelectedPlatforms.includes('sdui') ? 2 : 1) :
+    0;
+  const commConnectTotalSteps = commSelectedPlatforms.length;
+
   return (
     <div className="flex h-full w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-500">
 
@@ -1860,22 +2096,26 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <Bot className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="font-bold text-slate-800 text-sm">Presence Assistant</h2>
+            <h2 className="font-bold text-slate-800 text-sm">{t('commHub.chat.title')}</h2>
             <p className="text-xs text-slate-500">
-              {isIdle              ? 'Ready to help'                 :
-               isAudit             ? 'Audit complete'                :
-               isPostAudit         ? 'Site live — 10/10'             :
-               isMonInput          ? 'Configuring sources'           :
-               isMonScanning       ? 'Setting up feeds...'           :
-               isMonActive         ? 'Monitoring is live'            :
-               isAutoUrlInput      ? 'Awaiting site URL'             :
-               isAutoAnalyze       ? 'Analyzing your site'           :
-               isAutoCms           ? 'Linking your CMS'              :
-               isAutoSis           ? 'Linking your SIS'              :
-               isAutoLms           ? 'Linking your LMS'              :
-               isAutoSharedFolder  ? 'Linking a shared folder'       :
-               isAutoActive        ? 'Auto-updates are live'         :
-                                     'Migrating website'}
+              {isIdle              ? t('workspace.subtitle.ready')          :
+               isAudit             ? t('workspace.subtitle.auditComplete')  :
+               isPostAudit         ? t('workspace.subtitle.siteLive')       :
+               isMonInput          ? t('workspace.subtitle.monConfig')      :
+               isMonScanning       ? t('workspace.subtitle.monSetup')       :
+               isMonActive         ? t('workspace.subtitle.monLive')        :
+               isAutoUrlInput      ? t('workspace.subtitle.autoUrl')        :
+               isAutoAnalyze       ? t('workspace.subtitle.autoAnalyze')    :
+               isAutoCms           ? t('workspace.subtitle.autoCms')        :
+               isAutoSis           ? t('workspace.subtitle.autoSis')        :
+               isAutoLms           ? t('workspace.subtitle.autoLms')        :
+               isAutoSharedFolder  ? t('workspace.subtitle.autoFolder')     :
+               isAutoActive        ? t('workspace.subtitle.autoLive')       :
+               isCommSelect        ? t('workspace.subtitle.commSelect')    :
+               isCommConnectSdui   ? t('workspace.subtitle.commSdui')       :
+               isCommConnectEmail  ? t('workspace.subtitle.commEmail')      :
+               isCommHubActive     ? t('workspace.subtitle.commLive')       :
+                                     t('workspace.subtitle.migrating')}
             </p>
           </div>
         </div>
@@ -1887,13 +2127,13 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="space-y-4 animate-in fade-in duration-500">
               <div className="flex flex-col mr-auto items-start max-w-[95%]">
                 <div className="px-3 py-2 rounded-2xl rounded-bl-sm text-sm shadow-sm bg-white border border-slate-200 text-slate-700">
-                  <p className="font-medium mb-1">Hi! I'm your Presence Assistant —</p>
-                  <p className="text-slate-500 text-xs leading-relaxed">here to build and maintain your website, handle integrations, and run AI agents that keep your online presence in sync with the outside world. What should we start with?</p>
+                  <p className="font-medium mb-1">{t('workspace.idle.greeting')}</p>
+                  <p className="text-slate-500 text-xs leading-relaxed">{t('workspace.idle.body')}</p>
                 </div>
-                <span className="text-[10px] text-slate-500 mt-1">Presence Assistant</span>
+                <span className="text-[10px] text-slate-500 mt-1">{t('commHub.chat.title')}</span>
               </div>
               <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Quick Actions</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">{t('workspace.idle.quickActions')}</p>
                 {QUICK_ACTIONS.slice(0, showMoreActions ? QUICK_ACTIONS.length : 3).map((action, i) => (
                   i === 0 ? (
                     <button
@@ -1901,21 +2141,22 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                       onClick={startScenario}
                       className="w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all group text-sm font-semibold bg-indigo-50 hover:bg-indigo-100 hover:shadow-md border-indigo-300 text-indigo-800 cursor-pointer relative">
                       <span className={cn("p-1.5 rounded-lg border shrink-0", action.color)}>{action.icon}</span>
-                      <span className="flex-1">{action.label}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white shrink-0">Suggested</span>
+                      <span className="flex-1">{t(action.labelKey)}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white shrink-0">{t('workspace.idle.suggested')}</span>
                     </button>
                   ) : (
                     <button
                       key={i}
                       onClick={
-                        action.scenario                       ? startScenario           :
-                        (action as any).monitoringScenario    ? startMonitoringScenario :
+                        action.scenario                       ? startScenario            :
+                        (action as any).monitoringScenario    ? startMonitoringScenario  :
                         (action as any).autoUpdatesScenario   ? startAutoUpdatesScenario :
+                        (action as any).commScenario          ? startCommScenario        :
                                                                 undefined
                       }
                       className="w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all group text-sm font-semibold bg-white hover:shadow-md hover:border-slate-300 cursor-pointer border-slate-200 text-slate-700">
                       <span className={cn("p-1.5 rounded-lg border shrink-0", action.color)}>{action.icon}</span>
-                      <span className="flex-1">{action.label}</span>
+                      <span className="flex-1">{t(action.labelKey)}</span>
                       <MoveRight className="w-3.5 h-3.5 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   )
@@ -1924,7 +2165,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                   onClick={() => setShowMoreActions(v => !v)}
                   className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors">
                   <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", showMoreActions && "rotate-180")} />
-                  {showMoreActions ? 'View less' : 'View more'}
+                  {showMoreActions ? t('workspace.idle.viewLess') : t('workspace.idle.viewMore')}
                 </button>
               </div>
             </div>
@@ -1940,7 +2181,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               )}>
                 {msg.content}
               </div>
-              <span className="text-[10px] text-slate-500 mt-1">{msg.role === 'user' ? 'You' : 'Presence Assistant'}</span>
+              <span className="text-[10px] text-slate-500 mt-1">{msg.role === 'user' ? t('chat.sender.you') : t('commHub.chat.title')}</span>
             </div>
           ))}
 
@@ -1949,7 +2190,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
               <button onClick={confirmUrl}
                 className="border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                Submit link &rarr;
+                {t('workspace.cta.submitLink')} &rarr;
               </button>
             </div>
           )}
@@ -1960,7 +2201,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               <button onClick={confirmAutoUrl}
                 className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 shrink-0" />
-                Submit {autoTypedUrl}
+                {t('workspace.cta.submitUrl', { url: autoTypedUrl })}
               </button>
             </div>
           )}
@@ -1970,7 +2211,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
               <button onClick={proceedAutoPlan}
                 className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                Sounds good — set them up &rarr;
+                {t('workspace.cta.proceedSetup')} &rarr;
               </button>
             </div>
           )}
@@ -1980,11 +2221,11 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2 flex flex-wrap gap-2">
               <button onClick={() => handleAutoSourceAction('authorize')}
                 className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                {currentAutoSource.cta} &rarr;
+                {t(currentAutoSource.ctaKey)} &rarr;
               </button>
               <button onClick={() => handleAutoSourceAction('skip')}
                 className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                Skip for now
+                {t('workspace.skipForNow')}
               </button>
             </div>
           )}
@@ -1994,7 +2235,47 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
               <button onClick={finishAutoUpdatesAndGoToDashboard}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                Go to Automations <CheckCircle className="w-4 h-4" />
+                {t('workspace.cta.goToAutomations')} <CheckCircle className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* COMMS: confirm platform picker */}
+          {isCommSelect && !commPickerLocked && commSelectedPlatforms.length > 0 && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
+              <button onClick={confirmCommPlatforms}
+                className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                {t('workspace.cta.connectPlatforms', { count: commSelectedPlatforms.length })} &rarr;
+              </button>
+            </div>
+          )}
+
+          {/* COMMS: per-platform Authorize / Skip quick replies */}
+          {(isCommConnectSdui || isCommConnectEmail) && currentCommPlatform && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2 flex flex-wrap gap-2">
+              <button onClick={() => advanceCommAfterPlatform(currentCommPlatform.id, 'authorize')}
+                className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                {t(currentCommPlatform.ctaKey)} &rarr;
+              </button>
+              <button onClick={() => advanceCommAfterPlatform(currentCommPlatform.id, 'skip')}
+                className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                {t('workspace.skipForNow')}
+              </button>
+            </div>
+          )}
+
+          {/* COMMS: hub live — go to Communications Hub for examples */}
+          {isCommHubActive && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2 flex flex-wrap gap-2">
+              <button onClick={openCommHubFromScenario}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                <Bell className="w-3.5 h-3.5" />
+                {t('workspace.cta.openCommHub')} &rarr;
+              </button>
+              <button onClick={finishCommAndGoToDashboard}
+                className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
+                {t('workspace.cta.doneForNow')}
               </button>
             </div>
           )}
@@ -2004,7 +2285,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 pt-2">
               <button onClick={activateSources}
                 className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                Activate {monSelectedTopics.length} topic{monSelectedTopics.length !== 1 ? 's' : ''} &rarr;
+                {t('workspace.cta.activateTopics', { count: monSelectedTopics.length })} &rarr;
               </button>
             </div>
           )}
@@ -2015,49 +2296,49 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               <button onClick={submitWebsite}
                 className="border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 shrink-0" />
-                Add website
+                {t('workspace.cta.addWebsite')}
               </button>
             </div>
           )}
 
           {/* SCENARIO ACTION BUTTONS */}
-          {!isIdle && !isUrlInput && !isMonInput && !isMonScanning && !isAutoUpdates && (
+          {!isIdle && !isUrlInput && !isMonInput && !isMonScanning && !isAutoUpdates && !isCommHub && (
             <div className="pt-4 flex justify-start">
               {isAudit && auditReady && (
                 <button onClick={advanceToOrchestrator}
                   className="animate-in fade-in slide-in-from-bottom border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors">
-                  Proceed with improvements &rarr;
+                  {t('workspace.cta.proceedImprovements')} &rarr;
                 </button>
               )}
               {scenarioStep === 'orchestrator' && orchestratorTick >= 4 && (
                 <button onClick={advanceToGeneration}
                   className="animate-in fade-in slide-in-from-bottom border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors">
-                  Build Improved Site &rarr;
+                  {t('workspace.cta.buildImproved')} &rarr;
                 </button>
               )}
               {isPostAudit && postAuditReady && !siteApproved && (
                 <button onClick={approveSite}
                   className="animate-in fade-in slide-in-from-bottom border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors">
-                  Looks good — continue &rarr;
+                  {t('workspace.cta.looksGood')} &rarr;
                 </button>
               )}
               {isPostAudit && siteApproved && (
                 <button onClick={advanceToHiring}
                   className="animate-in fade-in slide-in-from-bottom border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors">
-                  Connect domain &amp; publish &rarr;
+                  {t('workspace.cta.connectDomain')} &rarr;
                 </button>
               )}
               {scenarioStep === 'hiring' && (
                 <button onClick={finishAndGoToDashboard}
                   className="animate-in fade-in slide-in-from-bottom bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                  Go to Automations <CheckCircle className="w-4 h-4" />
+                  {t('workspace.cta.goToAutomations')} <CheckCircle className="w-4 h-4" />
                 </button>
               )}
               {/* Monitoring: go to Automations — also sets hasMonitoringSetup */}
               {isMonActive && (
                 <button onClick={finishMonitoringAndGoToDashboard}
                   className="animate-in fade-in slide-in-from-bottom bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded-full shadow-sm transition-colors flex items-center gap-2">
-                  Go to Automations <CheckCircle className="w-4 h-4" />
+                  {t('workspace.cta.goToAutomations')} <CheckCircle className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -2093,7 +2374,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               </div>
             </div>
             <div className="flex-1 min-h-0 overflow-auto bg-white">
-              <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none"><SchoolAfterMagic showAfter={true} /></div>
+              <DemoSiteAfter siteScale={siteScale} />
             </div>
           </div>
         )}
@@ -2126,6 +2407,31 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             connected={autoConnectedSources}
             skipped={autoSkippedSources}
           />
+        )}
+
+        {/* COMMS: Phase 1.A — platform picker */}
+        {isCommSelect && (
+          <CommPlatformPickerCanvas
+            selected={commSelectedPlatforms}
+            onToggle={toggleCommPlatform}
+            locked={commPickerLocked}
+          />
+        )}
+
+        {/* COMMS: Phase 1.B — per-platform OAuth modal */}
+        {(isCommConnectSdui || isCommConnectEmail) && currentCommPlatform && (
+          <CommConnectPlatformCanvas
+            platform={currentCommPlatform}
+            onAuthorize={() => advanceCommAfterPlatform(currentCommPlatform.id, 'authorize')}
+            onSkip={() => advanceCommAfterPlatform(currentCommPlatform.id, 'skip')}
+            stepIndex={commConnectStepIndex}
+            totalSteps={commConnectTotalSteps}
+          />
+        )}
+
+        {/* COMMS: Phase 1.C — hub map (final state of the connections scenario) */}
+        {isCommHubActive && (
+          <CommHubMapCanvas connected={commConnectedPlatforms} />
         )}
 
         {/* MONITORING: source config / website question phase */}
@@ -2178,13 +2484,13 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             </div>
             {/* Content */}
             {auditTab === 'audit' && (isAudit || scenarioStep === 'generation') ? (
-              <AuditCanvasV2 />
+              <AuditCanvasV2 lang={auditLang} />
             ) : (
               <div className="flex-1 min-h-0 overflow-auto bg-white">
                 <div className="sticky top-0 z-10 bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center text-xs text-amber-700 font-medium">
-                  Example — for illustration purposes only
+                  {t('workspace.exampleBanner')}
                 </div>
-                <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none"><SchoolBefore /></div>
+                <DemoSiteBefore siteScale={siteScale} />
               </div>
             )}
           </div>
@@ -2229,13 +2535,13 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               </button>
             </div>
             {auditTab === 'audit' ? (
-              <AuditCanvasV2 />
+              <AuditCanvasV2 lang={auditLang} />
             ) : (
               <div className="flex-1 min-h-0 overflow-auto bg-white">
                 <div className="sticky top-0 z-10 bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center text-xs text-amber-700 font-medium">
-                  Example — for illustration purposes only
+                  {t('workspace.exampleBanner')}
                 </div>
-                <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none"><SchoolBefore /></div>
+                <DemoSiteBefore siteScale={siteScale} />
               </div>
             )}
           </div>
@@ -2277,10 +2583,10 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             </div>
             {/* Content */}
             {centerTab === 'audit' && siteApproved ? (
-              <PostAuditCanvasV2 />
+              <PostAuditCanvasV2 lang={auditLang} />
             ) : (
               <div className="flex-1 min-h-0 overflow-auto bg-white">
-                <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none"><SchoolAfterMagic showAfter={true} /></div>
+                <DemoSiteAfter siteScale={siteScale} />
               </div>
             )}
           </div>
@@ -2291,13 +2597,13 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
           <div className="flex-1 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-700">
             <div className="shrink-0 bg-white px-3 py-2 border-b border-slate-200 flex items-center gap-2">
               <div className="flex gap-1.5 shrink-0"><div className="w-2.5 h-2.5 rounded-full bg-red-400"/><div className="w-2.5 h-2.5 rounded-full bg-amber-400"/><div className="w-2.5 h-2.5 rounded-full bg-emerald-400"/></div>
-              <div className="bg-blue-50 px-3 py-1 rounded text-xs text-blue-700 font-bold font-mono flex-1 text-center border border-blue-200">https://oakwoodhigh.org (AI Managed)</div>
+              <div className="bg-blue-50 px-3 py-1 rounded text-xs text-blue-700 font-bold font-mono flex-1 text-center border border-blue-200">{TARGET_URL} ({t('workspace.hiringBar.aiManaged')})</div>
               <div className="text-[10px] text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full font-bold flex items-center gap-1 shrink-0">
                 <CheckCircle className="w-3 h-3" /> Live
               </div>
             </div>
             <div className="flex-1 min-h-0 overflow-auto bg-white">
-              <div style={{ zoom: siteScale, width: '1100px' }} className="pointer-events-none"><SchoolAfterMagic showAfter={true} /></div>
+              <DemoSiteAfter siteScale={siteScale} />
             </div>
           </div>
         )}
@@ -2308,7 +2614,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
         <div className="p-5 space-y-6">
 
           {/* MIGRATION PROGRESS PATH */}
-          {!isIdle && !isMonitoring && !isAutoUpdates && <ScenarioProgressBar step={scenarioStep} siteApproved={siteApproved} />}
+          {!isIdle && !isMonitoring && !isAutoUpdates && !isCommHub && <ScenarioProgressBar step={scenarioStep} siteApproved={siteApproved} />}
 
           {/* MONITORING PROGRESS PATH */}
           {isMonitoring && <MonitoringProgressBar step={scenarioStep} />}
@@ -2316,11 +2622,19 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
           {/* AUTO-UPDATES PROGRESS PATH */}
           {isAutoUpdates && <AutoUpdatesProgressBar step={scenarioStep} />}
 
+          {/* COMMUNICATION-HUB PROGRESS PATH */}
+          {isCommHub && <CommProgressBar step={scenarioStep} />}
+
+          {/* COMMUNICATION-HUB: connected channels card */}
+          {isCommHub && (isCommConnectSdui || isCommConnectEmail || isCommHubActive) && (
+            <CommHubStatusCard connected={commConnectedPlatforms} currentStep={scenarioStep} />
+          )}
+
           {/* AUTO-UPDATES: connected sources card */}
           {isAutoUpdates && (isAutoConnectingStep || isAutoActive) && (
             <div className="p-4 bg-white border border-blue-200 shadow-sm rounded-2xl animate-in slide-in-from-right-10 fade-in duration-500">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">Sources</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">{t('workspace.sourcesPanel.heading')}</p>
                 {isAutoActive && (
                   <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Live
@@ -2379,9 +2693,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
           {(isMonInput || isMonScanning) && (
             <div className="flex flex-col items-center justify-center gap-3 pt-16 text-center px-2 animate-in fade-in">
               <Server className="w-8 h-8 text-slate-200" />
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Active feeds will appear here once setup is complete.
-              </p>
+              <p className="text-xs text-slate-500 leading-relaxed">{t('workspace.sourcesPanel.empty')}</p>
             </div>
           )}
 
@@ -2390,7 +2702,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="p-4 bg-white border border-blue-200 rounded-2xl space-y-3 animate-in slide-in-from-right-10 fade-in duration-500">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">Sources</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">{t('workspace.sourcesPanel.heading')}</p>
               </div>
               <div className="space-y-2">
                 {monSelectedTopics.map(id => {
@@ -2399,7 +2711,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                   return (
                     <div key={id} className="flex items-center gap-2">
                       <div className="text-blue-500 [&>svg]:w-3.5 [&>svg]:h-3.5">{tile.icon}</div>
-                      <span className="text-xs text-slate-600 font-medium">{tile.label}</span>
+                      <span className="text-xs text-slate-600 font-medium">{t(tile.labelKey)}</span>
                       <CheckCircle className="w-3 h-3 text-blue-400 ml-auto shrink-0" />
                     </div>
                   );
@@ -2412,23 +2724,23 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                   </div>
                 )}
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed pt-1 border-t border-slate-100">Scans daily · drafts queued for review</p>
+              <p className="text-[10px] text-slate-400 leading-relaxed pt-1 border-t border-slate-100">{t('workspace.sourcesPanel.scansDaily')}</p>
             </div>
           )}
 
           {/* Integrations (improvement only) */}
-          {!isIdle && !isUrlInput && !isAudit && !isMonitoring && !isAutoUpdates && (scenarioStep !== 'orchestrator' || orchestratorTick >= 0) && (
+          {!isIdle && !isUrlInput && !isAudit && !isMonitoring && !isAutoUpdates && !isCommHub && (scenarioStep !== 'orchestrator' || orchestratorTick >= 0) && (
             <div className="p-4 bg-white border border-slate-200 shadow-sm rounded-2xl animate-in slide-in-from-right-10 fade-in duration-500">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">Integrations</p>
-                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full cursor-help">View All</span>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-900">{t('nav.integrations')}</p>
+                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full cursor-help">{t('workspace.integrationsPanel.viewAll')}</span>
               </div>
 
               {/* SIS section */}
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">SIS</p>
               <div className="space-y-2 mb-4">
                 {[
-                  { name: "PowerSchool", domain: "powerschool.com" },
+                  { name: "DaNiS", domain: "nibis.de" },
                 ].map((sis, idx) => {
                   const isConnecting = orchestratorTick === idx;
                   const isConnected  = orchestratorTick > idx || scenarioStep !== 'orchestrator';
@@ -2458,21 +2770,21 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               {/* LMS + Shared Folder — waiting tiles */}
               <div className="border-t border-slate-100 pt-3 space-y-2">
                 {[
-                  { label: 'LMS', sub: 'Canvas, Schoology, Google Classroom…', icon: <BookOpen className="w-3.5 h-3.5" /> },
-                  { label: 'Shared Folder', sub: 'Google Drive, OneDrive, Dropbox…', icon: <FolderOpen className="w-3.5 h-3.5" /> },
+                  { labelKey: 'workspace.integrationsPanel.lms.label',    subKey: 'workspace.integrationsPanel.lms.sub',    icon: <BookOpen className="w-3.5 h-3.5" /> },
+                  { labelKey: 'workspace.integrationsPanel.folder.label', subKey: 'workspace.integrationsPanel.folder.sub', icon: <FolderOpen className="w-3.5 h-3.5" /> },
                 ].map(tile => (
-                  <div key={tile.label} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-dashed border-slate-300 opacity-70">
+                  <div key={tile.labelKey} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-dashed border-slate-300 opacity-70">
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded bg-white border border-slate-200 flex items-center justify-center text-slate-400">
                         {tile.icon}
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-500">{tile.label}</p>
-                        <p className="text-[9px] text-slate-400 leading-tight">{tile.sub}</p>
+                        <p className="text-xs font-bold text-slate-500">{t(tile.labelKey)}</p>
+                        <p className="text-[9px] text-slate-400 leading-tight">{t(tile.subKey)}</p>
                       </div>
                     </div>
                     <button className="flex items-center gap-1 text-[10px] font-bold text-blue-500 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full hover:bg-blue-100 transition-colors">
-                      <Plus className="w-3 h-3" /> Add
+                      <Plus className="w-3 h-3" /> {t('workspace.integrationsPanel.add')}
                     </button>
                   </div>
                 ))}

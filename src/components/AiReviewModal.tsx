@@ -3,6 +3,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { AiAction } from '../data/mockData';
 import { Sparkles, X, Check, ArrowRight, AlertTriangle, Eye, Zap, Pencil, ExternalLink } from 'lucide-react';
 import { SchoolAfterMagic } from '../pages/SchoolAfterMagic';
+import { useT, useRegion } from '../lib/i18n';
+
+// Map previewType → lerchenberg section ID (Germany region)
+const PREVIEW_SECTION: Record<string, string> = {
+  new_teacher:      'section-team',
+  new_blog_post:    'section-news',
+  science_fair_blog:'section-news',
+  blog:             'section-news',
+  calendar:         'section-events',
+  document:         'section-resources',
+  banner:           'announcement',
+  quick_links:      'section-quick',
+  ada_compliance:   '',   // whole page — no specific section
+};
 
 interface Props {
   action: AiAction;
@@ -15,6 +29,8 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAfter, setShowAfter] = useState(true);
   const [autoApply, setAutoApply] = useState(false);
+  const t = useT();
+  const region = useRegion();
 
   const handleApprove = () => {
     if (action.requiresUserInput && !userInput.trim()) return;
@@ -63,7 +79,7 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2 text-blue-600 text-xs font-bold tracking-wide uppercase mb-2">
                 <Sparkles className="w-4 h-4" />
-                AI Content Proposal
+                {t('aiReviewModal.proposalLabel')}
               </div>
               <h2 className="text-xl font-bold text-slate-900 leading-tight">{action.title}</h2>
             </div>
@@ -72,7 +88,7 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
             <div className="p-6 overflow-y-auto flex-1 space-y-8">
               
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source Context</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('aiReviewModal.sourceContext')}</h3>
 
                 {/* Summary text */}
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -82,7 +98,7 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
                 {/* Multi-source citations */}
                 {action.sources && action.sources.length > 0 ? (
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Sources</h3>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{t('aiReviewModal.sources')}</h3>
                     {action.sources.map((src, idx) => (
                       <a
                         key={idx}
@@ -131,7 +147,7 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Proposed Changes</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('aiReviewModal.proposedChanges')}</h3>
                 <ul className="space-y-3 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
                   {action.proposedChanges.map((change, idx) => (
                     <li key={idx} className="flex gap-3 text-slate-700">
@@ -150,14 +166,14 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
                 >
                   <div className="flex items-center gap-2 text-orange-700 font-bold uppercase text-xs tracking-wider">
                     <AlertTriangle className="w-4 h-4" />
-                    Input Required
+                    {t('aiReviewModal.inputRequired')}
                   </div>
                   <p className="text-sm font-medium text-slate-800">{action.userPrompt}</p>
                   <input
                     type="text"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="Type missing info here..."
+                    placeholder={t('aiReviewModal.inputPlaceholder')}
                     className="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm"
                   />
                 </motion.div>
@@ -175,11 +191,11 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
                   disabled={isProcessing}
                   className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors disabled:opacity-40"
                 >
-                  Reject
+                  {t('aiReviewModal.action.reject')}
                 </button>
                 <button className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors flex items-center gap-1.5">
                   <Pencil className="w-3.5 h-3.5" />
-                  Edit
+                  {t('aiReviewModal.action.edit')}
                 </button>
                 <button
                   onClick={handleApprove}
@@ -189,12 +205,12 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
                   {isProcessing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                      Applying...
+                      {t('aiReviewModal.action.applying')}
                     </>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      Approve & Publish
+                      {t('aiReviewModal.action.approve')}
                     </>
                   )}
                 </button>
@@ -207,7 +223,7 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
               >
                 <div className="flex items-center gap-2">
                   <Zap className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="text-sm font-medium text-slate-600">Always apply this type automatically</span>
+                  <span className="text-sm font-medium text-slate-600">{t('aiReviewModal.autoApply')}</span>
                 </div>
                 {/* Knob */}
                 <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${autoApply ? 'bg-emerald-500' : 'bg-slate-200'}`}>
@@ -223,7 +239,7 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
             {/* Preview Toolbar */}
             <div className="h-14 bg-white border-b border-l border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
               <div className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <Eye className="w-4 h-4 text-blue-500" /> Live Site Preview
+                <Eye className="w-4 h-4 text-blue-500" /> {t('aiReviewModal.preview.title')}
               </div>
               
               {/* Before / After Toggle */}
@@ -232,27 +248,42 @@ export function AiReviewModal({ action, onClose, onComplete }: Props) {
                   onClick={() => setShowAfter(false)}
                   className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${!showAfter ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                 >
-                  Current Site
+                  {t('aiReviewModal.preview.before')}
                 </button>
                 <button
                   onClick={() => setShowAfter(true)}
                   className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${showAfter ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                 >
-                  AI Proposed
+                  {t('aiReviewModal.preview.after')}
                 </button>
               </div>
             </div>
 
             {/* Preview Canvas */}
             <div className="flex-1 relative overflow-hidden bg-slate-100">
-              <div className="w-full h-full overflow-y-auto bg-slate-50">
-                <SchoolAfterMagic
-                  previewType={action.previewType}
-                  showAfter={showAfter}
-                  userLocationValue={userInput}
-                  pendingChanges={action.pendingChanges}
+              {region.id === 'Germany' ? (
+                <iframe
+                  key={`${action.previewType}-${showAfter}`}
+                  src={(() => {
+                    const section = action.previewType ? PREVIEW_SECTION[action.previewType] : '';
+                    const params = new URLSearchParams();
+                    if (section) params.set('highlight', section);
+                    params.set('state', showAfter ? 'after' : 'before');
+                    return `${import.meta.env.BASE_URL}lerchenberg/good.html?${params}`;
+                  })()}
+                  className="w-full h-full border-0"
+                  title="Grundschule Lerchenberg Vorschau"
                 />
-              </div>
+              ) : (
+                <div className="w-full h-full overflow-y-auto bg-slate-50">
+                  <SchoolAfterMagic
+                    previewType={action.previewType}
+                    showAfter={showAfter}
+                    userLocationValue={userInput}
+                    pendingChanges={action.pendingChanges}
+                  />
+                </div>
+              )}
             </div>
 
           </div>

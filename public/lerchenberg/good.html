@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<!-- FIX #1: correct lang="de" for German content -->
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <!-- FIX #14: proper viewport meta tag for mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- FIX #21: descriptive, accurate page title -->
+  <title>Primarschule Rosenbach &ndash; Vogtlandkreis, Sachsen</title>
+  <!-- FIX #4: proper meta description -->
+  <meta name="description" content="Primarschule Rosenbach in Rosenbach, Vogtlandkreis, Sachsen. Kindergarten bis 6. Klasse, Tagesstruktur, Lehrplan 21. Schulb&uuml;ro: 037431 33 80." />
+  <!-- FIX #5: full Open Graph meta tags -->
+  <meta property="og:title" content="Primarschule Rosenbach &ndash; Vogtlandkreis, Sachsen" />
+  <meta property="og:description" content="Primarschule Rosenbach in Rosenbach, Vogtlandkreis, Sachsen. Kindergarten bis 6. Klasse, Tagesstruktur, Lehrplan 21." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.ps-rosenbach.ch/" />
+  <meta property="og:image" content="https://www.ps-rosenbach.ch/images/og-image.jpg" />
+  <meta property="og:locale" content="de_CH" />
+  <!-- FIX #2: no external font calls — system font stack only, no Google Fonts -->
+  <!-- FIX #3: no analytics scripts -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g9: #14281a;
+      --g8: #1e3d27;
+      --g7: #2d5a3d;
+      --g6: #3a7250;
+      --g5: #52b788;
+      --g4: #74c69d;
+      --g3: #95d5b2;
+      --g2: #b7e4c7;
+      --g1: #d8f3dc;
+      --g0: #f0faf3;
+      --ktn-blue: #003E7E;   /* Vogtlandkreis, Sachsen blue accent */
+      --amber: #f4a261;
+      --amber-lt: #fef3e2;
+      --amber-dk: #a3570a;
+      --slate-0: #f9fafb;
+      --slate-1: #f0f2f0;
+      --slate-2: #dde3de;
+      --slate-3: #b8c4b9;
+      --slate-5: #6b7c6d;
+      --slate-7: #374039;
+      --slate-9: #1a211b;
+      --white: #ffffff;
+      --r-sm: 6px;
+      --r-md: 10px;
+      --r-lg: 16px;
+      --r-xl: 22px;
+      --r-2xl: 32px;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,.06);
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+      --transition: .18s ease;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    /* FIX #2: system font stack, no external calls */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+      color: var(--slate-9);
+      background: var(--slate-0);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+    button { font-family: inherit; }
+
+    /* FIX #6: visible skip-to-content link */
+    .skip {
+      position: absolute; left: 1rem; top: -60px;
+      background: var(--g7); color: #fff;
+      padding: .6rem 1.4rem; border-radius: 0 0 var(--r-sm) var(--r-sm);
+      font-size: 14px; font-weight: 700; z-index: 9999;
+      text-decoration: none;
+      transition: top .15s;
+    }
+    .skip:focus { top: 0; outline: 3px solid var(--g4); outline-offset: 2px; }
+
+    /* ── CANTON TOPBAR ────────────────────────────────── */
+    .topbar {
+      background: var(--ktn-blue);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding: 6px 1.5rem;
+    }
+    .topbar-inner {
+      max-width: 1180px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem;
+    }
+    .topbar-left {
+      display: flex; gap: 1.5rem; align-items: center;
+      font-size: 12px; color: rgba(255,255,255,.7);
+    }
+    .topbar-left a { text-decoration: none; display: flex; align-items: center; gap: .35rem; color: rgba(255,255,255,.7); transition: color var(--transition); }
+    .topbar-left a:hover { color: #fff; }
+    .topbar-right { display: flex; gap: .5rem; align-items: center; }
+    /* FIX #13: touch targets minimum 44×44px */
+    .topbar-btn {
+      font-size: 12px; font-weight: 600;
+      padding: 10px 16px; min-height: 44px; min-width: 44px;
+      border-radius: 100px;
+      background: rgba(255,255,255,.12); color: rgba(255,255,255,.8);
+      border: 1px solid rgba(255,255,255,.18);
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center;
+      transition: background var(--transition), color var(--transition);
+    }
+    .topbar-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+    .topbar-btn.accent { background: var(--g5); color: var(--g9); border-color: var(--g5); }
+    .topbar-btn.accent:hover { background: var(--g4); }
+
+    /* ── NAV ──────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-2);
+      box-shadow: var(--shadow-xs);
+    }
+    .nav-inner {
+      max-width: 1180px; margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 70px;
+      display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: .75rem;
+      text-decoration: none; flex-shrink: 0;
+    }
+    /* FIX #10: no "Index A–Z" — proper school logo mark instead */
+    .nav-mark {
+      width: 42px; height: 42px;
+      background: var(--g7); border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
+      letter-spacing: -.5px; flex-shrink: 0;
+    }
+    .nav-text strong { display: block; font-size: 15px; font-weight: 700; color: var(--slate-9); line-height: 1.2; }
+    .nav-text span   { font-size: 11px; color: var(--slate-5); }
+
+    /* FIX #13: nav items with proper touch targets (min 44px) */
+    .nav-menu { display: flex; align-items: center; gap: .1rem; list-style: none; }
+    .nav-menu a {
+      font-size: 14px; font-weight: 500;
+      color: var(--slate-7); text-decoration: none;
+      padding: .65rem .85rem; min-height: 44px;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center;
+      transition: color var(--transition), background var(--transition);
+      white-space: nowrap;
+    }
+    .nav-menu a:hover { color: var(--g7); background: var(--g0); }
+    .nav-menu a.active { color: var(--g7); font-weight: 600; }
+    .nav-menu .nav-cta a {
+      background: var(--g7); color: #fff;
+      padding: .65rem 1.1rem;
+    }
+    .nav-menu .nav-cta a:hover { background: var(--g6); }
+
+    .nav-burger {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: .5rem; color: var(--slate-7);
+      border-radius: var(--r-sm); min-width: 44px; min-height: 44px;
+      align-items: center; justify-content: center;
+    }
+    .nav-burger:hover { background: var(--slate-1); }
+
+    @media (max-width: 860px) {
+      .nav-menu {
+        display: none; flex-direction: column; align-items: stretch;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(20,40,26,.97); backdrop-filter: blur(8px);
+        padding: 5rem 2rem 2rem; gap: .25rem; z-index: 300;
+      }
+      .nav-menu.open { display: flex; }
+      .nav-menu a { font-size: 18px; color: rgba(255,255,255,.85); padding: .9rem 1rem; min-height: 54px; }
+      .nav-menu a:hover { color: #fff; background: rgba(255,255,255,.08); }
+      .nav-menu .nav-cta a { background: var(--g5); color: var(--g9); margin-top: .5rem; text-align: center; justify-content: center; }
+      .nav-burger { display: flex; }
+      .topbar-left { display: none; }
+    }
+
+    .nav-close {
+      display: none; position: fixed; top: 1.25rem; right: 1.25rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; font-size: 20px; cursor: pointer;
+      align-items: center; justify-content: center; z-index: 400;
+    }
+    @media (max-width: 860px) { .nav-menu.open ~ .nav-close, .nav-close.open { display: flex; } }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      position: relative; overflow: hidden;
+      background: var(--g8);
+      min-height: 520px;
+      display: flex; align-items: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 90% 100% at 110% 50%, rgba(82,183,136,.18) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 80% at -10% 80%, rgba(30,61,39,.6) 0%, transparent 70%);
+    }
+    .hero-pattern {
+      position: absolute; inset: 0; opacity: .04;
+      background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .hero-inner {
+      max-width: 1180px; margin: 0 auto; padding: 4.5rem 1.5rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+      position: relative; z-index: 1; width: 100%;
+    }
+    @media (max-width: 860px) { .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; padding: 3rem 1.5rem; } }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+      border-radius: 100px; padding: .3rem .9rem;
+      font-size: 12px; font-weight: 600; color: var(--g3);
+      letter-spacing: .04em; text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--g4); flex-shrink: 0;
+    }
+    /* FIX #11: correct h1 heading — part of proper hierarchy h1>h2>h3 */
+    .hero h1 {
+      font-size: clamp(28px, 4.2vw, 50px);
+      font-weight: 800; line-height: 1.12; letter-spacing: -.8px;
+      color: #fff; margin-bottom: 1.1rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--g4); }
+    .hero-sub {
+      font-size: 17px; color: rgba(255,255,255,.7);
+      line-height: 1.65; margin-bottom: 2.25rem; max-width: 480px;
+    }
+    .hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+    /* FIX #13: buttons with min 44px touch target */
+    .btn-hero-prim {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--g5); color: var(--g9);
+      font-size: 15px; font-weight: 700;
+      padding: .85rem 1.75rem; min-height: 44px; border-radius: var(--r-lg);
+      text-decoration: none; border: none; cursor: pointer;
+      transition: background var(--transition), transform .1s;
+    }
+    .btn-hero-prim:hover { background: var(--g4); transform: translateY(-1px); }
+    .btn-hero-sec {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(255,255,255,.08); color: rgba(255,255,255,.9);
+      font-size: 15px; font-weight: 600;
+      padding: .85rem 1.75rem; min-height: 44px; border-radius: var(--r-lg);
+      text-decoration: none; border: 1px solid rgba(255,255,255,.2); cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-hero-sec:hover { background: rgba(255,255,255,.14); }
+
+    .hero-card {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(12px);
+      border-radius: var(--r-xl);
+      padding: 2rem;
+    }
+    .hero-card-title {
+      font-size: 12px; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--g3);
+      margin-bottom: 1.25rem;
+    }
+    .hero-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--r-md);
+      padding: .9rem 1rem;
+    }
+    .hero-stat-n { font-size: 28px; font-weight: 800; color: var(--g4); line-height: 1; margin-bottom: .2rem; }
+    .hero-stat-l { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.3; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .hero-tag {
+      font-size: 11px; font-weight: 600;
+      padding: .3rem .75rem; border-radius: 100px;
+      background: rgba(82,183,136,.15); color: var(--g3);
+      border: 1px solid rgba(82,183,136,.25);
+    }
+
+    /* ── QUICK ACCESS ─────────────────────────────────── */
+    .quick {
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-2);
+    }
+    .quick-inner {
+      max-width: 1180px; margin: 0 auto; padding: 0 1.5rem;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    @media (max-width: 700px) { .quick-inner { grid-template-columns: repeat(2, 1fr); } }
+    /* FIX #13: quick-item links are min 44px tall */
+    .quick-item {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 1.2rem .75rem; min-height: 80px;
+      text-decoration: none;
+      color: var(--slate-7);
+      border-right: 1px solid var(--slate-2);
+      transition: background var(--transition), color var(--transition);
+      gap: .45rem; justify-content: center;
+    }
+    .quick-item:last-child { border-right: none; }
+    .quick-item:hover { background: var(--g0); color: var(--g7); }
+    .quick-item:hover .quick-icon { background: var(--g2); }
+    .quick-icon {
+      width: 38px; height: 38px; border-radius: var(--r-md);
+      background: var(--slate-1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+      transition: background var(--transition);
+    }
+    .quick-label { font-size: 12px; font-weight: 600; text-align: center; line-height: 1.3; }
+
+    /* ── SECTION BASE ─────────────────────────────────── */
+    .section { padding: 72px 1.5rem; }
+    .section.alt { background: var(--white); }
+    .container { max-width: 1180px; margin: 0 auto; }
+    .eyebrow {
+      font-size: 12px; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--g6);
+      margin-bottom: .6rem;
+    }
+    /* FIX #11: correct heading hierarchy — h2 under h1 */
+    .heading {
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 800; line-height: 1.18; letter-spacing: -.4px;
+      color: var(--slate-9); margin-bottom: .9rem;
+    }
+    .lead {
+      font-size: 17px; color: var(--slate-5); line-height: 1.65;
+      max-width: 560px; margin-bottom: 2.5rem;
+    }
+
+    /* ── NEWS WIDGET ─────────────────────────────────── */
+    .news-widget {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 820px) { .news-widget { grid-template-columns: 1fr; } }
+
+    /* Featured alert card */
+    .news-alert {
+      background: #fff7ed;
+      border: 1.5px solid #fed7aa;
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      transition: box-shadow var(--transition);
+    }
+    .news-alert:hover { box-shadow: var(--shadow-md); }
+    .news-alert-img {
+      height: 190px;
+      position: relative; overflow: hidden;
+      background: #e2e8f0;
+    }
+    .news-alert-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(.95); }
+    .news-alert-badge {
+      position: absolute; top: 12px; left: 12px;
+      display: flex; align-items: center; gap: .4rem;
+      background: #ea580c; color: white;
+      font-size: 11px; font-weight: 700; letter-spacing: .05em;
+      padding: 4px 10px; border-radius: 100px;
+      box-shadow: 0 2px 6px rgba(234,88,12,.35);
+    }
+    .news-alert-time {
+      position: absolute; bottom: 10px; right: 12px;
+      font-size: 11px; font-weight: 600; color: white;
+      background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
+      padding: 3px 8px; border-radius: 100px;
+    }
+    .news-alert-body { padding: 1.25rem 1.5rem 1.5rem; }
+    .news-alert-body h3 {
+      font-size: 18px; font-weight: 800; line-height: 1.25;
+      color: var(--slate-9); margin-bottom: .6rem;
+    }
+    .news-alert-body p { font-size: 14px; color: var(--slate-5); line-height: 1.65; }
+    .news-alert-more {
+      display: inline-flex; align-items: center; gap: .3rem;
+      font-size: 13px; font-weight: 700; color: #ea580c; margin-top: .9rem;
+    }
+
+    /* Feed list panel */
+    .news-feed-panel {
+      background: var(--white);
+      border: 1px solid var(--slate-2);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+    .news-feed-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .85rem 1.25rem;
+      border-bottom: 1px solid var(--slate-2);
+      background: var(--slate-0);
+    }
+    .news-feed-title { font-size: 12px; font-weight: 700; color: var(--slate-7); text-transform: uppercase; letter-spacing: .07em; }
+    .news-feed-live {
+      display: flex; align-items: center; gap: .35rem;
+      font-size: 10px; font-weight: 700; color: var(--g6);
+    }
+    .news-feed-live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--g5); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .news-feed-item {
+      display: flex; gap: .9rem; align-items: flex-start;
+      padding: .95rem 1.25rem;
+      border-bottom: 1px solid var(--slate-2);
+      text-decoration: none; color: inherit;
+      transition: background var(--transition);
+    }
+    .news-feed-item:last-child { border-bottom: none; }
+    .news-feed-item:hover { background: var(--slate-0); }
+    .news-feed-item.urgent { background: #fff7ed; }
+    .news-feed-item.urgent:hover { background: #ffedd5; }
+
+    .news-feed-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
+    }
+    .dot-alert  { background: #ea580c; }
+    .dot-info   { background: var(--g5); }
+    .dot-event  { background: #3b82f6; }
+    .dot-notice { background: var(--slate-3); }
+
+    .news-feed-content { flex: 1; min-width: 0; }
+    .news-feed-content h3 {
+      font-size: 14px; font-weight: 700; line-height: 1.35;
+      color: var(--slate-9); margin-bottom: .2rem;
+    }
+    .news-feed-content p { font-size: 12px; color: var(--slate-5); line-height: 1.5; }
+    .news-feed-meta {
+      display: flex; align-items: center; gap: .5rem; margin-bottom: .25rem;
+    }
+    .news-feed-cat {
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+      padding: 1px 6px; border-radius: 100px;
+    }
+    .cat-alert  { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+    .cat-info   { background: var(--g0); color: var(--g7); border: 1px solid var(--g2); }
+    .cat-event  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .cat-notice { background: var(--slate-1); color: var(--slate-5); border: 1px solid var(--slate-2); }
+    .news-feed-ts { font-size: 10px; color: var(--slate-3); font-weight: 500; white-space: nowrap; flex-shrink: 0; margin-top: 4px; }
+
+    /* ── HIGHLIGHTS ───────────────────────────────────── */
+    /* FIX #15: CSS Grid layout, no table elements for layout */
+    .highlights {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    @media (max-width: 700px) { .highlights { grid-template-columns: 1fr; } }
+
+    .highlight {
+      border-radius: var(--r-xl);
+      padding: 2.25rem;
+      position: relative; overflow: hidden;
+    }
+    .highlight.green { background: var(--g7); color: #fff; }
+    .highlight.light { background: var(--g0); border: 1px solid var(--g2); }
+    .hl-icon {
+      width: 52px; height: 52px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 1.25rem;
+    }
+    .highlight.green .hl-icon { background: rgba(255,255,255,.15); }
+    .highlight.light .hl-icon { background: var(--g2); }
+    /* FIX #11: h3 under section h2 */
+    .highlight h3 { font-size: 20px; font-weight: 800; margin-bottom: .6rem; line-height: 1.2; }
+    .highlight.green h3 { color: #fff; }
+    .highlight.light h3 { color: var(--slate-9); }
+    .highlight p { font-size: 15px; line-height: 1.65; margin-bottom: 1.25rem; }
+    .highlight.green p { color: rgba(255,255,255,.72); }
+    .highlight.light p { color: var(--slate-5); }
+    .hl-list { list-style: none; display: flex; flex-direction: column; gap: .55rem; margin-bottom: 1.5rem; }
+    .hl-list li { display: flex; align-items: flex-start; gap: .6rem; font-size: 14px; }
+    .highlight.green .hl-list li { color: rgba(255,255,255,.8); }
+    .highlight.light .hl-list li { color: var(--slate-5); }
+    .hl-list li::before {
+      content: '';
+      width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px;
+      border-radius: 50%;
+      background-repeat: no-repeat; background-position: center;
+    }
+    .highlight.green .hl-list li::before {
+      background-color: rgba(255,255,255,.2);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5l2.5 2.5 4.5-4.5' stroke='white' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    .highlight.light .hl-list li::before {
+      background-color: var(--g2);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5l2.5 2.5 4.5-4.5' stroke='%232d5a3d' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    .hl-link {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: 14px; font-weight: 700; text-decoration: none;
+      padding: .65rem 1.1rem; min-height: 44px; border-radius: var(--r-md);
+    }
+    .highlight.green .hl-link { background: rgba(255,255,255,.15); color: #fff; }
+    .highlight.green .hl-link:hover { background: rgba(255,255,255,.24); }
+    .highlight.light .hl-link { background: var(--g7); color: #fff; }
+    .highlight.light .hl-link:hover { background: var(--g6); }
+
+    /* ── EVENTS ───────────────────────────────────────── */
+    .events-list { display: flex; flex-direction: column; gap: .75rem; }
+    .event {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: var(--slate-0); border: 1px solid var(--slate-2);
+      border-radius: var(--r-lg); padding: 1rem 1.25rem;
+      text-decoration: none; color: inherit;
+      transition: box-shadow var(--transition), background var(--transition);
+      min-height: 44px;
+    }
+    .event:hover { box-shadow: var(--shadow-sm); background: var(--white); }
+    .event-date {
+      background: var(--g7); color: #fff;
+      border-radius: var(--r-md);
+      width: 48px; flex-shrink: 0; text-align: center;
+      padding: .4rem .25rem;
+    }
+    .event-date-day { font-size: 20px; font-weight: 800; line-height: 1; }
+    .event-date-mon { font-size: 10px; font-weight: 600; opacity: .75; text-transform: uppercase; letter-spacing: .05em; }
+    .event-body { flex: 1; min-width: 0; }
+    /* FIX #11: h4 properly under h3 in events, correct hierarchy maintained */
+    .event h4 { font-size: 15px; font-weight: 700; margin-bottom: .2rem; }
+    .event p { font-size: 13px; color: var(--slate-5); line-height: 1.4; }
+    .event-tag {
+      align-self: center; flex-shrink: 0;
+      font-size: 11px; font-weight: 700;
+      padding: .25rem .65rem; border-radius: 100px;
+    }
+    .tag-schule { background: var(--g0); color: var(--g7); border: 1px solid var(--g2); }
+    .tag-ferien { background: var(--amber-lt); color: var(--amber-dk); border: 1px solid #fcd5a8; }
+    .tag-eltern { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+    /* FIX #12: PDF file info helpers */
+    .file-meta {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: 12px; color: var(--slate-5); margin-left: .35rem;
+      font-weight: 400;
+    }
+    .file-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: .04em;
+      background: #fee2e2; color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 1px 5px; border-radius: 3px;
+    }
+
+    /* Document list — properly marked up */
+    .doc-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .doc-list li a {
+      display: inline-flex; align-items: center; gap: .4rem;
+      color: var(--g7); font-size: 14px; font-weight: 500;
+      text-decoration: none; padding: .4rem 0; min-height: 44px;
+    }
+    .doc-list li a:hover { text-decoration: underline; }
+    .doc-list li a:hover .file-badge { background: #fca5a5; }
+
+    /* ── ANNOUNCEMENT ────────────────────────────────── */
+    .announcement { background: var(--amber-lt); border-bottom: 1px solid #fcd5a8; padding: 10px 1.5rem; }
+    .announcement-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: .75rem; font-size: 14px; color: var(--amber-dk); }
+    .announcement-badge { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; background: var(--amber); color: var(--amber-dk); padding: 2px 8px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; }
+    .announcement-close { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--amber-dk); opacity: .6; font-size: 18px; line-height: 1; padding: 0 .25rem; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .announcement-close:hover { opacity: 1; }
+
+    /* ── TEAM ─────────────────────────────────────────── */
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.25rem; }
+    .team-card { background: var(--white); border: 1px solid var(--slate-2); border-radius: var(--r-xl); padding: 1.5rem 1.25rem; text-align: center; transition: box-shadow var(--transition), transform var(--transition); position: relative; }
+    .team-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .team-card.pending { border: 2px solid #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
+    .team-pending-banner { position: absolute; top: -14px; left: 12px; right: 12px; background: #f59e0b; color: #78350f; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 100px; display: flex; align-items: center; justify-content: space-between; gap: .5rem; z-index: 2; box-shadow: var(--shadow-sm); }
+    .team-pending-actions { display: flex; gap: .35rem; }
+    .team-pending-btn { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px; border: none; cursor: pointer; }
+    .team-pending-btn.approve { background: #065f46; color: white; }
+    .team-pending-btn.approve:hover { background: #047857; }
+    .team-pending-btn.reject { background: rgba(255,255,255,.5); color: #78350f; }
+    .team-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto .9rem; overflow: hidden; border: 3px solid var(--g2); }
+    .team-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .team-name { font-size: 14px; font-weight: 700; color: var(--slate-9); margin-bottom: .2rem; line-height: 1.3; }
+    .team-role { font-size: 12px; color: var(--g6); font-weight: 600; margin-bottom: .2rem; }
+    .team-dept { font-size: 11px; color: var(--slate-3); }
+
+    /* ── RESOURCES ────────────────────────────────────── */
+    .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+    .resource-card { background: var(--white); border: 1px solid var(--slate-2); border-radius: var(--r-lg); padding: 1.1rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem; text-decoration: none; color: inherit; transition: box-shadow var(--transition), background var(--transition); }
+    .resource-card:hover { box-shadow: var(--shadow-sm); background: var(--g0); }
+    .resource-card.updated { border-color: var(--g4); background: var(--g0); }
+    .resource-icon { width: 42px; height: 42px; flex-shrink: 0; border-radius: var(--r-md); background: var(--g1); display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .resource-card.updated .resource-icon { background: var(--g2); }
+    .resource-body { flex: 1; min-width: 0; }
+    .resource-name { font-size: 14px; font-weight: 700; color: var(--slate-9); margin-bottom: .25rem; }
+    .resource-meta { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+    .resource-badge { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 100px; background: var(--slate-1); color: var(--slate-5); border: 1px solid var(--slate-2); }
+    .resource-card.updated .resource-badge.new-badge { background: var(--g1); color: var(--g7); border-color: var(--g3); }
+    .resource-size { font-size: 11px; color: var(--slate-3); }
+
+    /* ── CONTACT STRIP ────────────────────────────────── */
+    .contact-strip {
+      background: var(--g7);
+      padding: 56px 1.5rem;
+    }
+    /* FIX #15: Flexbox/grid layout, not tables */
+    .contact-strip-inner {
+      max-width: 1180px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center;
+    }
+    @media (max-width: 700px) { .contact-strip-inner { grid-template-columns: 1fr; gap: 2rem; } }
+    /* FIX #11: h2 for contact heading */
+    .contact-strip h2 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: .6rem; }
+    .contact-strip p  { font-size: 16px; color: rgba(255,255,255,.65); }
+    .contact-cards { display: flex; flex-direction: column; gap: .75rem; min-width: 260px; }
+    .contact-card {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--r-lg); padding: .9rem 1.1rem;
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .contact-card-icon {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      background: rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0;
+    }
+    .contact-card-label { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+    .contact-card-val { font-size: 14px; font-weight: 600; color: #fff; }
+    .contact-card-val a { color: var(--g3); text-decoration: none; }
+    .contact-card-val a:hover { text-decoration: underline; }
+
+    /* ── FOOTER ───────────────────────────────────────── */
+    footer {
+      background: var(--g9);
+      color: rgba(255,255,255,.55);
+      padding: 56px 1.5rem 32px;
+    }
+    /* FIX #15: CSS Grid, not table layout */
+    .footer-grid {
+      max-width: 1180px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2.5rem;
+      padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 1.75rem;
+    }
+    @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+    .footer-brand .nav-mark { background: var(--g6); }
+    .footer-brand .nav-text strong { color: rgba(255,255,255,.9); }
+    .footer-brand .nav-text span   { color: rgba(255,255,255,.4); }
+    .footer-about {
+      font-size: 13px; line-height: 1.65; margin-top: .85rem;
+      color: rgba(255,255,255,.4); max-width: 240px;
+    }
+    .footer-col h4 { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.8); letter-spacing: .05em; text-transform: uppercase; margin-bottom: .85rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+    /* FIX #16: all footer links use HTTPS */
+    .footer-col ul a { font-size: 13px; color: rgba(255,255,255,.45); text-decoration: none; transition: color var(--transition); }
+    .footer-col ul a:hover { color: var(--g4); }
+    .footer-bottom {
+      max-width: 1180px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .75rem;
+    }
+    /* FIX #19: legal text min 14px readable color */
+    .footer-copy { font-size: 14px; color: rgba(255,255,255,.4); }
+    .footer-legal { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+    .footer-legal a { font-size: 14px; color: rgba(255,255,255,.4); text-decoration: none; transition: color var(--transition); }
+    .footer-legal a:hover { color: var(--g4); }
+    .footer-a11y {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: 12px; color: rgba(255,255,255,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: .3rem .7rem; border-radius: 100px;
+    }
+
+    /* ── FOCUS ────────────────────────────────────────── */
+    :focus-visible {
+      outline: 3px solid var(--g5);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    /* ── UTILS ────────────────────────────────────────── */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- FIX #6: skip-to-content link -->
+  <a href="#main" class="skip">Zum Inhalt springen</a>
+
+  <!-- ANNOUNCEMENT BANNER — automation 'banner' previewType target -->
+  <div class="announcement" id="announcement" role="region" aria-label="Aktuelle Mitteilung">
+    <div class="announcement-inner">
+      <span class="announcement-badge">Neu</span>
+      <span>Anmeldung Schuljahr 2026/27 läuft — Unterlagen im Schulbüro oder online. <a href="https://www.ps-rosenbach.ch/anmeldung/" style="color:var(--amber-dk);font-weight:600;text-decoration:underline;">Jetzt anmelden →</a></span>
+      <button class="announcement-close" onclick="document.getElementById('announcement').style.display='none'" aria-label="Mitteilung schließen">&times;</button>
+    </div>
+  </div>
+
+  <!-- Canton topbar -->
+  <div class="topbar" aria-label="Sekundäre Navigation">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <!-- FIX #16: all links use HTTPS -->
+        <a href="https://www.sachsen.de" aria-label="Vogtlandkreis, Sachsen Website">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5.5"/><path d="M1 6.5h11M6.5 1a8 8 0 010 11M6.5 1a8 8 0 000 11"/></svg>
+          Vogtlandkreis, Sachsen
+        </a>
+        <a href="tel:+49374313380" aria-label="Telefon: 037431 33 80">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 9.5c0 .4-.1.7-.3 1-.2.3-.4.6-.7.8-.5.4-1 .6-1.6.6-.4 0-.9-.1-1.3-.3-.4-.2-.9-.5-1.3-.8L2.7 6.2C2.3 5.8 2 5.3 1.8 4.9c-.2-.4-.3-.8-.3-1.2 0-.5.1-1 .5-1.5.3-.4.7-.7 1.2-.7.2 0 .4 0 .5.1.2.1.3.2.4.4L5.4 4c.1.2.2.4.2.5s0 .3-.1.4l-.4.4c0 .1-.1.1-.1.2 0 .1 0 .1.1.2.2.3.5.7.8 1 .3.3.7.6 1 .8.1 0 .1.1.2.1.1 0 .1 0 .2-.1l.4-.4c.1-.1.3-.1.4-.1.2 0 .3.1.5.2l1.9 1.2c.2.1.3.3.4.5 0 .1.1.2.1.3z"/></svg>
+          037431 33 80
+        </a>
+        <span>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5.5"/><path d="M6.5 4v2.5l1.5 1.5"/></svg>
+          Schulb&uuml;ro Mo&ndash;Fr 07:45&ndash;12:00
+        </span>
+      </div>
+      <div class="topbar-right">
+        <a href="https://www.ps-rosenbach.ch/elternportal/" class="topbar-btn">Elternportal</a>
+        <a href="https://www.ps-rosenbach.ch/stundenplan/" class="topbar-btn">Stundenplan</a>
+        <a href="https://www.ps-rosenbach.ch/anmeldung/" class="topbar-btn accent">Anmeldung</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIX #10: clean navigation without "Index A–Z" -->
+  <nav class="nav" aria-label="Hauptnavigation">
+    <div class="nav-inner">
+      <a href="https://www.ps-rosenbach.ch/" class="nav-brand" aria-label="Primarschule Rosenbach – Startseite">
+        <!-- FIX #10: proper school logomark instead of A–Z index -->
+        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="nav-mark" style="background:none;padding:0;">
+          <rect width="40" height="40" rx="9" fill="#2d5a3d"/>
+          <!-- schoolhouse shape -->
+          <rect x="9" y="22" width="22" height="13" rx="1" fill="white"/>
+          <polygon points="20,9 8,22 32,22" fill="white"/>
+          <rect x="15" y="27" width="10" height="8" rx="1" fill="#2d5a3d"/>
+          <rect x="9" y="24" width="5" height="4" rx="0.5" fill="#74c69d"/>
+          <rect x="26" y="24" width="5" height="4" rx="0.5" fill="#74c69d"/>
+        </svg>
+        <div class="nav-text">
+          <strong>PS Rosenbach</strong>
+          <span>Grundschule &middot; Sachsen</span>
+        </div>
+      </a>
+
+      <!-- FIX #9: clean semantic URLs, no ?page_id= or .html/234 patterns -->
+      <ul class="nav-menu" id="nav-menu" role="list">
+        <li><a href="https://www.ps-rosenbach.ch/" class="active" aria-current="page">Start</a></li>
+        <li><a href="https://www.ps-rosenbach.ch/unsere-schule/">Unsere Schule</a></li>
+        <li><a href="https://www.ps-rosenbach.ch/kindergarten/">Kindergarten</a></li>
+        <li><a href="https://www.ps-rosenbach.ch/lehrplan-21/">Lehrplan 21</a></li>
+        <li><a href="https://www.ps-rosenbach.ch/tagesstruktur/">Tagesstruktur</a></li>
+        <li><a href="https://www.ps-rosenbach.ch/team/">Team</a></li>
+        <li class="nav-cta"><a href="https://www.ps-rosenbach.ch/kontakt/">Kontakt</a></li>
+      </ul>
+
+      <button class="nav-burger" id="burger" aria-label="Men&uuml; &ouml;ffnen" aria-expanded="false" aria-controls="nav-menu">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="19" y2="6"/>
+          <line x1="3" y1="11" x2="19" y2="11"/>
+          <line x1="3" y1="16" x2="19" y2="16"/>
+        </svg>
+      </button>
+      <button class="nav-close" id="nav-close" aria-label="Men&uuml; schlie&szlig;en">&times;</button>
+    </div>
+  </nav>
+
+  <!-- FIX #8: <main> landmark element with id="main" -->
+  <main id="main">
+
+    <!-- HERO — h1 heading -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <!-- FIX #7: hero background image with empty alt (decorative) -->
+      <img src="https://picsum.photos/seed/swiss-countryside-school/1400/600" alt=""
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;pointer-events:none;" />
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-pattern" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div>
+          <div class="hero-eyebrow">Willkommen in Rosenbach</div>
+          <!-- FIX #11: h1 is the top-level heading — hierarchy: h1 > h2 > h3 throughout page -->
+          <h1 id="hero-heading">
+            Gemeinsam lernen &mdash;<br><em>Stark f&uuml;r die Zukunft</em>
+          </h1>
+          <p class="hero-sub">
+            Herzlich willkommen auf der Website der Primarschule Rosenbach. Rund 240 Sch&uuml;lerinnen und Sch&uuml;ler aus Rosenbach und Umgebung lernen bei uns von der 1. bis zur 6. Klasse.
+          </p>
+          <div class="hero-actions">
+            <a href="https://www.ps-rosenbach.ch/unsere-schule/" class="btn-hero-prim">
+              Unsere Schule entdecken
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+            <a href="https://www.ps-rosenbach.ch/anmeldung/" class="btn-hero-sec">Anmeldung 2026/27</a>
+          </div>
+        </div>
+
+        <div class="hero-card" aria-label="Schule in Zahlen">
+          <div class="hero-card-title">Schule in Zahlen</div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-n">240</div>
+              <div class="hero-stat-l">Sch&uuml;lerinnen &amp;<br>Sch&uuml;ler</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-n">12</div>
+              <div class="hero-stat-l">Klassen 1&ndash;6</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-n">2</div>
+              <div class="hero-stat-l">Kindergarten&shy;klassen</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-n">2018</div>
+              <div class="hero-stat-l">Lehrplan 21<br>seit</div>
+            </div>
+          </div>
+          <div class="hero-tags">
+            <span class="hero-tag">Lehrplan 21</span>
+            <span class="hero-tag">Tagesstruktur</span>
+            <span class="hero-tag">Vogtlandkreis, Sachsen</span>
+            <span class="hero-tag">Rosenbach, Vogtlandkreis, Sachsen</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK ACCESS — FIX #15: no table, CSS Grid strip -->
+    <nav class="quick" id="section-quick" aria-label="Schnellzugriff f&uuml;r Eltern">
+      <div class="quick-inner">
+        <!-- FIX #9: clean URLs -->
+        <a href="https://www.ps-rosenbach.ch/stundenplan/" class="quick-item">
+          <div class="quick-icon" aria-hidden="true">📅</div>
+          <span class="quick-label">Stundenplan</span>
+        </a>
+        <a href="https://www.ps-rosenbach.ch/elternbriefe/" class="quick-item">
+          <div class="quick-icon" aria-hidden="true">✉</div>
+          <span class="quick-label">Elternbriefe</span>
+        </a>
+        <a href="https://www.ps-rosenbach.ch/jahresplan/" class="quick-item">
+          <div class="quick-icon" aria-hidden="true">🗓</div>
+          <span class="quick-label">Jahresplan</span>
+        </a>
+        <a href="https://www.ps-rosenbach.ch/tagesstruktur/" class="quick-item">
+          <div class="quick-icon" aria-hidden="true">🌞</div>
+          <span class="quick-label">Tagesstruktur</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- NEWS — section with h2 heading (FIX #11) -->
+    <section class="section" id="section-news" aria-labelledby="news-heading">
+      <div class="container">
+        <div class="eyebrow">Neuigkeiten</div>
+        <!-- FIX #11: h2 correctly under h1 -->
+        <h2 class="heading" id="news-heading">Aktuelles aus der Schule</h2>
+        <p class="lead">Neuigkeiten, Veranstaltungen und Berichte direkt aus dem Schulleben der Primarschule Rosenbach.</p>
+
+        <!-- FIX #15: CSS grid, no table for layout -->
+        <div class="news-widget">
+
+          <!-- Featured alert — hazardous weather -->
+          <a href="https://www.ps-rosenbach.de/aktuelles/unwetter-mai-2026/" class="news-alert"
+             aria-label="Wichtig: Unwetterwarnung Donnerstag 7. Mai — Sportunterricht verlegt">
+            <div class="news-alert-img">
+              <img src="https://picsum.photos/seed/overcast-village-day/480/190"
+                   alt="Bewölkter Himmel über einem Dorf"
+                   style="filter:brightness(1.3) saturate(.9);" />
+              <span class="news-alert-badge">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="currentColor" aria-hidden="true"><path d="M5.5 1L1 9h9L5.5 1zm0 2.5l2.5 4.5h-5l2.5-4.5z"/></svg>
+                Wichtige Mitteilung
+              </span>
+              <span class="news-alert-time">Heute, 07:30 Uhr</span>
+            </div>
+            <div class="news-alert-body">
+              <!-- FIX #11: h3 correctly nested under section h2 -->
+              <h3>Unwetterwarnung: Sportunterricht verlegt</h3>
+              <p>Der Deutsche Wetterdienst hat f&uuml;r Donnerstag, 7. Mai, eine Unwetterwarnung (Stufe&nbsp;2) f&uuml;r den Vogtlandkreis ausgegeben. Der Sportunterricht aller Klassen findet daher in der Sporthalle statt. Der Schulbetrieb l&auml;uft ansonsten normal.</p>
+              <div class="news-alert-more">Details lesen
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10"/></svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Compact news feed -->
+          <div class="news-feed-panel" role="feed" aria-label="Aktuelle Meldungen">
+            <div class="news-feed-header">
+              <span class="news-feed-title">Aktuelle Meldungen</span>
+              <span class="news-feed-live">
+                <span class="news-feed-live-dot"></span>
+                Laufend aktualisiert
+              </span>
+            </div>
+
+            <a href="https://www.ps-rosenbach.de/aktuelles/brueckentag-mai/" class="news-feed-item urgent"
+               aria-label="Schulfrei Brückentag 22. Mai, heute um 11:00 Uhr gepostet">
+              <span class="news-feed-dot dot-alert" aria-hidden="true"></span>
+              <div class="news-feed-content">
+                <div class="news-feed-meta">
+                  <span class="news-feed-cat cat-alert">Schulfrei</span>
+                </div>
+                <h3>Br&uuml;ckentag Fr. 22.&nbsp;Mai — schulfrei</h3>
+                <p>Der Freitag nach Himmelfahrt ist f&uuml;r alle Klassen schulfrei. Betreuung auf Anfrage.</p>
+              </div>
+              <time class="news-feed-ts" datetime="2026-05-06T11:00">Heute&nbsp;11:00</time>
+            </a>
+
+            <a href="https://www.ps-rosenbach.de/aktuelles/elternabend-mai/" class="news-feed-item"
+               aria-label="Elternabend 1. und 2. Klasse am 20. Mai, gepostet gestern">
+              <span class="news-feed-dot dot-event" aria-hidden="true"></span>
+              <div class="news-feed-content">
+                <div class="news-feed-meta">
+                  <span class="news-feed-cat cat-event">Elternabend</span>
+                </div>
+                <h3>Elternabend 1./2.&nbsp;Klasse — 20.&nbsp;Mai, 19:30&nbsp;Uhr</h3>
+                <p>Aula Schulhaus Rosenbach. Traktanden werden per Elternbrief verschickt.</p>
+              </div>
+              <time class="news-feed-ts" datetime="2026-05-05">Gestern</time>
+            </a>
+
+            <a href="https://www.ps-rosenbach.de/aktuelles/speiseplan-mai/" class="news-feed-item"
+               aria-label="Neuer Speiseplan ab 11. Mai, gepostet vor 2 Tagen">
+              <span class="news-feed-dot dot-info" aria-hidden="true"></span>
+              <div class="news-feed-content">
+                <div class="news-feed-meta">
+                  <span class="news-feed-cat cat-info">Mensa</span>
+                </div>
+                <h3>Neuer Speiseplan ab 11.&nbsp;Mai</h3>
+                <p>Der aktualisierte Speiseplan f&uuml;r Mai ist ab sofort im Elternportal abrufbar.</p>
+              </div>
+              <time class="news-feed-ts" datetime="2026-05-04">vor 2&nbsp;Tagen</time>
+            </a>
+
+            <a href="https://www.ps-rosenbach.de/aktuelles/sporttag-2026/" class="news-feed-item"
+               aria-label="Sporttag bestätigt für 18. Juni, gepostet am 2. Mai">
+              <span class="news-feed-dot dot-event" aria-hidden="true"></span>
+              <div class="news-feed-content">
+                <div class="news-feed-meta">
+                  <span class="news-feed-cat cat-event">Veranstaltung</span>
+                </div>
+                <h3>Sporttag am 18.&nbsp;Juni best&auml;tigt</h3>
+                <p>Alle Klassen nehmen teil. Sportkleidung und viel Wasser mitbringen!</p>
+              </div>
+              <time class="news-feed-ts" datetime="2026-05-02">2.&nbsp;Mai</time>
+            </a>
+
+            <a href="https://www.ps-rosenbach.de/aktuelles/neue-schulleiterin/" class="news-feed-item"
+               aria-label="Begrüßung neue Schulleiterin Frau Wolf, gepostet am 28. April">
+              <span class="news-feed-dot dot-notice" aria-hidden="true"></span>
+              <div class="news-feed-content">
+                <div class="news-feed-meta">
+                  <span class="news-feed-cat cat-notice">Schule</span>
+                </div>
+                <h3>Herzlich willkommen, Frau Wolf!</h3>
+                <p>Antje Wolf &uuml;bernimmt ab Mai die Schulleitung der Grundschule Rosenbach.</p>
+              </div>
+              <time class="news-feed-ts" datetime="2026-04-28">28.&nbsp;Apr.</time>
+            </a>
+
+            <a href="https://www.ps-rosenbach.de/aktuelles/" class="news-feed-item"
+               style="justify-content:center;padding:.75rem 1.25rem;"
+               aria-label="Alle Meldungen anzeigen">
+              <span style="font-size:13px;font-weight:700;color:var(--g6);display:flex;align-items:center;gap:.3rem;">
+                Alle Meldungen
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10"/></svg>
+              </span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAM / LEHRPERSONEN — automation 'new_teacher' previewType target -->
+    <section class="section" id="section-team" aria-labelledby="team-heading">
+      <div class="container">
+        <div class="eyebrow">Kollegium</div>
+        <h2 class="heading" id="team-heading">Unsere Lehrpersonen</h2>
+        <p class="lead">Engagierte Lehrpersonen und Fachkräfte begleiten die Kinder der Primarschule Rosenbach auf ihrem Bildungsweg.</p>
+
+        <div class="team-grid">
+          <!-- Pending new teacher — 'new_teacher' automation target, amber review banner -->
+          <div class="team-card pending" aria-label="Neue Lehrperson — ausstehende Überprüfung">
+            <div class="team-pending-banner">
+              <span>⏳ Ausstehend</span>
+              <div class="team-pending-actions">
+                <button class="team-pending-btn approve" onclick="this.closest('.team-card').style.display='none'" aria-label="Genehmigen">✓ Bestätigen</button>
+                <button class="team-pending-btn reject" onclick="this.closest('.team-card').style.display='none'" aria-label="Ablehnen">✗</button>
+              </div>
+            </div>
+            <div style="padding-top:.75rem;">
+              <div class="team-avatar" style="border-color:#fcd34d;">
+                <img src="https://randomuser.me/api/portraits/women/29.jpg" alt="Profilfoto von Li Chen, neue Lehrperson" />
+              </div>
+              <div class="team-name">Li Chen</div>
+              <div class="team-role">Mathematik</div>
+              <div class="team-dept">Neue Lehrkraft · Klasse 4b</div>
+            </div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-avatar"><img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Profilfoto von Herr Hans-Peter Egger, Schulleiter" /></div>
+            <div class="team-name">H.-P. Egger</div>
+            <div class="team-role">Schulleiter</div>
+            <div class="team-dept">Schulleitung</div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-avatar"><img src="https://randomuser.me/api/portraits/women/52.jpg" alt="Profilfoto von Frau Monika Winteler, Klassenlehrerin" /></div>
+            <div class="team-name">M. Winteler</div>
+            <div class="team-role">Klassenlehrerin 3a</div>
+            <div class="team-dept">Deutsch &amp; Sachkunde</div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-avatar"><img src="https://randomuser.me/api/portraits/men/54.jpg" alt="Profilfoto von Herr Thomas Keller, Klassenlehrer" /></div>
+            <div class="team-name">T. Keller</div>
+            <div class="team-role">Klassenlehrer 5b</div>
+            <div class="team-dept">Mathematik &amp; Sport</div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-avatar"><img src="https://randomuser.me/api/portraits/women/34.jpg" alt="Profilfoto von Frau Ursula Meier, Schulverwaltung" /></div>
+            <div class="team-name">U. Meier</div>
+            <div class="team-role">Schulverwaltung</div>
+            <div class="team-dept">Sekretariat</div>
+          </div>
+
+          <div class="team-card">
+            <div class="team-avatar"><img src="https://randomuser.me/api/portraits/women/67.jpg" alt="Profilfoto von Frau Aisha Yilmaz, Sonderpädagogin" /></div>
+            <div class="team-name">A. Yilmaz</div>
+            <div class="team-role">Sonderpädagogin</div>
+            <div class="team-dept">Förderung &amp; Integration</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS — h2 section, h3 cards (FIX #11 hierarchy) -->
+    <section class="section alt" aria-labelledby="highlights-heading">
+      <div class="container">
+        <div class="eyebrow">Unsere Angebote</div>
+        <h2 class="heading" id="highlights-heading">Was uns auszeichnet</h2>
+        <p class="lead">Zwei Schwerpunkte, die den Schulalltag an der Primarschule Rosenbach pr&auml;gen.</p>
+
+        <!-- FIX #15: Flexbox/grid layout, no tables -->
+        <div class="highlights">
+          <div class="highlight green">
+            <div class="hl-icon" aria-hidden="true">🌞</div>
+            <!-- FIX #11: h3 correctly nested under h2 -->
+            <h3>Tagesstruktur</h3>
+            <p>F&uuml;r berufst&auml;tige Eltern bieten wir eine betreute Tagesstruktur mit Morgen&shy;betreuung, Mittagstisch und Nachmittags&shy;betreuung an. Die Anmeldung erfolgt &uuml;ber das Schulb&uuml;ro.</p>
+            <ul class="hl-list" aria-label="Merkmale der Tagesstruktur">
+              <li>Morgenbetreuung ab 07:00 Uhr</li>
+              <li>Mittagstisch mit warmem Essen</li>
+              <li>Nachmittagsbetreuung bis 18:00 Uhr</li>
+              <li>Betreute Hausaufgabenzeit</li>
+            </ul>
+            <a href="https://www.ps-rosenbach.ch/tagesstruktur/" class="hl-link">
+              Zur Tagesstruktur
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/></svg>
+            </a>
+          </div>
+
+          <div class="highlight light">
+            <div class="hl-icon" aria-hidden="true">📖</div>
+            <h3>Lehrplan 21</h3>
+            <p>Seit dem Schuljahr 2018/19 unterrichten wir nach dem Lehrplan 21 in Vogtlandkreis, Sachsen. Kompetenzorientiertes Lernen steht im Mittelpunkt — mit Fokus auf Verstehen, Anwenden und Reflektieren.</p>
+            <ul class="hl-list" aria-label="Merkmale des Lehrplan 21">
+              <li>Harmonisierte Volksschulbildung</li>
+              <li>Kompetenz&shy;orientierter Unterricht</li>
+              <li>F&auml;cher&uuml;bergreifende Projekte</li>
+              <li>Individuelle F&ouml;rderung</li>
+            </ul>
+            <a href="https://www.ps-rosenbach.ch/lehrplan-21/" class="hl-link">
+              Mehr zum Lehrplan 21
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENTS + CALENDAR SIDEBAR — FIX #15: CSS Grid, not table -->
+    <section class="section" id="section-events" aria-labelledby="events-heading">
+      <div class="container" style="display:grid;grid-template-columns:1fr 380px;gap:3.5rem;align-items:start;">
+        <div>
+          <div class="eyebrow">Termine</div>
+          <!-- FIX #11: h2 heading -->
+          <h2 class="heading" id="events-heading">Kommende Veranstaltungen</h2>
+          <p class="lead">Die wichtigsten Termine im Schuljahr 2025/26 auf einen Blick.</p>
+
+          <div class="events-list" role="list">
+            <a href="https://www.ps-rosenbach.ch/termine/elternabend-mai-2026/" class="event" role="listitem" aria-label="Elternabend 1. und 2. Klasse, 20. Mai 2026">
+              <div class="event-date" aria-hidden="true">
+                <div class="event-date-day">20</div>
+                <div class="event-date-mon">Mai</div>
+              </div>
+              <div class="event-body">
+                <!-- FIX #11: h4 correctly nested under h2/h3 in events context -->
+                <h4>Elternabend 1./2. Klasse</h4>
+                <p>Alle Klassen 1a, 1b, 2a, 2b &middot; 19:30 Uhr &middot; Aula Schulhaus Rosenbach</p>
+              </div>
+              <span class="event-tag tag-eltern">Eltern</span>
+            </a>
+
+            <a href="https://www.ps-rosenbach.ch/termine/auffahrt-2026/" class="event" role="listitem" aria-label="Auffahrt, schulfrei, 28. Mai 2026">
+              <div class="event-date" aria-hidden="true">
+                <div class="event-date-day">28</div>
+                <div class="event-date-mon">Mai</div>
+              </div>
+              <div class="event-body">
+                <h4>Auffahrt &mdash; Schulfrei</h4>
+                <p>Gesetzlicher Feiertag &middot; Schulbetrieb geschlossen</p>
+              </div>
+              <span class="event-tag tag-ferien">Feiertag</span>
+            </a>
+
+            <a href="https://www.ps-rosenbach.ch/termine/sporttag-2026/" class="event" role="listitem" aria-label="Sporttag, 18. Juni 2026">
+              <div class="event-date" aria-hidden="true">
+                <div class="event-date-day">18</div>
+                <div class="event-date-mon">Jun</div>
+              </div>
+              <div class="event-body">
+                <h4>Sporttag 2026</h4>
+                <p>Alle Klassen &middot; Ganzt&auml;gig &middot; Sportplatz Rosenbach</p>
+              </div>
+              <span class="event-tag tag-schule">Schule</span>
+            </a>
+
+            <a href="https://www.ps-rosenbach.ch/termine/schulabschluss-2026/" class="event" role="listitem" aria-label="Schulabschlussfeier, 3. Juli 2026">
+              <div class="event-date" aria-hidden="true">
+                <div class="event-date-day">03</div>
+                <div class="event-date-mon">Jul</div>
+              </div>
+              <div class="event-body">
+                <h4>Schulabschlussfeier</h4>
+                <p>Alle Klassen &middot; 14:00&ndash;17:00 Uhr &middot; Schulhaus Rosenbach</p>
+              </div>
+              <span class="event-tag tag-schule">Schule</span>
+            </a>
+
+            <a href="https://www.ps-rosenbach.ch/termine/sommerferien-2026/" class="event" role="listitem" aria-label="Sommerferien ab 5. Juli 2026">
+              <div class="event-date" aria-hidden="true">
+                <div class="event-date-day">05</div>
+                <div class="event-date-mon">Jul</div>
+              </div>
+              <div class="event-body">
+                <h4>Sommerferien 2026</h4>
+                <p>5. Juli &ndash; 16. August 2026 &middot; Schulbetrieb geschlossen</p>
+              </div>
+              <span class="event-tag tag-ferien">Ferien</span>
+            </a>
+          </div>
+
+          <!-- FIX #12: document links with file type and size info -->
+          <div style="margin-top:2.5rem;">
+            <h3 style="font-size:16px;font-weight:700;color:var(--slate-9);margin-bottom:1rem;">Dokumente zum Download</h3>
+            <ul class="doc-list" aria-label="Schuldokumente">
+              <li>
+                <a href="https://www.ps-rosenbach.ch/dokumente/schulordnung.pdf" aria-label="Schulordnung herunterladen, PDF, 124 Kilobyte">
+                  📄 Schulordnung
+                  <span class="file-meta"><span class="file-badge">PDF</span> 124 KB</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.ps-rosenbach.ch/dokumente/jahresplan_2025_26.pdf" aria-label="Jahresplan 2025/26 herunterladen, PDF, 256 Kilobyte">
+                  📄 Jahresplan 2025/26
+                  <span class="file-meta"><span class="file-badge">PDF</span> 256 KB</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.ps-rosenbach.ch/dokumente/ferienplan_sachsen_2025_26.pdf" aria-label="Ferienplan Sachsen 2025/26 herunterladen, PDF, 89 Kilobyte">
+                  📄 Ferienplan Sachsen 2025/26
+                  <span class="file-meta"><span class="file-badge">PDF</span> 89 KB</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.ps-rosenbach.ch/dokumente/anmeldeformular_tagesstruktur.pdf" aria-label="Anmeldeformular Tagesstruktur herunterladen, PDF, 78 Kilobyte">
+                  📄 Anmeldeformular Tagesstruktur
+                  <span class="file-meta"><span class="file-badge">PDF</span> 78 KB</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <a href="https://www.ps-rosenbach.ch/termine/" style="display:inline-flex;align-items:center;gap:.4rem;font-size:14px;font-weight:700;color:var(--g6);text-decoration:none;margin-top:1.5rem;min-height:44px;">
+            Alle Termine im Schulkalender
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/></svg>
+          </a>
+        </div>
+
+        <!-- SIDEBAR: interactive calendar widget + info boxes -->
+        <aside aria-label="Kalender und Informationen">
+
+          <!-- CALENDAR WIDGET — same JS logic as lerchenberg/index.html, May 2026 start, Swiss events -->
+          <div style="background:var(--white);border:1px solid var(--slate-2);border-radius:var(--r-xl);overflow:hidden;margin-bottom:1.25rem;" role="region" aria-label="Monatskalender">
+
+            <div style="background:var(--g7);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+              <!-- FIX #13: calendar nav buttons 44×44px -->
+              <button id="cal-prev" aria-label="Vorheriger Monat"
+                style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;width:44px;height:44px;border-radius:var(--r-sm);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                &#8249;
+              </button>
+              <div style="text-align:center;">
+                <div id="cal-month-label" style="font-size:15px;font-weight:700;color:#fff;"></div>
+                <div id="cal-year-label" style="font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;"></div>
+              </div>
+              <button id="cal-next" aria-label="N&auml;chster Monat"
+                style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;width:44px;height:44px;border-radius:var(--r-sm);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                &#8250;
+              </button>
+            </div>
+
+            <div id="cal-grid" style="padding:.75rem .9rem .9rem;">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-3);padding:3px 0;">Mo</div>
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-3);padding:3px 0;">Di</div>
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-3);padding:3px 0;">Mi</div>
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-3);padding:3px 0;">Do</div>
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-3);padding:3px 0;">Fr</div>
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-5);padding:3px 0;">Sa</div>
+                <div style="text-align:center;font-size:10px;font-weight:700;color:var(--slate-5);padding:3px 0;">So</div>
+              </div>
+              <div id="cal-days" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
+            </div>
+
+            <div style="border-top:1px solid var(--slate-2);padding:.7rem 1rem;display:flex;gap:1rem;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:.4rem;font-size:11px;color:var(--slate-5);">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--g5);flex-shrink:0;"></span>Schulveranstaltung
+              </div>
+              <div style="display:flex;align-items:center;gap:.4rem;font-size:11px;color:var(--slate-5);">
+                <span style="width:8px;height:8px;border-radius:50%;background:#f4a261;flex-shrink:0;"></span>Ferien / Feiertag
+              </div>
+              <div style="display:flex;align-items:center;gap:.4rem;font-size:11px;color:var(--slate-5);">
+                <span style="width:8px;height:8px;border-radius:50%;background:#93c5fd;flex-shrink:0;"></span>Elternabend
+              </div>
+            </div>
+
+            <div id="cal-tooltip" style="display:none;padding:.6rem 1rem;background:var(--g0);border-top:1px solid var(--g2);font-size:12px;color:var(--g8);font-weight:600;min-height:34px;" role="status" aria-live="polite"></div>
+          </div>
+
+          <!-- Schulbüro hours -->
+          <div style="background:var(--g0);border:1px solid var(--g2);border-radius:var(--r-xl);padding:1.5rem;margin-bottom:1.25rem;">
+            <!-- FIX #11: h3 correctly nested in aside -->
+            <h3 style="font-size:14px;font-weight:700;color:var(--g8);margin-bottom:.9rem;display:flex;align-items:center;gap:.45rem;">
+              <span aria-hidden="true">🕐</span> Schulb&uuml;ro
+            </h3>
+            <div style="font-size:13px;color:var(--slate-5);display:flex;flex-direction:column;gap:.45rem;">
+              <div style="display:flex;justify-content:space-between;"><span>Montag&ndash;Freitag</span><span style="font-weight:600;color:var(--slate-7);">07:45&ndash;12:00</span></div>
+              <div style="border-top:1px solid var(--g2);padding-top:.45rem;display:flex;flex-direction:column;gap:.25rem;">
+                <!-- FIX #16: HTTPS links -->
+                <a href="tel:+49374313380" style="color:var(--g7);font-weight:700;font-size:14px;text-decoration:none;">037431 33 80</a>
+                <a href="mailto:sekretariat@ps-rosenbach.ch" style="color:var(--g6);font-size:12px;text-decoration:none;">sekretariat@ps-rosenbach.ch</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enrollment CTA -->
+          <div style="background:var(--g7);border-radius:var(--r-xl);padding:1.5rem;color:#fff;">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:.5rem;">Schulanmeldung 2026/27</h3>
+            <p style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.55;margin-bottom:1.1rem;">Kinder, die bis 31. Juli 2027 das schulpflichtige Alter erreichen, k&ouml;nnen jetzt angemeldet werden. Formulare im Schulb&uuml;ro oder online.</p>
+            <!-- FIX #13: CTA button min 44px, FIX #16: HTTPS link -->
+            <a href="https://www.ps-rosenbach.ch/anmeldung/" style="display:flex;align-items:center;justify-content:center;gap:.4rem;background:var(--g5);color:var(--g9);font-size:13px;font-weight:700;padding:.75rem 1rem;min-height:44px;border-radius:var(--r-md);text-decoration:none;">
+              Jetzt anmelden
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/></svg>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- RESOURCES / DOKUMENTE — automation 'document' previewType target -->
+    <section class="section" id="section-resources" aria-labelledby="resources-heading">
+      <div class="container">
+        <div class="eyebrow">Downloads &amp; Ressourcen</div>
+        <h2 class="heading" id="resources-heading">Elternressourcen</h2>
+        <p class="lead">Aktuelle Dokumente für Eltern und Erziehungsberechtigte — immer aktuell, direkt zum Download.</p>
+
+        <div class="resources-grid">
+          <!-- Updated document — 'document' automation target -->
+          <a href="https://www.ps-rosenbach.ch/dokumente/elternhandbuch.pdf" class="resource-card updated"
+            aria-label="Elternhandbuch 2026 herunterladen — neu aktualisiert, PDF, 1.2 MB">
+            <div class="resource-icon">📘</div>
+            <div class="resource-body">
+              <div class="resource-name">Elternhandbuch 2026</div>
+              <div class="resource-meta">
+                <span class="resource-badge new-badge">✦ Neu</span>
+                <span class="resource-badge">PDF</span>
+                <span class="resource-size">1.2 MB</span>
+              </div>
+              <div style="font-size:11px;color:var(--g6);margin-top:.35rem;font-weight:500;">Aktualisiert via Drive · Mai 2026</div>
+            </div>
+          </a>
+          <a href="https://www.ps-rosenbach.ch/dokumente/schulordnung.pdf" class="resource-card"
+            aria-label="Schulordnung herunterladen, PDF, 124 KB">
+            <div class="resource-icon">📋</div>
+            <div class="resource-body">
+              <div class="resource-name">Schulordnung</div>
+              <div class="resource-meta"><span class="resource-badge">PDF</span><span class="resource-size">124 KB</span></div>
+            </div>
+          </a>
+          <a href="https://www.ps-rosenbach.ch/dokumente/jahresplan.pdf" class="resource-card"
+            aria-label="Jahresplan 2025/26 herunterladen, PDF, 256 KB">
+            <div class="resource-icon">📅</div>
+            <div class="resource-body">
+              <div class="resource-name">Jahresplan 2025/26</div>
+              <div class="resource-meta"><span class="resource-badge">PDF</span><span class="resource-size">256 KB</span></div>
+            </div>
+          </a>
+          <a href="https://www.ps-rosenbach.ch/dokumente/ferienplan.pdf" class="resource-card"
+            aria-label="Ferienplan Sachsen 2025/26 herunterladen, PDF, 89 KB">
+            <div class="resource-icon">🗓</div>
+            <div class="resource-body">
+              <div class="resource-name">Ferienplan Sachsen</div>
+              <div class="resource-meta"><span class="resource-badge">PDF</span><span class="resource-size">89 KB</span></div>
+            </div>
+          </a>
+          <a href="https://www.ps-rosenbach.ch/dokumente/anmeldung-tagesstruktur.pdf" class="resource-card"
+            aria-label="Anmeldeformular Tagesstruktur herunterladen, PDF, 78 KB">
+            <div class="resource-icon">✏</div>
+            <div class="resource-body">
+              <div class="resource-name">Anmeldung Tagesstruktur</div>
+              <div class="resource-meta"><span class="resource-badge">PDF</span><span class="resource-size">78 KB</span></div>
+            </div>
+          </a>
+          <a href="https://www.ps-rosenbach.ch/datenschutz/" class="resource-card"
+            aria-label="Datenschutzerklärung öffnen">
+            <div class="resource-icon">🔒</div>
+            <div class="resource-body">
+              <div class="resource-name">Datenschutzerklärung</div>
+              <div class="resource-meta"><span class="resource-badge">HTML</span></div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT STRIP -->
+    <div class="contact-strip" aria-label="Kontaktinformationen">
+      <div class="contact-strip-inner">
+        <div>
+          <!-- FIX #11: h2 in contact strip -->
+          <h2>Fragen? Wir helfen gern.</h2>
+          <p>Unser Schulb&uuml;ro ist montags bis freitags von 07:45 bis 12:00 Uhr erreichbar &mdash; pers&ouml;nlich, per Telefon oder per E-Mail.</p>
+          <!-- FIX #7: staff portraits with descriptive alt text -->
+          <div style="display:flex;gap:.75rem;margin-top:1.5rem;align-items:center;">
+            <div style="text-align:center;">
+              <img src="https://randomuser.me/api/portraits/men/45.jpg"
+                alt="Hans-Peter Egger, Schulleiter der Primarschule Rosenbach"
+                style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:block;" />
+              <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;line-height:1.3;">H.-P. Egger<br>Schulleiter</div>
+            </div>
+            <div style="text-align:center;">
+              <img src="https://randomuser.me/api/portraits/women/52.jpg"
+                alt="Monika Winteler, Stellvertretende Schulleiterin der Primarschule Rosenbach"
+                style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:block;" />
+              <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;line-height:1.3;">M. Winteler<br>Stv. Schulleiterin</div>
+            </div>
+            <div style="text-align:center;">
+              <img src="https://randomuser.me/api/portraits/women/34.jpg"
+                alt="Ursula Meier, Schulverwaltung der Primarschule Rosenbach"
+                style="width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:block;" />
+              <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;line-height:1.3;">U. Meier<br>Schulverwaltung</div>
+            </div>
+          </div>
+        </div>
+        <div class="contact-cards">
+          <div class="contact-card">
+            <div class="contact-card-icon" aria-hidden="true">📍</div>
+            <div>
+              <div class="contact-card-label">Adresse</div>
+              <div class="contact-card-val">Friedensstr. 4, 08539 Rosenbach/Vogtl., Sachsen</div>
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon" aria-hidden="true">📞</div>
+            <div>
+              <div class="contact-card-label">Telefon</div>
+              <!-- FIX #16: HTTPS / tel: link -->
+              <div class="contact-card-val"><a href="tel:+49374313380">037431 33 80</a></div>
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon" aria-hidden="true">✉</div>
+            <div>
+              <div class="contact-card-label">E-Mail</div>
+              <div class="contact-card-val"><a href="mailto:sekretariat@ps-rosenbach.ch">sekretariat@ps-rosenbach.ch</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <!-- FIX #15: CSS Grid layout, no tables -->
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:.75rem;pointer-events:none;">
+          <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="nav-mark" style="background:none;padding:0;">
+            <rect width="40" height="40" rx="9" fill="#3a7250"/>
+            <rect x="9" y="22" width="22" height="13" rx="1" fill="white"/>
+            <polygon points="20,9 8,22 32,22" fill="white"/>
+            <rect x="15" y="27" width="10" height="8" rx="1" fill="#3a7250"/>
+            <rect x="9" y="24" width="5" height="4" rx="0.5" fill="#95d5b2"/>
+            <rect x="26" y="24" width="5" height="4" rx="0.5" fill="#95d5b2"/>
+          </svg>
+          <div class="nav-text">
+            <strong>PS Rosenbach</strong>
+            <span>Grundschule &middot; Sachsen</span>
+          </div>
+        </div>
+        <p class="footer-about">Primarschule Rosenbach &middot; Friedensstr. 4 &middot; 08539 Rosenbach/Vogtl., Sachsen. Volksschule nach sächsischem Lehrplan.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Schule</h4>
+        <ul>
+          <!-- FIX #9: clean semantic URLs, FIX #16: HTTPS -->
+          <li><a href="https://www.ps-rosenbach.ch/unsere-schule/">Unsere Schule</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/kindergarten/">Kindergarten</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/lehrplan-21/">Lehrplan 21</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/tagesstruktur/">Tagesstruktur</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/team/">Team &amp; Lehrpersonen</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>F&uuml;r Eltern</h4>
+        <ul>
+          <li><a href="https://www.ps-rosenbach.ch/stundenplan/">Stundenplan</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/elternbriefe/">Elternbriefe</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/jahresplan/">Jahresplan</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/elternportal/">Elternportal</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/anmeldung/">Anmeldung 2026/27</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kanton &amp; Gemeinde</h4>
+        <ul>
+          <!-- FIX #16: HTTPS links -->
+          <li><a href="https://www.sachsen.de">Vogtlandkreis, Sachsen</a></li>
+          <li><a href="https://www.bildung.sachsen.de">Grundschule Sachsen</a></li>
+          <li><a href="https://www.bildung.sachsen.de">Bildungsdirektion Vogtlandkreis, Sachsen</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/kontakt/">Kontakt</a></li>
+          <li><a href="https://www.ps-rosenbach.ch/impressum/">Impressum</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <!-- FIX #19: readable font size 14px with adequate color contrast -->
+      <span class="footer-copy">&copy; 2026 Gemeinde Rosenbach/Vogtl. &middot; Sachsen</span>
+      <div class="footer-legal">
+        <!-- FIX #17: Datenschutzerklärung prominently in footer -->
+        <a href="https://www.ps-rosenbach.ch/datenschutz/">Datenschutzerkl&auml;rung</a>
+        <!-- FIX #18: Barrierefreiheitserklärung link in footer -->
+        <a href="https://www.ps-rosenbach.ch/barrierefreiheit/">Barriere&shy;freiheiterkl&auml;rung</a>
+        <a href="https://www.ps-rosenbach.ch/impressum/">Impressum</a>
+        <a href="https://www.ps-rosenbach.ch/sitemap/">Sitemap</a>
+        <span class="footer-a11y" title="Barrierefreiheit nach WCAG 2.1 AA">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="5"/><path d="M4 6l1.5 1.5 2.5-3"/></svg>
+          WCAG 2.1 AA
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FIX #20: no <font> tags anywhere — all semantic HTML only -->
+  <script>
+    // Mobile nav toggle
+    const burger = document.getElementById('burger');
+    const menu   = document.getElementById('nav-menu');
+    const close  = document.getElementById('nav-close');
+
+    function openMenu() {
+      menu.classList.add('open');
+      close.classList.add('open');
+      burger.setAttribute('aria-expanded', 'true');
+      burger.setAttribute('aria-label', 'Menü schließen');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenu() {
+      menu.classList.remove('open');
+      close.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.setAttribute('aria-label', 'Menü öffnen');
+      document.body.style.overflow = '';
+    }
+
+    burger.addEventListener('click', () => menu.classList.contains('open') ? closeMenu() : openMenu());
+    close.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+    // ── CALENDAR — Swiss school events, May 2026 start ──────────
+    const DE_MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+    // Swiss school calendar events for Vogtlandkreis, Sachsen 2025/26
+    const EVENTS = {
+      '2026-5-20': { label: 'Elternabend 1./2. Klasse · 19:30 Uhr · Aula', type: 'eltern' },
+      '2026-5-28': { label: 'Auffahrt — Schulfrei', type: 'ferien' },
+      '2026-5-29': { label: 'Brückentag — Schulfrei', type: 'ferien' },
+      '2026-6-8':  { label: 'Pfingstmontag — Schulfrei', type: 'ferien' },
+      '2026-6-12': { label: 'Lehrplan 21 Informationsabend · 19:00 Uhr', type: 'eltern' },
+      '2026-6-18': { label: 'Sporttag 2026 · Sportplatz Rosenbach', type: 'schule' },
+      '2026-7-3':  { label: 'Schulabschlussfeier · 14:00–17:00 Uhr', type: 'schule' },
+      '2026-7-5':  { label: 'Sommerferien beginnen', type: 'ferien' },
+      '2026-7-6':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-7':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-8':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-9':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-12': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-13': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-14': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-15': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-16': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-19': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-20': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-21': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-22': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-23': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-26': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-27': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-28': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-29': { label: 'Sommerferien', type: 'ferien' },
+      '2026-7-30': { label: 'Sommerferien', type: 'ferien' },
+      '2026-8-2':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-8-3':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-8-4':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-8-5':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-8-6':  { label: 'Sommerferien', type: 'ferien' },
+      '2026-8-10': { label: 'Nationalfeiertag — Schulfrei', type: 'ferien' },
+      '2026-8-17': { label: 'Schuljahr 2026/27 beginnt', type: 'schule' },
+    };
+
+    const TYPE_COLOR  = { schule: 'var(--g5)', ferien: '#f4a261', eltern: '#93c5fd' };
+    const TYPE_BG     = { schule: 'var(--g0)', ferien: '#fef3e2', eltern: '#eff6ff' };
+    const TYPE_BORDER = { schule: 'var(--g2)', ferien: '#fcd5a8', eltern: '#bfdbfe' };
+
+    let calYear = 2026, calMonth = 4; // 0-indexed: 4 = May
+    const today = new Date();
+
+    function renderCalendar() {
+      document.getElementById('cal-month-label').textContent = DE_MONTHS[calMonth];
+      document.getElementById('cal-year-label').textContent = calYear;
+
+      const firstDay  = new Date(calYear, calMonth, 1);
+      const lastDay   = new Date(calYear, calMonth + 1, 0);
+      const totalDays = lastDay.getDate();
+
+      let startOffset = firstDay.getDay() - 1;
+      if (startOffset < 0) startOffset = 6;
+
+      const grid = document.getElementById('cal-days');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < startOffset; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for (let d = 1; d <= totalDays; d++) {
+        const key      = `${calYear}-${calMonth + 1}-${d}`;
+        const event    = EVENTS[key];
+        const dow      = new Date(calYear, calMonth, d).getDay();
+        const isWeekend = dow === 0 || dow === 6;
+        const isToday  = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+
+        const cell = document.createElement('div');
+        cell.style.cssText = `
+          text-align:center;
+          padding:5px 2px;
+          border-radius:6px;
+          font-size:13px;
+          font-weight:${isToday ? '700' : event ? '600' : '400'};
+          cursor:${event ? 'pointer' : 'default'};
+          color:${isToday ? '#fff' : isWeekend && !event ? 'var(--slate-3)' : 'var(--slate-7)'};
+          background:${isToday ? 'var(--g7)' : event ? TYPE_BG[event.type] : 'transparent'};
+          border:1px solid ${isToday ? 'var(--g7)' : event ? TYPE_BORDER[event.type] : 'transparent'};
+          transition:background .12s;
+        `;
+
+        cell.textContent = d;
+
+        if (event && !isToday) {
+          const dot = document.createElement('div');
+          dot.style.cssText = `width:4px;height:4px;border-radius:50%;background:${TYPE_COLOR[event.type]};margin:2px auto 0;`;
+          cell.appendChild(dot);
+        }
+
+        if (event) {
+          cell.setAttribute('tabindex', '0');
+          cell.setAttribute('role', 'button');
+          cell.setAttribute('aria-label', `${d}. ${DE_MONTHS[calMonth]}: ${event.label}`);
+          const showTooltip = () => {
+            const tt = document.getElementById('cal-tooltip');
+            tt.style.display = 'block';
+            tt.textContent = `${d}. ${DE_MONTHS[calMonth]}: ${event.label}`;
+          };
+          const hideTooltip = () => { document.getElementById('cal-tooltip').style.display = 'none'; };
+          cell.addEventListener('mouseenter', showTooltip);
+          cell.addEventListener('focus', showTooltip);
+          cell.addEventListener('mouseleave', hideTooltip);
+          cell.addEventListener('blur', hideTooltip);
+        }
+
+        grid.appendChild(cell);
+      }
+    }
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+
+    renderCalendar();
+  </script>
+
+  <!-- AUTOMATION PREVIEW — ?highlight=section-id&state=before|after -->
+  <script>
+    (function () {
+      var params  = new URLSearchParams(location.search);
+      var target  = params.get('highlight');
+      var state   = params.get('state'); // 'before' | 'after'
+
+      // Hide announcement bar unless it is the target
+      if (target !== 'announcement') {
+        var ann = document.getElementById('announcement');
+        if (ann) ann.style.display = 'none';
+      }
+
+      // --- Team section: before = teacher hidden, after = teacher approved ---
+      var pendingCard = document.querySelector('.team-card.pending');
+      if (pendingCard) {
+        if (target === 'section-team' && state === 'after') {
+          var banner = pendingCard.querySelector('.team-pending-banner');
+          if (banner) banner.style.display = 'none';
+          pendingCard.classList.remove('pending');
+          pendingCard.style.border = '';
+          pendingCard.style.boxShadow = '';
+        } else {
+          pendingCard.style.display = 'none';
+        }
+      }
+
+      // --- Announcement bar: state=after swaps content to weather alert ---
+      if (target === 'announcement' && state === 'after') {
+        var annInner = document.querySelector('.announcement-inner');
+        if (annInner) {
+          annInner.innerHTML = '<span class="announcement-badge" style="background:#ef4444;color:#fff;">⚠ Unwetter</span>'
+            + '<span><strong>Unwetterwarnung Stufe 2 – Donnerstag, 7. Mai:</strong> Der DWD warnt vor Starkregen und Gewitter. Der Schulbetrieb läuft, Sportunterricht findet in der Halle statt. <a href="#" style="color:var(--amber-dk);font-weight:600;text-decoration:underline;">Mehr Infos →</a></span>'
+            + '<button class="announcement-close" onclick="this.closest(\'.announcement\').style.display=\'none\'" aria-label="Mitteilung schließen">&times;</button>';
+          // Show the bar (it may have been hidden by default)
+          document.getElementById('announcement').style.display = '';
+        }
+      }
+
+      // --- News section: before = science fair post hidden, after = post visible ---
+      var sciencePost = document.getElementById('news-science-fair');
+      if (sciencePost) {
+        if (target === 'section-news' && state === 'after') {
+          sciencePost.style.display = '';
+        }
+        // else: stays hidden (display:none set inline)
+      }
+
+      if (!target) return;
+
+      var el = document.getElementById(target);
+      if (!el) return;
+
+      // Scroll into view
+      el.scrollIntoView({ behavior: 'instant', block: 'center' });
+
+      // Ring highlight
+      el.style.outline = '3px solid #6366f1';
+      el.style.outlineOffset = '4px';
+
+      // Pulsing inner glow overlay
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:999;border-radius:4px;box-shadow:inset 0 0 0 3px #6366f1;animation:presence-pulse 2s ease-in-out infinite;';
+      el.appendChild(overlay);
+
+      var style = document.createElement('style');
+      style.textContent = '@keyframes presence-pulse{0%,100%{opacity:.5}50%{opacity:1}}';
+      document.head.appendChild(style);
+    })();
+  </script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Eye, CheckCircle, ArrowRight, CalendarDays, BookOpen, Database } from 'lucide-react';
 import { SchoolAfterMagic } from '../pages/SchoolAfterMagic';
+import { useT, useRegion } from '../lib/i18n';
 
 type Variant = 'teacher' | 'vacation';
 
@@ -10,32 +11,36 @@ interface Props {
   variant?: Variant;
 }
 
-const TEACHER_WHAT_WAS_DONE = [
-  'New faculty profile created for Mr. James Holloway',
-  'Added to Team page — 10th Grade History',
-  'Faculty Directory updated and re-indexed',
+const TEACHER_WHAT_WAS_DONE_KEYS = [
+  'autoUpdateModal.teacher.done.0',
+  'autoUpdateModal.teacher.done.1',
+  'autoUpdateModal.teacher.done.2',
 ];
 
-const VACATION_WHAT_WAS_DONE = [
-  'Spring Break schedule (Apr 13–17) added to the Calendar page',
-  'Holiday Programs hub created — lessons & clubs running during the break',
-  '7 club pages updated with break-period meeting times',
-  'Homepage banner highlighting break dates and signups published',
+const VACATION_WHAT_WAS_DONE_KEYS = [
+  'autoUpdateModal.vacation.done.0',
+  'autoUpdateModal.vacation.done.1',
+  'autoUpdateModal.vacation.done.2',
+  'autoUpdateModal.vacation.done.3',
+];
+
+const VACATION_CLUBS = [
+  { labelKey: 'autoUpdateModal.vacation.club.0.label', timeKey: 'autoUpdateModal.vacation.club.0.time' },
+  { labelKey: 'autoUpdateModal.vacation.club.1.label', timeKey: 'autoUpdateModal.vacation.club.1.time' },
+  { labelKey: 'autoUpdateModal.vacation.club.2.label', timeKey: 'autoUpdateModal.vacation.club.2.time' },
+  { labelKey: 'autoUpdateModal.vacation.club.3.label', timeKey: 'autoUpdateModal.vacation.club.3.time' },
 ];
 
 export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) {
+  const t = useT();
+  const region = useRegion();
   const [showAfter, setShowAfter] = useState(true);
   const [alwaysManual, setAlwaysManual] = useState(false);
 
   const isVacation = variant === 'vacation';
-  const whatWasDone = isVacation ? VACATION_WHAT_WAS_DONE : TEACHER_WHAT_WAS_DONE;
-  const headerLabel = isVacation ? 'Auto-Applied Update' : 'Auto-Applied Update';
-  const title = isVacation
-    ? 'Vacation Schedule & Holiday Programs Published'
-    : 'New Teacher Profile Published';
-  const toggleLabel = isVacation
-    ? 'Always require my review for calendar updates'
-    : 'Always require my review for teacher updates';
+  const whatWasDoneKeys = isVacation ? VACATION_WHAT_WAS_DONE_KEYS : TEACHER_WHAT_WAS_DONE_KEYS;
+  const title = t(isVacation ? 'autoUpdateModal.vacation.title' : 'autoUpdateModal.teacher.title');
+  const toggleLabel = t(isVacation ? 'autoUpdateModal.vacation.toggleLabel' : 'autoUpdateModal.teacher.toggleLabel');
 
   return (
     <AnimatePresence>
@@ -70,7 +75,7 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2 text-emerald-600 text-xs font-bold tracking-wide uppercase mb-2">
                 <Zap className="w-4 h-4" />
-                {headerLabel}
+                {t('autoUpdateModal.headerLabel')}
               </div>
               <h2 className="text-xl font-bold text-slate-900 leading-tight">{title}</h2>
             </div>
@@ -80,7 +85,9 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
 
               {/* Source */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source{isVacation ? 's' : ''}</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  {t(isVacation ? 'autoUpdateModal.section.sources' : 'autoUpdateModal.section.source')}
+                </h3>
                 {isVacation ? (
                   <div className="space-y-2">
                     <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center gap-3">
@@ -92,8 +99,8 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-700">PowerSchool <span className="text-[10px] text-slate-400 font-normal">(SIS)</span></p>
-                        <p className="text-xs text-slate-400">Academic calendar updated — Spring Break dates</p>
+                        <p className="text-sm font-semibold text-slate-700">PowerSchool <span className="text-[10px] text-slate-400 font-normal">{t('autoUpdateModal.vacation.source.powerschool.tag')}</span></p>
+                        <p className="text-xs text-slate-400">{t('autoUpdateModal.vacation.source.powerschool.detail')}</p>
                       </div>
                       <Database className="w-4 h-4 text-blue-400 shrink-0" />
                     </div>
@@ -107,9 +114,23 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-slate-700">Canvas LMS</p>
-                        <p className="text-xs text-slate-400">Holiday-period lessons &amp; clubs schedule</p>
+                        <p className="text-xs text-slate-400">{t('autoUpdateModal.vacation.source.canvas.detail')}</p>
                       </div>
                       <BookOpen className="w-4 h-4 text-indigo-400 shrink-0" />
+                    </div>
+                  </div>
+                ) : region.id === 'Germany' ? (
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                      <img
+                        src="https://www.google.com/s2/favicons?domain=webuntis.com&sz=64"
+                        alt="WebUntis"
+                        className="w-5 h-5 object-contain"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700">WebUntis</p>
+                      <p className="text-xs text-slate-400">Neuer Personaleintrag erkannt · Gerade eben</p>
                     </div>
                   </div>
                 ) : (
@@ -123,7 +144,7 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-700">PowerSchool</p>
-                      <p className="text-xs text-slate-400">New staff record detected · Just now</p>
+                      <p className="text-xs text-slate-400">{t('autoUpdateModal.teacher.source.detail')}</p>
                     </div>
                   </div>
                 )}
@@ -131,12 +152,12 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
 
               {/* What was done */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">What Was Done</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('autoUpdateModal.section.whatWasDone')}</h3>
                 <ul className="space-y-3 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                  {whatWasDone.map((item, idx) => (
+                  {whatWasDoneKeys.map((key, idx) => (
                     <li key={idx} className="flex gap-3 text-slate-700">
                       <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span className="text-sm font-medium">{item}</span>
+                      <span className="text-sm font-medium">{t(key)}</span>
                     </li>
                   ))}
                 </ul>
@@ -145,7 +166,7 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
               {/* Published card */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  {isVacation ? 'Published Schedule' : 'Published Profile'}
+                  {t(isVacation ? 'autoUpdateModal.section.publishedSchedule' : 'autoUpdateModal.section.publishedProfile')}
                 </h3>
                 {isVacation ? (
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
@@ -154,26 +175,35 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                         <CalendarDays className="w-6 h-6" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-slate-900 text-sm">Spring Break 2026</p>
-                        <p className="text-xs text-amber-600 font-semibold mt-0.5">April 13 – April 17</p>
-                        <p className="text-xs text-slate-400 mt-0.5">5 school days · Classes resume April 20</p>
+                        <p className="font-bold text-slate-900 text-sm">{t('autoUpdateModal.vacation.card.title')}</p>
+                        <p className="text-xs text-amber-600 font-semibold mt-0.5">{t('autoUpdateModal.vacation.card.dates')}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{t('autoUpdateModal.vacation.card.subDates')}</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-slate-300 ml-auto shrink-0" />
                     </div>
                     <div className="border-t border-slate-200 pt-3 space-y-1.5">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Running during break</p>
-                      {[
-                        { label: 'Robotics Club', time: 'Mon · Wed · 9–11am' },
-                        { label: 'Art Studio Open Hours', time: 'Tue · Thu · 10am–1pm' },
-                        { label: 'JV Soccer Practice', time: 'Daily · 3–5pm' },
-                        { label: 'College Prep Workshops', time: 'Wed · 1–3pm' },
-                      ].map(c => (
-                        <div key={c.label} className="flex items-center justify-between text-xs">
-                          <span className="text-slate-700 font-medium">{c.label}</span>
-                          <span className="text-slate-400">{c.time}</span>
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{t('autoUpdateModal.vacation.card.runningDuringBreak')}</p>
+                      {VACATION_CLUBS.map(c => (
+                        <div key={c.labelKey} className="flex items-center justify-between text-xs">
+                          <span className="text-slate-700 font-medium">{t(c.labelKey)}</span>
+                          <span className="text-slate-400">{t(c.timeKey)}</span>
                         </div>
                       ))}
                     </div>
+                  </div>
+                ) : region.id === 'Germany' ? (
+                  <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <img
+                      src="https://randomuser.me/api/portraits/women/29.jpg"
+                      alt="Li Chen"
+                      className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900 text-sm">Li Chen</p>
+                      <p className="text-xs text-indigo-600 font-semibold mt-0.5">Mathematik · Klasse 4b</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Neue Lehrkraft</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-300 ml-auto shrink-0" />
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
@@ -184,8 +214,8 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-slate-900 text-sm">Mr. James Holloway</p>
-                      <p className="text-xs text-indigo-600 font-semibold mt-0.5">10th Grade History</p>
-                      <p className="text-xs text-slate-400 mt-0.5">Social Studies Department</p>
+                      <p className="text-xs text-indigo-600 font-semibold mt-0.5">{t('autoUpdateModal.teacher.card.subject')}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{t('autoUpdateModal.teacher.card.department')}</p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-slate-300 ml-auto shrink-0" />
                   </div>
@@ -202,14 +232,14 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                   onClick={onClose}
                   className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
                 >
-                  Revert
+                  {t('autoUpdateModal.action.revert')}
                 </button>
                 <button
                   onClick={onClose}
                   className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-slate-900 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="w-4 h-4" />
-                  Looks Good
+                  {t('autoUpdateModal.action.looksGood')}
                 </button>
               </div>
 
@@ -238,7 +268,7 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
             {/* Preview Toolbar */}
             <div className="h-14 bg-white border-b border-l border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
               <div className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <Eye className="w-4 h-4 text-blue-500" /> Live Site Preview
+                <Eye className="w-4 h-4 text-blue-500" /> {t('autoUpdateModal.preview.title')}
               </div>
 
               {/* Before / After Toggle */}
@@ -249,7 +279,7 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                     !showAfter ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  Before
+                  {t('autoUpdateModal.preview.before')}
                 </button>
                 <button
                   onClick={() => setShowAfter(true)}
@@ -257,19 +287,30 @@ export function AutoUpdatePreviewModal({ onClose, variant = 'teacher' }: Props) 
                     showAfter ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  After
+                  {t('autoUpdateModal.preview.after')}
                 </button>
               </div>
             </div>
 
             {/* Preview Canvas */}
             <div className="flex-1 relative overflow-hidden">
-              <div className="w-full h-full overflow-y-auto bg-slate-50">
-                <SchoolAfterMagic
-                  previewType={isVacation ? undefined : 'new_teacher'}
-                  showAfter={showAfter}
+              {region.id === 'Germany' ? (
+                <iframe
+                  key={`${variant}-${showAfter}`}
+                  src={`${import.meta.env.BASE_URL}lerchenberg/good.html?highlight=${
+                    isVacation ? 'section-events' : 'section-team'
+                  }&state=${showAfter ? 'after' : 'before'}`}
+                  className="w-full h-full border-0"
+                  title="Grundschule Lerchenberg Vorschau"
                 />
-              </div>
+              ) : (
+                <div className="w-full h-full overflow-y-auto bg-slate-50">
+                  <SchoolAfterMagic
+                    previewType={isVacation ? undefined : 'new_teacher'}
+                    showAfter={showAfter}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

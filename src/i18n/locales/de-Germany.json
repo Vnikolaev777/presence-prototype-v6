@@ -1,0 +1,9 @@
+{
+  "workspace.narration.mon.preselected": "Ich habe 6 relevante Themenkategorien für Primarschule Rosenbach vorausgewählt. Tippen Sie zum Anpassen, dann aktivieren, wenn Sie bereit sind.",
+  "workspace.narration.mon.settingUp": "Richte {count} Überwachungsquelle{plural} für Primarschule Rosenbach ein — Feeds werden jetzt verbunden…",
+  "workspace.monitoringSetup.subtitleActive": "Themen-Feeds werden für Primarschule Rosenbach verbunden",
+  "workspace.topic.district.sub": "Rosenbach-Schulen-Feed",
+  "workspace.narration.mon.ministrySiteName": "ausbildung.de",
+  "knowledge.website.preview.subtitle": "rosenbach.de · Aktuelle Version",
+  "knowledge.school.fact.0": "Primarschule Rosenbach, gegründet 1978, öffentliche Grundschule im Ort Rosenbach."
+}
