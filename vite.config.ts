@@ -5,7 +5,7 @@ import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? '/presence-prototype-v5/' : '/',
+  base: process.env.GITHUB_ACTIONS ? '/presence-prototype-v6/' : '/',
   plugins: [
     tailwindcss(),
     react()
