@@ -374,6 +374,11 @@
   "knowledge.integrations.powerschool.desc": "Synchronisieren Sie Stundenpläne, Lehrerverzeichnisse und Schülerakten direkt mit Ihrer Website. Änderungen werden automatisch übernommen.",
   "knowledge.integrations.googleAnalytics.desc": "Verfolgen Sie Besucherverhalten, Seitenleistung und Traffic-Quellen. KI-Agenten nutzen diese Daten, um Inhaltsverbesserungen vorzuschlagen.",
   "knowledge.integrations.classdojo.desc": "Verbinden Sie ClassDojo, um Schulankündigungen und Eltern-Kommunikation direkt auf der Website anzuzeigen.",
+  "knowledge.integrations.type.lms": "Schulplattform & LMS",
+  "knowledge.integrations.type.comms": "Eltern- & Schülerkommunikation",
+  "knowledge.integrations.webuntis.desc": "Synchronisiert Stundenpläne, Vertretungen und den Schulkalender automatisch mit Ihrer Website.",
+  "knowledge.integrations.iserv.desc": "Verbindet die Schulplattform mit der Website — Neuigkeiten, Termine und Lehrerinformationen werden automatisch übertragen.",
+  "knowledge.integrations.sdui.desc": "Verknüpft sdui-Ankündigungen und Benachrichtigungen direkt mit Ihrer Schulwebsite.",
   "knowledge.integrations.connected": "Verbunden",
   "knowledge.integrations.connect": "Verbinden",
   "knowledge.integrations.authenticating": "Authentifizierung läuft…",
@@ -951,5 +956,7 @@
   "dashboard.review.weather.preview.tab.email": "E-Mail",
   "dashboard.review.weather.preview.title": "Vorschau: Unwetterwarnung",
   "dashboard.review.weather.preview.sub": "So sehen Eltern die Warnung auf jedem Kanal",
-  "dashboard.review.weather.actionPublish": "Warnung veröffentlichen"
+  "dashboard.review.weather.actionPublish": "Warnung veröffentlichen",
+  "dashboard.fixture.autoUpdate.0.dach.title": "Neues Lehrprofil veröffentlicht",
+  "dashboard.fixture.autoUpdate.0.dach.detail": "Li Chen ist neu als Mathematik-Lehrkraft der Klasse 4b. Profilseite erstellt und im Kollegiumsverzeichnis ergänzt."
 }

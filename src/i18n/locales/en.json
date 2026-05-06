@@ -374,6 +374,11 @@
   "knowledge.integrations.powerschool.desc": "Sync class schedules, teacher directories, and student records directly to your website. Changes reflect automatically.",
   "knowledge.integrations.googleAnalytics.desc": "Track visitor behaviour, page performance, and traffic sources. AI agents use this data to suggest content improvements.",
   "knowledge.integrations.classdojo.desc": "Connect ClassDojo to surface school announcements and parent communications directly on the website.",
+  "knowledge.integrations.type.lms": "School Platform & LMS",
+  "knowledge.integrations.type.comms": "Parent & Student Communication",
+  "knowledge.integrations.webuntis.desc": "Syncs timetables, substitutions and the school calendar automatically to your website.",
+  "knowledge.integrations.iserv.desc": "Connects the school platform with your website — news, events and teacher information are transferred automatically.",
+  "knowledge.integrations.sdui.desc": "Links sdui announcements and notifications directly to your school website.",
   "knowledge.integrations.connected": "Connected",
   "knowledge.integrations.connect": "Connect",
   "knowledge.integrations.authenticating": "Authenticating...",
@@ -951,5 +956,7 @@
   "dashboard.review.weather.preview.tab.email": "Email",
   "dashboard.review.weather.preview.title": "Weather Alert Preview",
   "dashboard.review.weather.preview.sub": "How parents will see the alert across each channel",
-  "dashboard.review.weather.actionPublish": "Publish Alert"
+  "dashboard.review.weather.actionPublish": "Publish Alert",
+  "dashboard.fixture.autoUpdate.0.dach.title": "New Teacher Profile Published",
+  "dashboard.fixture.autoUpdate.0.dach.detail": "Li Chen joined as Maths teacher for Class 4b. Profile page created and added to the Faculty Directory."
 }

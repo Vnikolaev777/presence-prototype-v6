@@ -409,29 +409,62 @@ function SchoolProfileTab() {
 
 // ─── Integrations Tab ────────────────────────────────────────────────────────
 
-const ALL_INTEGRATIONS = [
-  {
-    name: 'PowerSchool',
-    typeKey: 'knowledge.integrations.type.sis',
-    descKey: 'knowledge.integrations.powerschool.desc',
-    domain: 'powerschool.com',
-    defaultLive: true,
-  },
-  {
-    name: 'Google Analytics',
-    typeKey: 'knowledge.integrations.type.analytics',
-    descKey: 'knowledge.integrations.googleAnalytics.desc',
-    domain: 'analytics.google.com',
-    defaultLive: true,
-  },
-  {
-    name: 'ClassDojo',
-    typeKey: 'knowledge.integrations.type.engagement',
-    descKey: 'knowledge.integrations.classdojo.desc',
-    domain: 'classdojo.com',
-    defaultLive: true,
-  },
-];
+interface IntegrationDef {
+  name: string;
+  typeKey: string;
+  descKey: string;
+  domain: string;
+  defaultLive: boolean;
+}
+
+const INTEGRATIONS_BY_REGION: Record<string, IntegrationDef[]> = {
+  US: [
+    {
+      name: 'PowerSchool',
+      typeKey: 'knowledge.integrations.type.sis',
+      descKey: 'knowledge.integrations.powerschool.desc',
+      domain: 'powerschool.com',
+      defaultLive: true,
+    },
+    {
+      name: 'Google Analytics',
+      typeKey: 'knowledge.integrations.type.analytics',
+      descKey: 'knowledge.integrations.googleAnalytics.desc',
+      domain: 'analytics.google.com',
+      defaultLive: true,
+    },
+    {
+      name: 'ClassDojo',
+      typeKey: 'knowledge.integrations.type.engagement',
+      descKey: 'knowledge.integrations.classdojo.desc',
+      domain: 'classdojo.com',
+      defaultLive: true,
+    },
+  ],
+  Germany: [
+    {
+      name: 'WebUntis',
+      typeKey: 'knowledge.integrations.type.sis',
+      descKey: 'knowledge.integrations.webuntis.desc',
+      domain: 'webuntis.com',
+      defaultLive: true,
+    },
+    {
+      name: 'IServ',
+      typeKey: 'knowledge.integrations.type.lms',
+      descKey: 'knowledge.integrations.iserv.desc',
+      domain: 'iserv.de',
+      defaultLive: true,
+    },
+    {
+      name: 'sdui',
+      typeKey: 'knowledge.integrations.type.comms',
+      descKey: 'knowledge.integrations.sdui.desc',
+      domain: 'sdui.com',
+      defaultLive: true,
+    },
+  ],
+};
 
 function IntegrationsTab({ connectedSystems, setConnectedSystems, onNavigate }: {
   connectedSystems: any[];
@@ -441,7 +474,10 @@ function IntegrationsTab({ connectedSystems, setConnectedSystems, onNavigate }: 
   onNavigate: (tab: string) => void;
 }) {
   const t = useT();
+  const region = useRegion();
   const [connecting, setConnecting] = useState<string | null>(null);
+
+  const integrations = INTEGRATIONS_BY_REGION[region.id] ?? INTEGRATIONS_BY_REGION.US;
 
   const handleConnect = (name: string, type: string) => {
     setConnecting(name);
@@ -452,13 +488,13 @@ function IntegrationsTab({ connectedSystems, setConnectedSystems, onNavigate }: 
   };
 
   const isConnected = (name: string) =>
-    ALL_INTEGRATIONS.find(i => i.name === name)?.defaultLive ||
+    integrations.find(i => i.name === name)?.defaultLive ||
     connectedSystems.some((s: any) => s.name === name);
 
   return (
     <div className="max-w-3xl space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ALL_INTEGRATIONS.map(intg => (
+        {integrations.map(intg => (
           <IntegrationCard
             key={intg.name}
             name={intg.name}

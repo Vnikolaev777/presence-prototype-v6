@@ -147,6 +147,10 @@ const AUTO_UPDATES: AutoUpdate[] = [
 // ─── Auto-update row component ──────────────────────────────────────────────
 function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void }) {
   const t = useT();
+  const region = useRegion();
+  const isDACH = region.id === 'DACH';
+  const titleKey  = isDACH && item.id === 'au_0' ? 'dashboard.fixture.autoUpdate.0.dach.title'  : item.titleKey;
+  const detailKey = isDACH && item.id === 'au_0' ? 'dashboard.fixture.autoUpdate.0.dach.detail' : item.detailKey;
   return (
     <div className="flex gap-3 items-start py-3 px-4 hover:bg-slate-50 transition-colors rounded-xl group">
       {/* Source favicon(s) or fallback icon */}
@@ -197,10 +201,10 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-semibold text-slate-800 leading-tight">{t(item.titleKey)}</p>
+          <p className="text-sm font-semibold text-slate-800 leading-tight">{t(titleKey)}</p>
           <span className="text-xs text-slate-400 shrink-0 mt-0.5 whitespace-nowrap">{t(item.timeKey)}</span>
         </div>
-        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{t(item.detailKey)}</p>
+        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{t(detailKey)}</p>
         <div className="flex items-center justify-between mt-1.5">
           <span className="text-xs text-slate-400 font-medium">{item.sourceKey ? t(item.sourceKey) : item.source}</span>
           {onView && (
