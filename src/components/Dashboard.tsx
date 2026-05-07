@@ -17,6 +17,9 @@ type AutoUpdate = {
   sourceKey?: string;
   sourceDomain?: string;
   sourceDomains?: string[]; // when multiple sources contributed (e.g. SIS + LMS)
+  /** DACH-region overrides for source display */
+  dachSource?: string;
+  dachSourceDomain?: string;
   /** Translation key for the title — resolved via useT() in AutoUpdateRow. */
   titleKey: string;
   /** Translation key for the body. */
@@ -45,6 +48,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
   {
     id: 'au_0',
     source: 'PowerSchool',
+    sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.0.title',
     detailKey: 'dashboard.fixture.autoUpdate.0.detail',
@@ -55,6 +59,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
   {
     id: 'au_1',
     source: 'PowerSchool',
+    sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.1.title',
     detailKey: 'dashboard.fixture.autoUpdate.1.detail',
@@ -85,6 +90,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
   {
     id: 'au_4',
     source: 'PowerSchool',
+    sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.4.title',
     detailKey: 'dashboard.fixture.autoUpdate.4.detail',
@@ -135,6 +141,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
   {
     id: 'au_9',
     source: 'PowerSchool',
+    sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.9.title',
     detailKey: 'dashboard.fixture.autoUpdate.9.detail',
@@ -147,8 +154,6 @@ const AUTO_UPDATES: AutoUpdate[] = [
 // ─── Auto-update row component ──────────────────────────────────────────────
 function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void }) {
   const t = useT();
-  const titleKey  = item.titleKey;
-  const detailKey = item.detailKey;
   return (
     <div className="flex gap-3 items-start py-3 px-4 hover:bg-slate-50 transition-colors rounded-xl group">
       {/* Source favicon(s) or fallback icon */}
@@ -199,10 +204,10 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-semibold text-slate-800 leading-tight">{t(titleKey)}</p>
+          <p className="text-sm font-semibold text-slate-800 leading-tight">{t(item.titleKey)}</p>
           <span className="text-xs text-slate-400 shrink-0 mt-0.5 whitespace-nowrap">{t(item.timeKey)}</span>
         </div>
-        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{t(detailKey)}</p>
+        <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{t(item.detailKey)}</p>
         <div className="flex items-center justify-between mt-1.5">
           <span className="text-xs text-slate-400 font-medium">{item.sourceKey ? t(item.sourceKey) : item.source}</span>
           {onView && (
@@ -697,7 +702,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
     hasMonitoringSetup && isCCPending,
     hasMonitoringSetup && isWAPending,
     hasHiredAgents && isConsentPending,
-    hasHiredAgents && isEventPending,
+    hasMonitoringSetup && isEventPending,
   ].filter(Boolean).length;
 
   return (
@@ -814,25 +819,14 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
               {/* Consent form card — appears after first scenario */}
               {isConsentPending && (
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 animate-in fade-in">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <ClipboardCheck className="w-2.5 h-2.5" /> {t('dashboard.review.consent.badge')}
-                    </span>
-                  </div>
                   <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.consent.title')}</h3>
                   <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.consent.body')}</p>
-                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  <div className="flex items-center gap-2 mt-3">
                     <button
                       onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
                       className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
                       {t('dashboard.review.consent.action')}
-                    </button>
-                    <button
-                      onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
-                      className="text-xs font-bold bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      {t('dashboard.review.consent.actionSms')}
                     </button>
                     <button
                       onClick={() => setCommPreview('consent')}
@@ -850,22 +844,29 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                 </div>
               )}
 
-              {/* Weather alert card — appears after first scenario */}
-              {isEventPending && (
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-red-200 animate-in fade-in">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <AlertTriangle className="w-2.5 h-2.5" /> {t('dashboard.review.weather.badge')}
-                    </span>
-                  </div>
+              {/* Weather alert card — appears after second (monitoring) scenario */}
+              {hasMonitoringSetup && isEventPending && (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 animate-in fade-in">
                   <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.weather.title')}</h3>
                   <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.weather.body')}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setShowWeatherModal(true)}
+                      onClick={() => setRemovedActions(prev => [...prev, 'event_1'])}
                       className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
-                      Review Alert
+                      {t('dashboard.review.weather.actionPublish')}
+                    </button>
+                    <button
+                      onClick={() => setShowWeatherModal(true)}
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                    >
+                      {t('dashboard.review.action.preview')}
+                    </button>
+                    <button
+                      onClick={() => setRemovedActions(prev => [...prev, 'event_1'])}
+                      className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors ml-auto"
+                    >
+                      {t('dashboard.review.action.dismiss')}
                     </button>
                   </div>
                 </div>
@@ -898,7 +899,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                 </div>
               )}
 
-              {!isConsentPending && !isEventPending && !(hasMonitoringSetup && isCCPending) && !(hasMonitoringSetup && isWAPending) && (
+              {!isConsentPending && !(hasMonitoringSetup && isEventPending) && !(hasMonitoringSetup && isCCPending) && !(hasMonitoringSetup && isWAPending) && (
                 <div className="py-10 text-center text-slate-400 space-y-2">
                   <CheckCircle className="w-8 h-8 mx-auto opacity-40" />
                   <p className="text-sm font-medium">{t('dashboard.review.allCaughtUp.title')}</p>

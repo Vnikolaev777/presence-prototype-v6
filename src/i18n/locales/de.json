@@ -956,5 +956,6 @@
   "dashboard.review.weather.preview.tab.email": "E-Mail",
   "dashboard.review.weather.preview.title": "Vorschau: Unwetterwarnung",
   "dashboard.review.weather.preview.sub": "So sehen Eltern die Warnung auf jedem Kanal",
-  "dashboard.review.weather.actionPublish": "Warnung veröffentlichen"
+  "dashboard.review.weather.actionPublish": "Warnung veröffentlichen",
+  "dashboard.fixture.autoUpdate.source.sis": "PowerSchool"
 }

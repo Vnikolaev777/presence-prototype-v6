@@ -5,5 +5,6 @@
   "workspace.topic.district.sub": "Rosenbach-Schulen-Feed",
   "workspace.narration.mon.ministrySiteName": "ausbildung.de",
   "knowledge.website.preview.subtitle": "rosenbach.de · Aktuelle Version",
-  "knowledge.school.fact.0": "Primarschule Rosenbach, gegründet 1978, öffentliche Grundschule im Ort Rosenbach."
+  "knowledge.school.fact.0": "Primarschule Rosenbach, gegründet 1978, öffentliche Grundschule im Ort Rosenbach.",
+  "dashboard.fixture.autoUpdate.source.sis": "DaNiS"
 }
