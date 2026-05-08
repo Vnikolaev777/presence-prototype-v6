@@ -2923,8 +2923,8 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                 <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full cursor-help">{t('workspace.integrationsPanel.viewAll')}</span>
               </div>
 
-              {/* SIS section */}
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">SIS</p>
+              {/* Scheduling section */}
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{t('utilities.category.scheduling')}</p>
               <div className="space-y-2 mb-4">
                 {[
                   { name: "WebUntis", domain: "webuntis.com" },
@@ -2954,9 +2954,10 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
                 })}
               </div>
 
-              {/* LMS + Shared Folder — waiting tiles */}
+              {/* Communications + LMS + Shared Folder — waiting tiles */}
               <div className="border-t border-slate-100 pt-3 space-y-2">
                 {[
+                  { labelKey: 'workspace.integrationsPanel.comms.label',  subKey: 'workspace.integrationsPanel.comms.sub',  icon: <MessageSquare className="w-3.5 h-3.5" /> },
                   { labelKey: 'workspace.integrationsPanel.lms.label',    subKey: 'workspace.integrationsPanel.lms.sub',    icon: <BookOpen className="w-3.5 h-3.5" /> },
                   { labelKey: 'workspace.integrationsPanel.folder.label', subKey: 'workspace.integrationsPanel.folder.sub', icon: <FolderOpen className="w-3.5 h-3.5" /> },
                 ].map(tile => (

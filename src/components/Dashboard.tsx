@@ -316,7 +316,174 @@ function ConsentPhonePreview() {
 }
 
 // ─── Weather alert preview modal ─────────────────────────────────────────────
-function WeatherAlertModal({ onClose }: { onClose: () => void }) {
+// ─── Consent modal ───────────────────────────────────────────────────────────
+function ConsentModal({ onClose, onApprove }: { onClose: () => void; onApprove: () => void }) {
+  const t = useT();
+  const region = useRegion();
+  const [tab, setTab] = useState<'sdui' | 'email'>('sdui');
+  const [autoApply, setAutoApply] = useState(false);
+  const isDACH = region.id === 'Germany';
+
+  const tabs = [
+    { id: 'sdui'  as const, label: 'Sdui',  icon: <MessageSquare className="w-3.5 h-3.5" /> },
+    { id: 'email' as const, label: 'Email', icon: <Mail className="w-3.5 h-3.5" /> },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full h-full max-w-[1400px] bg-white border border-slate-200 shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row">
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 text-slate-500 hover:text-slate-800 bg-white/80 backdrop-blur hover:bg-slate-100 rounded-full p-2 shadow-sm transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* ── Left panel ── */}
+        <div className="w-full md:w-[400px] lg:w-[440px] flex flex-col shrink-0 bg-white z-0 relative">
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+            <div className="flex items-center gap-2 text-indigo-600 text-xs font-bold tracking-wide uppercase mb-2">
+              <ClipboardCheck className="w-4 h-4" />
+              {t('dashboard.review.consent.badge')}
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 leading-tight">{t('dashboard.review.consent.title')}</h2>
+          </div>
+
+          <div className="p-6 flex-1 overflow-y-auto space-y-7">
+            {/* Source */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('autoUpdateModal.section.source')}</h3>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                  <img src={`https://www.google.com/s2/favicons?domain=${isDACH ? 'webuntis.com' : 'powerschool.com'}&sz=64`} alt={isDACH ? 'WebUntis' : 'PowerSchool'} className="w-5 h-5 object-contain" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">{isDACH ? 'WebUntis' : 'PowerSchool'}</p>
+                  <p className="text-xs text-slate-400">{isDACH ? 'Klassenfahrt Biologie erkannt · Mai 14' : 'Biology field trip detected · May 14'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Trip details */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{isDACH ? 'Details' : 'Trip Details'}</h3>
+              <ul className="space-y-2.5 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                {(isDACH ? [
+                  { icon: <CalendarDays className="w-4 h-4 text-indigo-500" />, label: 'Datum', value: '14. Mai 2026' },
+                  { icon: <Globe className="w-4 h-4 text-slate-400" />,         label: 'Ziel',  value: 'Naturhistorisches Museum' },
+                  { icon: <Users className="w-4 h-4 text-slate-400" />,        label: 'Klasse', value: 'Klasse 10b · 28 Schüler:innen' },
+                  { icon: <Clock className="w-4 h-4 text-amber-500" />,        label: 'Frist',  value: 'Bestätigung bis 10. Mai' },
+                ] : [
+                  { icon: <CalendarDays className="w-4 h-4 text-indigo-500" />, label: 'Date',      value: 'May 14, 2026' },
+                  { icon: <Globe className="w-4 h-4 text-slate-400" />,         label: 'Destination', value: 'Natural History Museum' },
+                  { icon: <Users className="w-4 h-4 text-slate-400" />,        label: 'Class',     value: 'Class 10b · 28 students' },
+                  { icon: <Clock className="w-4 h-4 text-amber-500" />,        label: 'Deadline',  value: 'Confirm by May 10' },
+                ]).map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm">
+                    <span className="shrink-0">{item.icon}</span>
+                    <span className="text-slate-400 w-20 shrink-0 text-xs font-medium">{item.label}</span>
+                    <span className="text-slate-700 font-medium">{item.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Channels */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{isDACH ? 'Versand über' : 'Sending via'}</h3>
+              <ul className="space-y-2 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                {[
+                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: isDACH ? 'Sdui-Push an 28 Eltern' : 'Sdui push to 28 parents' },
+                  { icon: <Mail className="w-4 h-4 text-slate-400" />,           label: isDACH ? 'E-Mail-Fallback (kein App-Konto)' : 'Email fallback (no app account)' },
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <span className="shrink-0 mt-0.5">{item.icon}</span>
+                    <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Footer — same as AiReviewModal */}
+          <div className="p-5 border-t border-slate-100 bg-white space-y-3">
+            <div className="flex gap-2">
+              <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors">
+                {t('aiReviewModal.action.reject')}
+              </button>
+              <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors">
+                {t('aiReviewModal.action.edit')}
+              </button>
+              <button onClick={() => { onApprove(); onClose(); }} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-slate-900 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+                <CheckCircle className="w-4 h-4" /> {t('aiReviewModal.action.approve')}
+              </button>
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-xs text-slate-500 font-medium pr-4">{t('aiReviewModal.autoApply')}</span>
+              <button type="button" role="switch" aria-checked={autoApply} onClick={() => setAutoApply(v => !v)} className="shrink-0 focus:outline-none">
+                <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${autoApply ? 'bg-emerald-500' : 'bg-slate-200'}`}>
+                  <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${autoApply ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right panel ── */}
+        <div className="hidden md:flex flex-1 flex-col bg-slate-100 relative">
+          <div className="h-14 bg-white border-b border-l border-slate-200 flex items-center justify-between px-6 shrink-0">
+            <div className="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-blue-500" /> {t('dashboard.consentPreview.title')}
+            </div>
+            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 gap-0.5">
+              {tabs.map(tb => (
+                <button key={tb.id} onClick={() => setTab(tb.id)}
+                  className={cn('flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition-all',
+                    tab === tb.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
+                  {tb.icon} {tb.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            {tab === 'sdui' && <ConsentPhonePreview />}
+            {tab === 'email' && (
+              <div className="w-full h-full flex items-center justify-center bg-slate-100 p-8">
+                <div className="w-full max-w-[520px] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-sm">
+                  <div className="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                      <ClipboardCheck className="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-900 text-xs">{isDACH ? 'Primarschule Rosenbach <info@ps-rosenbach.ch>' : 'Oakwood High <info@oakwoodhigh.org>'}</p>
+                      <p className="text-[10px] text-slate-400">{isDACH ? 'An: Eltern Klasse 10b · Mo, 5. Mai 2026' : 'To: Class 10b parents · Mon, May 5 2026'}</p>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    <p className="text-base font-extrabold text-slate-900">{isDACH ? '📋 Einverständniserklärung — Klassenfahrt 14. Mai' : '📋 Permission Slip — Field Trip May 14'}</p>
+                    <p className="text-sm text-slate-600">{isDACH ? 'Liebe Eltern,' : 'Dear parents,'}</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">{isDACH
+                      ? 'Für die Exkursion der Klasse 10b ins Naturhistorische Museum am 14. Mai 2026 benötigen wir Ihr schriftliches Einverständnis.'
+                      : 'Class 10b will visit the Natural History Museum on May 14, 2026. We need your written consent.'}</p>
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                      <p className="text-sm font-bold text-indigo-900 mb-2">{isDACH ? 'Bitte bestätigen Sie bis 10. Mai:' : 'Please confirm by May 10:'}</p>
+                      <a href="#" className="block w-full text-center py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold">{isDACH ? 'Formular öffnen →' : 'Open form →'}</a>
+                    </div>
+                    <p className="text-sm text-slate-600">{isDACH ? 'Mit freundlichen Grüßen,\nSchulleitung' : 'Best regards,\nOakwood High Administration'}</p>
+                    <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-400">
+                      {isDACH ? 'Gesendet an 28 Empfänger · Presence AI' : 'Sent to 28 recipients · Presence AI'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Weather alert preview modal ─────────────────────────────────────────────
+function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onApprove: () => void }) {
   const t = useT();
   const region = useRegion();
   const [tab, setTab] = useState<'website' | 'sdui' | 'email'>('website');
@@ -390,7 +557,7 @@ function WeatherAlertModal({ onClose }: { onClose: () => void }) {
               <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors flex items-center gap-1.5">
                 {t('aiReviewModal.action.edit')}
               </button>
-              <button onClick={onClose} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-slate-900 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+              <button onClick={() => { onApprove(); onClose(); }} className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white bg-slate-900 hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
                 <CheckCircle className="w-4 h-4" /> {t('aiReviewModal.action.approve')}
               </button>
             </div>
@@ -609,7 +776,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
   const [selectedAction, setSelectedAction] = useState<AiAction | null>(null);
   const [removedActions, setRemovedActions] = useState<string[]>([]);
   const [previewVariant, setPreviewVariant] = useState<'teacher' | 'vacation' | null>(null);
-  const [commPreview, setCommPreview] = useState<'consent' | 'event' | null>(null);
+  const [showConsentModal, setShowConsentModal] = useState(false);
   const [showWeatherModal, setShowWeatherModal] = useState(false);
   const t = useT();
   const region = useRegion();
@@ -828,7 +995,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                   <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.consent.body')}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setCommPreview('consent')}
+                      onClick={() => setShowConsentModal(true)}
                       className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
                       {t('dashboard.review.action.review')}
@@ -979,12 +1146,18 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
         />
       )}
 
-      {commPreview && (
-        <PhoneNotifModal type={commPreview} onClose={() => setCommPreview(null)} />
+      {showConsentModal && (
+        <ConsentModal
+          onClose={() => setShowConsentModal(false)}
+          onApprove={() => setRemovedActions(prev => [...prev, 'consent_1'])}
+        />
       )}
 
       {showWeatherModal && (
-        <WeatherAlertModal onClose={() => setShowWeatherModal(false)} />
+        <WeatherAlertModal
+          onClose={() => setShowWeatherModal(false)}
+          onApprove={() => setRemovedActions(prev => [...prev, 'event_1'])}
+        />
       )}
 
       {/* Review modal — unchanged */}

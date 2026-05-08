@@ -90,29 +90,40 @@ export interface CategoryDef {
 
 export const CATEGORIES: CategoryDef[] = [
   {
-    labelKey: 'utilities.category.studentInfo',
+    labelKey: 'utilities.category.sis',
     connectors: [
       'ASV Bayern', 'SVWS-NRW', 'LUSD', 'DaNiS', 'SaxSVS', 'SchILD-NRW',
-      'EduPage', 'DaVinci', 'Schulmanager Online',
-      'LOGINEO NRW', 'ByCS', 'itslearning', 'Schulportal Hessen', 'LernSax',
+      'Schulmanager Online',
       'Arbor', 'SIMS', 'Veracross', 'iSAMS',
       'Infinite Campus', 'Skyward', 'FACTS SIS', 'Aeries SIS',
       'WebUnits', 'K12NET', 'Magister', 'SomToday', 'Librus',
-      'Canvas', 'Google Classroom', 'Moodle', 'Schoology', 'Brightspace', 'Blackboard',
-      'MS Teams Edu', 'EBA', 'Sebit Vitamin', 'Seesaw',
     ],
   },
   {
-    labelKey: 'utilities.category.communication',
+    labelKey: 'utilities.category.scheduling',
     connectors: [
-      'IServ', 'Sdui', 'SchoolFox', 'stashcat',
+      'WebUntis', 'EduPage', 'DaVinci',
+    ],
+  },
+  {
+    labelKey: 'utilities.category.communications',
+    connectors: [
+      'Sdui', 'IServ', 'SchoolFox', 'stashcat',
       'rapidmail', 'CleverReach', 'Brevo',
       'ParentSquare', 'Remind', 'Bloomz', 'ClassTag', 'TalkingPoints',
       'Klassly', 'SchoolMessenger',
     ],
   },
   {
-    labelKey: 'utilities.category.productivity',
+    labelKey: 'utilities.category.lms',
+    connectors: [
+      'LOGINEO NRW', 'ByCS', 'itslearning', 'Schulportal Hessen', 'LernSax',
+      'Canvas', 'Google Classroom', 'Moodle', 'Schoology', 'Brightspace', 'Blackboard',
+      'MS Teams Edu', 'EBA', 'Sebit Vitamin', 'Seesaw',
+    ],
+  },
+  {
+    labelKey: 'utilities.category.others',
     connectors: [
       'Clever', 'ClassLink', 'Wonde', 'VIDIS', 'Okta', 'Azure AD / Entra',
       'Microsoft 365', 'Google Workspace', 'Apple School Manager', 'Nextcloud',
