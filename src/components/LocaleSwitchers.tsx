@@ -1,7 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Two pill-shaped dropdowns for the top header — Region, then Language.
-// They share a DropdownShell (button + animated panel + click-outside handling)
-// so the two switchers stay visually identical.
+// Pill-shaped language switcher for the top header.
+//
+// The region picker used to live next to it; it now lives inside the
+// `ProfileMenu` popover (under "Developer Settings") so end users don't see it
+// as a primary control.
 //
 // Hidden below `md` because mobile already has the hamburger menu; a
 // mobile-friendly switcher lands in Phase 2.
@@ -9,18 +11,15 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Globe, Languages } from 'lucide-react';
+import { ChevronDown, Languages } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLocale, useT, type Language } from '../lib/i18n';
-import type { Region } from '../i18n/regions';
 
-const REGION_OPTIONS: Region[] = ['US', 'Germany'];
 const LANGUAGE_OPTIONS: Language[] = ['en', 'de'];
 
 export function LocaleSwitchers() {
   return (
     <div className="hidden md:flex items-center gap-2">
-      <RegionDropdown />
       <LanguageDropdown />
     </div>
   );
@@ -85,35 +84,6 @@ function DropdownShell({ icon, buttonLabel, ariaLabel, open, setOpen, children }
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-// ── Region dropdown ─────────────────────────────────────────────────────────
-
-function RegionDropdown() {
-  const t = useT();
-  const { locale, setRegion } = useLocale();
-  const [open, setOpen] = useState(false);
-  const currentLabel = t(`localeSwitcher.region.${locale.region}`);
-
-  return (
-    <DropdownShell
-      icon={<Globe className="w-3.5 h-3.5 text-slate-500" />}
-      buttonLabel={currentLabel}
-      ariaLabel={`${t('localeSwitcher.region.label')}: ${currentLabel}`}
-      open={open}
-      setOpen={setOpen}
-    >
-      <DropdownHeader>{t('localeSwitcher.region.label')}</DropdownHeader>
-      {REGION_OPTIONS.map(r => (
-        <DropdownOption
-          key={r}
-          label={t(`localeSwitcher.region.${r}`)}
-          selected={locale.region === r}
-          onSelect={() => { setRegion(r); setOpen(false); }}
-        />
-      ))}
-    </DropdownShell>
   );
 }
 

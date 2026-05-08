@@ -15,6 +15,7 @@ type AutoUpdate = {
   source: string;
   /** Optional translation key — overrides `source` for non-brand sources (e.g. "Web Admin Agent"). */
   sourceKey?: string;
+  sourceDomainKey?: string;
   sourceDomain?: string;
   sourceDomains?: string[]; // when multiple sources contributed (e.g. SIS + LMS)
   /** DACH-region overrides for source display */
@@ -49,6 +50,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_0',
     source: 'PowerSchool',
     sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
+    sourceDomainKey: 'dashboard.fixture.autoUpdate.source.sis.domain',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.0.title',
     detailKey: 'dashboard.fixture.autoUpdate.0.detail',
@@ -60,6 +62,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_1',
     source: 'PowerSchool',
     sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
+    sourceDomainKey: 'dashboard.fixture.autoUpdate.source.sis.domain',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.1.title',
     detailKey: 'dashboard.fixture.autoUpdate.1.detail',
@@ -91,6 +94,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_4',
     source: 'PowerSchool',
     sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
+    sourceDomainKey: 'dashboard.fixture.autoUpdate.source.sis.domain',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.4.title',
     detailKey: 'dashboard.fixture.autoUpdate.4.detail',
@@ -142,6 +146,7 @@ const AUTO_UPDATES: AutoUpdate[] = [
     id: 'au_9',
     source: 'PowerSchool',
     sourceKey: 'dashboard.fixture.autoUpdate.source.sis',
+    sourceDomainKey: 'dashboard.fixture.autoUpdate.source.sis.domain',
     sourceDomain: 'powerschool.com',
     titleKey: 'dashboard.fixture.autoUpdate.9.title',
     detailKey: 'dashboard.fixture.autoUpdate.9.detail',
@@ -180,10 +185,10 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
           </div>
         ) : (
           <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden bg-white border border-slate-200 shadow-sm')}>
-            {item.sourceDomain ? (
+            {(item.sourceDomainKey ? t(item.sourceDomainKey) : item.sourceDomain) ? (
               <img
-                src={`https://www.google.com/s2/favicons?domain=${item.sourceDomain}&sz=64`}
-                alt={item.source}
+                src={`https://www.google.com/s2/favicons?domain=${item.sourceDomainKey ? t(item.sourceDomainKey) : item.sourceDomain}&sz=64`}
+                alt={item.sourceKey ? t(item.sourceKey) : item.source}
                 className="w-5 h-5 object-contain"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
@@ -619,7 +624,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
   // When the user clicks "Review", `selectedAction` snapshots the current
   // language — switching locales while the modal is open won't retranslate it,
   // matching the same chat-snapshot pattern used elsewhere in the prototype.
-  const isDACH = region.id === 'DACH';
+  const isDACH = region.id === 'Germany';
   const CC_ACTION: AiAction = {
     id: 'cc_dash_1',
     isInternal: false,
@@ -823,16 +828,10 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                   <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.consent.body')}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
+                      onClick={() => setCommPreview('consent')}
                       className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
-                      {t('dashboard.review.consent.action')}
-                    </button>
-                    <button
-                      onClick={() => setCommPreview('consent')}
-                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
-                    >
-                      {t('dashboard.review.action.preview')}
+                      {t('dashboard.review.action.review')}
                     </button>
                     <button
                       onClick={() => setRemovedActions(prev => [...prev, 'consent_1'])}
@@ -851,16 +850,10 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                   <p className="text-sm text-slate-600 mt-1">{t('dashboard.review.weather.body')}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setRemovedActions(prev => [...prev, 'event_1'])}
+                      onClick={() => setShowWeatherModal(true)}
                       className="text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                     >
-                      {t('dashboard.review.weather.actionPublish')}
-                    </button>
-                    <button
-                      onClick={() => setShowWeatherModal(true)}
-                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
-                    >
-                      {t('dashboard.review.action.preview')}
+                      {t('dashboard.review.action.review')}
                     </button>
                     <button
                       onClick={() => setRemovedActions(prev => [...prev, 'event_1'])}
@@ -881,7 +874,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                     onClick={() => setSelectedAction(CC_ACTION)}
                     className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                   >
-                    {t('dashboard.review.scienceFair.action')}
+                    {t('dashboard.review.action.review')}
                   </button>
                 </div>
               )}
@@ -894,7 +887,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                     onClick={() => setSelectedAction(WA_ACTION)}
                     className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                   >
-                    {t('dashboard.review.ada.action')}
+                    {t('dashboard.review.action.review')}
                   </button>
                 </div>
               )}

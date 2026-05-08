@@ -16,5 +16,6 @@
   "knowledge.school.fact.0": "Primarschule Rosenbach, founded 1978, public primary school in Rosenbach.",
   "dashboard.fixture.autoUpdate.0.title": "New Teacher Profile Published",
   "dashboard.fixture.autoUpdate.0.detail": "Li Chen joined as Maths teacher for Class 4b. Profile page created and added to the Faculty Directory.",
-  "dashboard.fixture.autoUpdate.source.sis": "DaNiS"
+  "dashboard.fixture.autoUpdate.source.sis": "DaNiS",
+  "dashboard.fixture.autoUpdate.source.sis.domain": ""
 }

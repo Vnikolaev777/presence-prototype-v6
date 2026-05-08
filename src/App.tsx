@@ -16,6 +16,7 @@ import {
 import { cn } from './lib/utils';
 import { LocaleProvider, useT } from './lib/i18n';
 import { LocaleSwitchers } from './components/LocaleSwitchers';
+import { ProfileMenu } from './components/ProfileMenu';
 import type { AiAction } from './data/mockData';
 import { MOCK_AI_ACTIONS, MOCK_STATS, MOCK_AGENTS } from './data/mockData';
 
@@ -81,9 +82,7 @@ function AppShell() {
         </div>
         <div className="flex items-center space-x-3">
           <LocaleSwitchers />
-          <div className="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 items-center justify-center text-sm font-semibold text-slate-700 hidden md:flex">
-            JD
-          </div>
+          <ProfileMenu />
           <button
             className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
             onClick={() => setMobileMenuOpen(v => !v)}

@@ -2,82 +2,18 @@ import { useState } from 'react';
 import { CheckCircle, MoreHorizontal, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useT } from '../lib/i18n';
-
-const DOMAIN_MAP: Record<string, string> = {
-  'PowerSchool': 'powerschool.com', 'Infinite Campus': 'infinitecampus.com', 'Skyward': 'skyward.com',
-  'FACTS SIS': 'factsmgt.com', 'Aeries SIS': 'aeries.com', 'Arbor': 'arbor-education.com',
-  'Canvas': 'instructure.com', 'Google Classroom': 'classroom.google.com', 'Moodle': 'moodle.org',
-  'Schoology': 'schoology.com', 'Brightspace': 'd2l.com', 'Blackboard': 'blackboard.com',
-  'Microsoft 365': 'microsoft.com', 'Google Workspace': 'workspace.google.com', 'Wonde': 'wonde.com',
-  'Okta': 'okta.com', 'Clever': 'clever.com', 'ClassLink': 'classlink.com',
-  'Google Search': 'google.com', 'Bing Search': 'bing.com', 'Zoom': 'zoom.us',
-  'Power BI': 'powerbi.microsoft.com', 'Zapier': 'zapier.com', 'WordPress': 'wordpress.org',
-  'Drupal': 'drupal.org', 'Remind': 'remind.com', 'Seesaw': 'seesaw.me', 'ClassDojo': 'classdojo.com',
-  'ParentSquare': 'parentsquare.com', 'Bloomz': 'bloomz.com', 'ClassTag': 'classtag.com',
-  'Sdui': 'sdui.de', 'Klassly': 'klassroom.co', 'SchoolMessenger': 'schoolmessenger.com',
-  'Azure AD / Entra': 'microsoft.com', 'SIMS': 'ess-sims.co.uk', 'Veracross': 'veracross.com',
-  'iSAMS': 'isams.com', 'Google Analytics': 'analytics.google.com', 'Matomo': 'matomo.org', 'WebUntis': 'webuntis.com',
-  'MS Teams Edu': 'microsoft.com', 'EBA': 'eba.gov.tr', 'WebUnits': 'webunits.com',
-  'ASV Bayern': 'asv.bayern.de', 'SVWS-NRW': 'svws.nrw.de', 'LUSD': 'lusd.hessen.de',
-  'DaNiS': 'danis-hilfe.nibis.de', 'SaxSVS': 'saxsvs.de',
-  'K12NET': 'k12net.com', 'Magister': 'magister.com', 'SomToday': 'somtoday.nl',
-  'Librus': 'librus.pl', 'TalkingPoints': 'talkingpts.org', 'Sebit Vitamin': 'vitaminegitim.com',
-};
-
-const colors = [
-  'bg-blue-100 text-blue-700', 'bg-emerald-100 text-emerald-700',
-  'bg-purple-100 text-purple-700', 'bg-amber-100 text-amber-700',
-  'bg-rose-100 text-rose-700', 'bg-indigo-100 text-indigo-700',
-  'bg-cyan-100 text-cyan-700', 'bg-fuchsia-100 text-fuchsia-700'
-];
+import { DOMAIN_MAP, FALLBACK_COLORS as colors, CATEGORIES, type CategoryDef } from '../data/integrations';
 
 interface ConnectedHardcoded {
   name: string;
   domain: string;
-  /** Translation key for the description. */
   descKey: string;
 }
 
-// Three connectors shown at the top as "already connected"
 const CONNECTED: ConnectedHardcoded[] = [
   { name: 'WebUntis', domain: 'webuntis.com', descKey: 'utilities.connected.webuntis.desc' },
   { name: 'Matomo',   domain: 'matomo.org',   descKey: 'utilities.connected.matomo.desc' },
   { name: 'Sdui',     domain: 'sdui.de',      descKey: 'utilities.connected.sdui.desc' },
-];
-
-interface CategoryDef {
-  /** Translation key for the category label. */
-  labelKey: string;
-  connectors: string[];
-}
-
-// Remaining connectors, grouped into 3 categories
-const CATEGORIES: CategoryDef[] = [
-  {
-    labelKey: 'utilities.category.studentInfo',
-    connectors: [
-      'ASV Bayern', 'SVWS-NRW', 'LUSD', 'DaNiS', 'SaxSVS',
-      'Infinite Campus', 'Skyward', 'FACTS SIS', 'Aeries SIS', 'Arbor',
-      'WebUnits', 'K12NET', 'SIMS', 'Magister', 'SomToday', 'Librus', 'Veracross', 'iSAMS',
-      'Canvas', 'Google Classroom', 'Moodle', 'Schoology', 'Brightspace', 'Blackboard',
-      'MS Teams Edu', 'EBA', 'Sebit Vitamin', 'Seesaw',
-    ],
-  },
-  {
-    labelKey: 'utilities.category.communication',
-    connectors: [
-      'ParentSquare', 'Remind', 'Bloomz', 'ClassTag', 'TalkingPoints',
-      'Sdui', 'Klassly', 'SchoolMessenger',
-    ],
-  },
-  {
-    labelKey: 'utilities.category.productivity',
-    connectors: [
-      'Clever', 'ClassLink', 'Microsoft 365', 'Google Workspace', 'Wonde', 'Okta',
-      'Azure AD / Entra', 'Zoom', 'Google Search', 'Bing Search',
-      'Power BI', 'Zapier', 'WordPress', 'Drupal',
-    ],
-  },
 ];
 
 function ConnectorCard({ name, fallbackIndex, size = 'md' }: { name: string; fallbackIndex: number; size?: 'sm' | 'md' }) {

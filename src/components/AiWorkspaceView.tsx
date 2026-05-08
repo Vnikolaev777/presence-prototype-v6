@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useT, useLocale, useRegion } from '../lib/i18n';
+import { DOMAIN_MAP as INT_DOMAIN_MAP, CATEGORIES as INT_CATEGORIES, CATEGORY_COLORS } from '../data/integrations';
 import { SchoolBefore } from '../pages/SchoolBefore';
 import { SchoolAfterMagic } from '../pages/SchoolAfterMagic';
 import { AuditChatCardV2, PostAuditChatCardV2, AuditCanvasV2, PostAuditCanvasV2 } from './AuditPreviews';
@@ -300,6 +301,191 @@ function AgentHireCard({ name, role, description, gradientClass, icon }: {
       </div>
       <div className="px-4 py-3">
         <p className="text-xs text-slate-600 leading-relaxed">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Connect CTA screen ──────────────────────────────────────────────────────
+function ConnectCTAScreen({ onConnect, onSkip }: { onConnect: () => void; onSkip: () => void }) {
+  const t = useT();
+  return (
+    <div className="flex-1 flex items-center justify-center bg-slate-100 p-8 animate-in fade-in duration-500">
+      <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 w-full max-w-sm space-y-6 text-center">
+        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto border border-blue-100">
+          <Layers className="w-8 h-8 text-blue-600" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">{t('workspace.connectCta.heading')}</h2>
+          <p className="text-slate-500 text-sm mt-2 leading-relaxed">{t('workspace.connectCta.sub')}</p>
+        </div>
+        <button
+          onClick={onConnect}
+          className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"
+        >
+          <Layers className="w-4 h-4" />
+          {t('workspace.connectCta.button')}
+        </button>
+        <button onClick={onSkip} className="text-xs text-slate-400 hover:text-slate-600 underline underline-offset-2 transition-colors">
+          {t('workspace.skipForNow')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Integration picker screen ───────────────────────────────────────────────
+const AI_SUGGESTIONS_GERMANY = [
+  { name: 'WebUntis',      domain: 'webuntis.com'  },
+  { name: 'Sdui',          domain: 'sdui.de'        },
+  { name: 'Microsoft 365', domain: 'microsoft.com'  },
+];
+const AI_SUGGESTIONS_US = [
+  { name: 'PowerSchool',   domain: 'powerschool.com'  },
+  { name: 'Canvas',        domain: 'instructure.com'  },
+  { name: 'ParentSquare',  domain: 'parentsquare.com' },
+];
+
+function IntegrationPickerScreen({ onSelect, onSkip }: {
+  onSelect: (name: string, domain: string) => void;
+  onSkip: () => void;
+}) {
+  const t = useT();
+  const region = useRegion();
+  const isGermany = region.id === 'Germany';
+  const suggestions = isGermany ? AI_SUGGESTIONS_GERMANY : AI_SUGGESTIONS_US;
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState<number | null>(null);
+
+  const IntegrationCard = ({ name, highlighted }: { name: string; highlighted?: boolean }) => {
+    const domain = INT_DOMAIN_MAP[name] ?? '';
+    return (
+      <button
+        onClick={() => onSelect(name, domain)}
+        className={cn(
+          'flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all gap-2 text-center group',
+          highlighted
+            ? 'bg-blue-50 border-blue-200 hover:border-blue-400 hover:shadow-md'
+            : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
+        )}
+      >
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm border border-black/5 overflow-hidden bg-white group-hover:scale-110 transition-transform duration-200">
+          <img
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
+            alt={name}
+            className="w-6 h-6 object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              if (e.currentTarget.parentElement) {
+                e.currentTarget.parentElement.textContent = name.charAt(0);
+                e.currentTarget.parentElement.className = 'w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm bg-blue-100 text-blue-700 border border-black/5';
+              }
+            }}
+          />
+        </div>
+        <span className="text-[10px] font-semibold text-slate-700 leading-tight line-clamp-2">{name}</span>
+      </button>
+    );
+  };
+
+  // Filter categories by search + active category selection
+  const visibleCategories = INT_CATEGORIES
+    .map((cat, i) => ({ ...cat, index: i }))
+    .filter((cat) => activeCategory === null || cat.index === activeCategory)
+    .map((cat) => ({
+      ...cat,
+      connectors: search
+        ? cat.connectors.filter(n => n.toLowerCase().includes(search.toLowerCase()))
+        : cat.connectors,
+    }))
+    .filter((cat) => cat.connectors.length > 0);
+
+  return (
+    <div className="flex-1 flex flex-col bg-slate-50 animate-in fade-in duration-500 overflow-auto">
+      <div className="p-5 space-y-5 max-w-xl w-full mx-auto">
+
+        <h2 className="text-lg font-bold text-slate-900">{t('workspace.integrationPicker.heading')}</h2>
+
+        {/* AI Suggestions */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">{t('workspace.integrationPicker.aiSuggestedLabel')}</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {suggestions.map(s => <IntegrationCard key={s.name} name={s.name} highlighted />)}
+          </div>
+          <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+            {t('workspace.integrationPicker.aiExplanation')}
+          </p>
+        </div>
+
+        {/* Search + category tags + all integrations */}
+        <div className="space-y-3">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('workspace.integrationPicker.allLabel')}</p>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={t('workspace.integrationPicker.searchPlaceholder')}
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
+            />
+          </div>
+
+          {/* Category filter tags — same colors as Integrations page */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveCategory(null)}
+              className={cn(
+                'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
+                activeCategory === null
+                  ? 'bg-slate-800 text-white border-slate-800'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
+              )}
+            >
+              {t('workspace.integrationPicker.allLabel')}
+            </button>
+            {INT_CATEGORIES.map((cat, i) => {
+              const c = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+              return (
+                <button
+                  key={cat.labelKey}
+                  onClick={() => setActiveCategory(activeCategory === i ? null : i)}
+                  className={cn(
+                    'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
+                    activeCategory === i ? c.activeTag : c.tag
+                  )}
+                >
+                  {t(cat.labelKey)}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Integrations grid — grouped by category */}
+          <div className="space-y-4">
+            {visibleCategories.map((cat) => {
+              const c = CATEGORY_COLORS[cat.index % CATEGORY_COLORS.length];
+              return (
+                <div key={cat.labelKey}>
+                  <p className={cn('text-[10px] font-bold uppercase tracking-wider mb-2 px-1', c.tag.split(' ')[1])}>
+                    {t(cat.labelKey)}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {cat.connectors.map(name => <IntegrationCard key={name} name={name} />)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <button onClick={onSkip} className="text-xs text-slate-400 hover:text-slate-600 underline underline-offset-2 transition-colors w-full text-center pb-2">
+          {t('workspace.skipForNow')}
+        </button>
       </div>
     </div>
   );
@@ -1060,9 +1246,9 @@ const AUTO_UPDATE_SOURCES: AutoSource[] = [
   },
   {
     id: 'sis',
-    label: 'DaNiS',
+    label: 'WebUntis',
     subKey: 'workspace.autoSource.sis.sub',
-    domain: 'danis-hilfe.nibis.de',
+    domain: 'webuntis.com',
     iconKey: 'database',
     ctaKey: 'workspace.autoSource.sis.cta',
     feedsKey: 'workspace.autoSource.sis.feeds',
@@ -1492,7 +1678,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
   const [auditReady, setAuditReady]       = useState(false);
   const [postAuditReady, setPostAuditReady] = useState(false);
   const [siteApproved, setSiteApproved] = useState(false);
-  const [connectionStep, setConnectionStep] = useState<'type_select' | 'sis_select' | 'powerschool_auth' | null>(null);
+  const [connectionStep, setConnectionStep] = useState<'connect_cta' | 'integration_picker' | 'webuntis_auth' | null>(null);
   const [selectedSisInfo, setSelectedSisInfo] = useState<{ name: string; domain: string }>({ name: 'WebUntis', domain: 'webuntis.com' });
   const [centerTab, setCenterTab] = useState<'site' | 'audit'>('site');
   const [auditTab, setAuditTab] = useState<'site' | 'audit'>('site');
@@ -1562,7 +1748,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
         agentMessage(t('workspace.narration.orch.intro'));
       } else if (orchestratorTick === -1) {
         agentMessage(t('workspace.narration.orch.connectPrompt'));
-        setConnectionStep('type_select');
+        setConnectionStep('connect_cta');
       } else if (orchestratorTick === 4) {
         agentMessage(t('workspace.narration.orch.everythingInPlace'));
       }
@@ -1666,16 +1852,14 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
     }, 2500);
   };
 
-  const handleTypeSelectSIS = () => {
-    userMessage(t('workspace.narration.improve.userPickSis'));
-    setConnectionStep('sis_select');
+  const handleConnectCTA = () => {
+    setConnectionStep('integration_picker');
   };
 
-  const handleSISContinue = (sisName: string) => {
-    userMessage(t('workspace.narration.improve.userConnectVia', { name: sisName }));
-    const provider = SIS_PROVIDERS.find(p => p.name === sisName);
-    setSelectedSisInfo({ name: sisName, domain: provider?.domain ?? 'webuntis.com' });
-    setConnectionStep('powerschool_auth');
+  const handleIntegrationSelect = (name: string, domain: string) => {
+    userMessage(t('workspace.narration.improve.userConnectVia', { name }));
+    setSelectedSisInfo({ name, domain });
+    setConnectionStep('webuntis_auth');
   };
 
   const handleAuthorize = () => {
@@ -2500,13 +2684,13 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
         )}
 
         {/* ORCHESTRATOR: connection flow screens OR desaturated old site */}
-        {scenarioStep === 'orchestrator' && connectionStep === 'type_select' && (
-          <ConnectionTypeScreen onSelectSIS={handleTypeSelectSIS} onSkip={handleSkipConnection} />
+        {scenarioStep === 'orchestrator' && connectionStep === 'connect_cta' && (
+          <ConnectCTAScreen onConnect={handleConnectCTA} onSkip={handleSkipConnection} />
         )}
-        {scenarioStep === 'orchestrator' && connectionStep === 'sis_select' && (
-          <SISSelectScreen onContinue={handleSISContinue} />
+        {scenarioStep === 'orchestrator' && connectionStep === 'integration_picker' && (
+          <IntegrationPickerScreen onSelect={handleIntegrationSelect} onSkip={handleSkipConnection} />
         )}
-        {scenarioStep === 'orchestrator' && connectionStep === 'powerschool_auth' && (
+        {scenarioStep === 'orchestrator' && connectionStep === 'webuntis_auth' && (
           <ConnectPowerSchoolScreen onAuthorize={handleAuthorize} />
         )}
         {scenarioStep === 'orchestrator' && connectionStep === null && (
@@ -2743,7 +2927,7 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">SIS</p>
               <div className="space-y-2 mb-4">
                 {[
-                  { name: "DaNiS", domain: "nibis.de" },
+                  { name: "WebUntis", domain: "webuntis.com" },
                 ].map((sis, idx) => {
                   const isConnecting = orchestratorTick === idx;
                   const isConnected  = orchestratorTick > idx || scenarioStep !== 'orchestrator';
