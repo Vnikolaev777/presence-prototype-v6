@@ -7,5 +7,7 @@
   "knowledge.website.preview.subtitle": "rosenbach.de · Aktuelle Version",
   "knowledge.school.fact.0": "Primarschule Rosenbach, gegründet 1978, öffentliche Grundschule im Ort Rosenbach.",
   "dashboard.fixture.autoUpdate.source.sis": "DaNiS",
-  "dashboard.fixture.autoUpdate.source.sis.domain": ""
+  "dashboard.fixture.autoUpdate.source.sis.domain": "",
+  "dashboard.fixture.autoUpdate.0.title": "Neues Lehrprofil veröffentlicht",
+  "dashboard.fixture.autoUpdate.0.detail": "Li Chen ist neu als Mathematik-Lehrkraft der Klasse 4b. Profilseite erstellt und im Kollegiumsverzeichnis ergänzt."
 }
