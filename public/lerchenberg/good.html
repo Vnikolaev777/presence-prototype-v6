@@ -906,6 +906,20 @@
               </span>
             </div>
 
+            <!-- NEW POST — science fair winners, hidden by default, shown in 'after' state -->
+            <a href="#" id="news-science-fair" class="news-feed-item" style="display:none;"
+               aria-label="Unsere Sieger der Wissenschaftsmesse, gepostet heute">
+              <span class="news-feed-dot dot-event" aria-hidden="true"></span>
+              <div class="news-feed-content">
+                <div class="news-feed-meta">
+                  <span class="news-feed-cat cat-event">✦ Neu</span>
+                </div>
+                <h3>Unsere Sieger der Wissenschaftsmesse 🏆</h3>
+                <p>Drei Goldmedaillen für die Primarschule Rosenbach beim kantonalen Wissenschaftswettbewerb!</p>
+              </div>
+              <time class="news-feed-ts" datetime="2026-05-05">Heute</time>
+            </a>
+
             <a href="https://www.ps-rosenbach.de/aktuelles/brueckentag-mai/" class="news-feed-item urgent"
                aria-label="Schulfrei Brückentag 22. Mai, heute um 11:00 Uhr gepostet">
               <span class="news-feed-dot dot-alert" aria-hidden="true"></span>
@@ -1680,8 +1694,24 @@
       if (sciencePost) {
         if (target === 'section-news' && state === 'after') {
           sciencePost.style.display = '';
+          // Also swap the featured article to science fair (celebratory image, not rain)
+          var alertImg = document.querySelector('.news-alert-img img');
+          if (alertImg) {
+            alertImg.src = 'https://picsum.photos/seed/children-celebrate-trophy/480/190';
+            alertImg.alt = 'Schülerinnen und Schüler feiern ihren Sieg bei der Wissenschaftsmesse';
+            alertImg.style.filter = '';
+          }
+          var alertBadge = document.querySelector('.news-alert-badge');
+          if (alertBadge) alertBadge.textContent = '✦ Neu';
+          var alertTitle = document.querySelector('.news-alert-body h3');
+          if (alertTitle) alertTitle.textContent = 'Unsere Sieger der Wissenschaftsmesse 🏆';
+          var alertBody = document.querySelector('.news-alert-body p');
+          if (alertBody) alertBody.textContent = 'Drei Goldmedaillen für die Primarschule Rosenbach! Unsere Schülerinnen und Schüler haben beim kantonalen Wissenschaftswettbewerb herausragende Leistungen erzielt.';
+          var alertTime = document.querySelector('.news-alert-time');
+          if (alertTime) alertTime.textContent = 'Heute, 09:15 Uhr';
+          var alertLink = document.querySelector('a.news-alert');
+          if (alertLink) alertLink.href = '#';
         }
-        // else: stays hidden (display:none set inline)
       }
 
       if (!target) return;
