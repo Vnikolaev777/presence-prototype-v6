@@ -4,7 +4,7 @@
   "workspace.narration.improve.finding.2": "Missing Impressum, no Datenschutzerklärung, Google Fonts loaded from external servers — DSGVO and BITV 2.0 issues.",
   "workspace.narration.improve.fixOffer": "We can fix all of this — including bringing the site into DSGVO and BITV 2.0 compliance. Want me to go ahead?",
   "workspace.narration.improve.siteLive": "🎉 Your new site is live at a temporary Presence URL. Ready to connect your own domain and make it official?",
-  "workspace.narration.improve.hiringLine.0": "Automatic updates from DaNiS — student records, class rosters, and enrollment data, ready to publish.",
+  "workspace.narration.improve.hiringLine.0": "Automatic updates — timetables, class rosters, and substitution plans, ready to publish.",
   "workspace.narration.improve.hiringLine.1": "News drafts generated from external events and school feeds, waiting for your approval.",
   "workspace.narration.improve.hiringLine.2": "Accessibility and compliance reports flagging any issues against BITV 2.0 and DSGVO standards.",
   "workspace.narration.improve.connected": "{name} connected! You can add more systems — WebUntis, IServ, shared folders — anytime from the Integrations tab.",
@@ -17,5 +17,6 @@
   "dashboard.fixture.autoUpdate.0.title": "New Teacher Profile Published",
   "dashboard.fixture.autoUpdate.0.detail": "Li Chen joined as Maths teacher for Class 4b. Profile page created and added to the Faculty Directory.",
   "dashboard.fixture.autoUpdate.source.sis": "DaNiS",
-  "dashboard.fixture.autoUpdate.source.sis.domain": ""
+  "dashboard.fixture.autoUpdate.source.sis.domain": "",
+  "dashboard.status.siteDomain": "rosenbach.de"
 }

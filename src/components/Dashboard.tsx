@@ -228,7 +228,6 @@ function AutoUpdateRow({ item, onView }: { item: AutoUpdate; onView?: () => void
 
 // ─── Compact consent phone preview ──────────────────────────────────────────
 function ConsentPhonePreview() {
-  const t = useT();
   const [stage, setStage] = useState<0 | 1 | 2 | 3>(0);
   useEffect(() => {
     if (stage >= 3) return;
@@ -256,7 +255,7 @@ function ConsentPhonePreview() {
           {stage === 0 && (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 bg-slate-50 px-4 text-center">
               <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-              <p className="text-[10px] text-slate-500">{t('dashboard.consentPreview.sending')}</p>
+              <p className="text-[10px] text-slate-500">Wird gesendet…</p>
             </div>
           )}
 
@@ -265,22 +264,22 @@ function ConsentPhonePreview() {
               <div className="px-4 py-2 flex items-center gap-2 bg-white border-b border-slate-200 shrink-0">
                 <img src="https://www.google.com/s2/favicons?domain=sdui.de&sz=64" alt="Sdui" className="w-4 h-4 object-contain" />
                 <p className="text-[11px] font-bold text-slate-900">Sdui</p>
-                <span className="ml-auto text-[9px] text-slate-400">{t('dashboard.consentPreview.timeNow')}</span>
+                <span className="ml-auto text-[9px] text-slate-400">jetzt</span>
               </div>
               <div className="p-3 space-y-2 flex-1 overflow-hidden">
                 <div className="bg-white border border-slate-200 rounded-xl p-2.5 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                  <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5">{t('dashboard.consentPreview.permissionSlipBadge')}</p>
-                  <p className="text-[11px] font-bold text-slate-900 leading-snug">{t('dashboard.consentPreview.permissionSlipTitle')}</p>
-                  <p className="text-[9px] text-slate-500 mt-0.5">{t('dashboard.consentPreview.permissionSlipBody')}</p>
+                  <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5">Einverständnis</p>
+                  <p className="text-[11px] font-bold text-slate-900 leading-snug">Klassenfahrt Biologie · 14. Mai</p>
+                  <p className="text-[9px] text-slate-500 mt-0.5">Naturhistorisches Museum · Bitte bis 10. Mai bestätigen</p>
                   <button className="mt-2 w-full text-[10px] font-bold py-1.5 rounded-lg bg-blue-600 text-white">
-                    {t('dashboard.consentPreview.openForm')}
+                    Formular öffnen →
                   </button>
                 </div>
 
                 {stage >= 2 && (
                   <div className="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{t('dashboard.consentPreview.prefilled')}</p>
-                    {['Student: Lina M.', 'Class: 10b', 'Emergency: +49 …'].map(line => (
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Vorausgefüllt</p>
+                    {['Schüler:in: Lina M.', 'Klasse: 10b', 'Notfallkontakt: +49 …'].map(line => (
                       <div key={line} className="flex items-center gap-1.5 text-[10px] text-slate-700">
                         <CheckCircle className="w-2.5 h-2.5 text-emerald-500 shrink-0" /> {line}
                       </div>
@@ -289,7 +288,7 @@ function ConsentPhonePreview() {
                       <div className="w-3 h-3 rounded border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
                         <CheckCircle className="w-2 h-2 text-white" />
                       </div>
-                      <span className="text-[10px] font-semibold text-emerald-800">{t('dashboard.consentPreview.iAgree')}</span>
+                      <span className="text-[10px] font-semibold text-emerald-800">Ich stimme zu</span>
                     </div>
                     <div className="rounded-lg border border-dashed border-slate-300 bg-white h-7 flex items-center justify-center">
                       <span className="text-slate-400 italic text-xs" style={{ fontFamily: 'Caveat, cursive' }}>M. Müller</span>
@@ -305,8 +304,8 @@ function ConsentPhonePreview() {
               <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center">
                 <CheckCircle className="w-5 h-5" />
               </div>
-              <p className="text-xs font-bold text-emerald-900">{t('dashboard.consentPreview.submitted.title')}</p>
-              <p className="text-[10px] text-emerald-700 leading-relaxed">{t('dashboard.consentPreview.submitted.body')}</p>
+              <p className="text-xs font-bold text-emerald-900">Einverständnis eingereicht</p>
+              <p className="text-[10px] text-emerald-700 leading-relaxed">Schule benachrichtigt · 28 von 28 Rückmeldungen</p>
             </div>
           )}
         </div>
@@ -357,26 +356,21 @@ function ConsentModal({ onClose, onApprove }: { onClose: () => void; onApprove: 
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-700">{isDACH ? 'WebUntis' : 'PowerSchool'}</p>
-                  <p className="text-xs text-slate-400">{isDACH ? 'Klassenfahrt Biologie erkannt · Mai 14' : 'Biology field trip detected · May 14'}</p>
+                  <p className="text-xs text-slate-400">{t('consentModal.source.detail')}</p>
                 </div>
               </div>
             </div>
 
             {/* Trip details */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{isDACH ? 'Details' : 'Trip Details'}</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('consentModal.details.heading')}</h3>
               <ul className="space-y-2.5 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                {(isDACH ? [
-                  { icon: <CalendarDays className="w-4 h-4 text-indigo-500" />, label: 'Datum', value: '14. Mai 2026' },
-                  { icon: <Globe className="w-4 h-4 text-slate-400" />,         label: 'Ziel',  value: 'Naturhistorisches Museum' },
-                  { icon: <Users className="w-4 h-4 text-slate-400" />,        label: 'Klasse', value: 'Klasse 10b · 28 Schüler:innen' },
-                  { icon: <Clock className="w-4 h-4 text-amber-500" />,        label: 'Frist',  value: 'Bestätigung bis 10. Mai' },
-                ] : [
-                  { icon: <CalendarDays className="w-4 h-4 text-indigo-500" />, label: 'Date',      value: 'May 14, 2026' },
-                  { icon: <Globe className="w-4 h-4 text-slate-400" />,         label: 'Destination', value: 'Natural History Museum' },
-                  { icon: <Users className="w-4 h-4 text-slate-400" />,        label: 'Class',     value: 'Class 10b · 28 students' },
-                  { icon: <Clock className="w-4 h-4 text-amber-500" />,        label: 'Deadline',  value: 'Confirm by May 10' },
-                ]).map((item, i) => (
+                {[
+                  { icon: <CalendarDays className="w-4 h-4 text-indigo-500" />, label: t('consentModal.details.date.label'),        value: t('consentModal.details.date.value') },
+                  { icon: <Globe className="w-4 h-4 text-slate-400" />,         label: t('consentModal.details.destination.label'), value: t('consentModal.details.destination.value') },
+                  { icon: <Users className="w-4 h-4 text-slate-400" />,         label: t('consentModal.details.class.label'),       value: t('consentModal.details.class.value') },
+                  { icon: <Clock className="w-4 h-4 text-amber-500" />,         label: t('consentModal.details.deadline.label'),    value: t('consentModal.details.deadline.value') },
+                ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
                     <span className="shrink-0">{item.icon}</span>
                     <span className="text-slate-400 w-20 shrink-0 text-xs font-medium">{item.label}</span>
@@ -388,11 +382,11 @@ function ConsentModal({ onClose, onApprove }: { onClose: () => void; onApprove: 
 
             {/* Channels */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{isDACH ? 'Versand über' : 'Sending via'}</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('consentModal.channels.heading')}</h3>
               <ul className="space-y-2 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
                 {[
-                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: isDACH ? 'Sdui-Push an 28 Eltern' : 'Sdui push to 28 parents' },
-                  { icon: <Mail className="w-4 h-4 text-slate-400" />,           label: isDACH ? 'E-Mail-Fallback (kein App-Konto)' : 'Email fallback (no app account)' },
+                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: t('consentModal.channels.sdui') },
+                  { icon: <Mail className="w-4 h-4 text-slate-400" />,           label: t('consentModal.channels.email') },
                 ].map((item, i) => (
                   <li key={i} className="flex gap-3 items-start">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>
@@ -453,23 +447,21 @@ function ConsentModal({ onClose, onApprove }: { onClose: () => void; onApprove: 
                       <ClipboardCheck className="w-4 h-4 text-indigo-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-900 text-xs">{isDACH ? 'Primarschule Rosenbach <info@ps-rosenbach.ch>' : 'Oakwood High <info@oakwoodhigh.org>'}</p>
-                      <p className="text-[10px] text-slate-400">{isDACH ? 'An: Eltern Klasse 10b · Mo, 5. Mai 2026' : 'To: Class 10b parents · Mon, May 5 2026'}</p>
+                      <p className="font-bold text-slate-900 text-xs">Primarschule Rosenbach &lt;info@ps-rosenbach.ch&gt;</p>
+                      <p className="text-[10px] text-slate-400">An: Eltern Klasse 10b · Mo, 5. Mai 2026</p>
                     </div>
                   </div>
                   <div className="p-6 space-y-4">
-                    <p className="text-base font-extrabold text-slate-900">{isDACH ? '📋 Einverständniserklärung — Klassenfahrt 14. Mai' : '📋 Permission Slip — Field Trip May 14'}</p>
-                    <p className="text-sm text-slate-600">{isDACH ? 'Liebe Eltern,' : 'Dear parents,'}</p>
-                    <p className="text-sm text-slate-600 leading-relaxed">{isDACH
-                      ? 'Für die Exkursion der Klasse 10b ins Naturhistorische Museum am 14. Mai 2026 benötigen wir Ihr schriftliches Einverständnis.'
-                      : 'Class 10b will visit the Natural History Museum on May 14, 2026. We need your written consent.'}</p>
+                    <p className="text-base font-extrabold text-slate-900">📋 Einverständniserklärung — Klassenfahrt 14. Mai</p>
+                    <p className="text-sm text-slate-600">Liebe Eltern,</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Für die Exkursion der Klasse 10b ins Naturhistorische Museum am 14. Mai 2026 benötigen wir Ihr schriftliches Einverständnis.</p>
                     <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
-                      <p className="text-sm font-bold text-indigo-900 mb-2">{isDACH ? 'Bitte bestätigen Sie bis 10. Mai:' : 'Please confirm by May 10:'}</p>
-                      <a href="#" className="block w-full text-center py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold">{isDACH ? 'Formular öffnen →' : 'Open form →'}</a>
+                      <p className="text-sm font-bold text-indigo-900 mb-2">Bitte bestätigen Sie bis 10. Mai:</p>
+                      <a href="#" className="block w-full text-center py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold">Formular öffnen →</a>
                     </div>
-                    <p className="text-sm text-slate-600">{isDACH ? 'Mit freundlichen Grüßen,\nSchulleitung' : 'Best regards,\nOakwood High Administration'}</p>
+                    <p className="text-sm text-slate-600">Mit freundlichen Grüßen,<br /><strong>Schulleitung Primarschule Rosenbach</strong></p>
                     <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-400">
-                      {isDACH ? 'Gesendet an 28 Empfänger · Presence AI' : 'Sent to 28 recipients · Presence AI'}
+                      Gesendet an 28 Empfänger · Presence AI
                     </div>
                   </div>
                 </div>
@@ -508,8 +500,8 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
         {/* ── Left panel ── */}
         <div className="w-full md:w-[400px] lg:w-[440px] flex flex-col shrink-0 bg-white z-0 relative">
           <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-            <div className="flex items-center gap-2 text-amber-600 text-xs font-bold tracking-wide uppercase mb-2">
-              <Trophy className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-slate-600 text-xs font-bold tracking-wide uppercase mb-2">
+              <AlertTriangle className="w-4 h-4" />
               {t('dashboard.review.weather.badge')}
             </div>
             <h2 className="text-xl font-bold text-slate-900 leading-tight">{t('dashboard.review.weather.title')}</h2>
@@ -518,26 +510,26 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
           <div className="p-6 flex-1 overflow-y-auto space-y-7">
             {/* Source */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('weatherModal.source.heading')}</h3>
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 shadow-sm flex items-center justify-center shrink-0">
-                  <Trophy className="w-4 h-4 text-amber-500" />
+                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                  <img src="https://www.google.com/s2/favicons?domain=dwd.de&sz=64" alt="DWD" className="w-5 h-5 object-contain" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">Regionale Schulolympiade</p>
-                  <p className="text-xs text-slate-400">Ergebnisse veröffentlicht · Gerade eben</p>
+                  <p className="text-sm font-semibold text-slate-700">Deutscher Wetterdienst</p>
+                  <p className="text-xs text-slate-400">{t('weatherModal.source.detail')}</p>
                 </div>
               </div>
             </div>
 
             {/* What was prepared */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Prepared</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('weatherModal.prepared.heading')}</h3>
               <ul className="space-y-3 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
                 {[
-                  { icon: <Globe className="w-4 h-4 text-blue-500" />,    label: 'Website post celebrating the medal winners' },
-                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: 'Sdui notification to share the news with parents' },
-                  { icon: <Mail className="w-4 h-4 text-slate-400" />,    label: 'Email for parents not yet on Sdui' },
+                  { icon: <Globe className="w-4 h-4 text-blue-500" />,           label: t('weatherModal.prepared.website') },
+                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: t('weatherModal.prepared.sdui') },
+                  { icon: <Mail className="w-4 h-4 text-slate-400" />,           label: t('weatherModal.prepared.email') },
                 ].map((item, i) => (
                   <li key={i} className="flex gap-3 text-slate-700 items-start">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>
@@ -635,15 +627,15 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
                       </div>
                       {/* Notification */}
                       <div className="flex-1 bg-slate-50 p-3 space-y-2">
-                        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                        <div className="bg-slate-100 border border-slate-200 rounded-2xl p-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
                           <div className="flex items-center gap-1.5 mb-1.5">
-                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">🏅 Schulolympiade</span>
+                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-600 bg-slate-200 px-2 py-0.5 rounded-full">⚠ Unwetter</span>
                           </div>
-                          <p className="text-[12px] font-extrabold text-slate-900 leading-snug">Unsere Schüler gewinnen Medaillen bei der Regionalen Olympiade!</p>
-                          <p className="text-[11px] text-slate-600 mt-1 leading-snug">3 Schülerinnen und Schüler holten Gold, Silber und Bronze. Herzlichen Glückwunsch!</p>
+                          <p className="text-[12px] font-extrabold text-slate-900 leading-snug">Unwetterwarnung Stufe 2 — Donnerstag, 7. Mai</p>
+                          <p className="text-[11px] text-slate-600 mt-1 leading-snug">Starkregen &amp; Gewitter erwartet. Schulbetrieb läuft — Sportunterricht findet in der Halle statt.</p>
                           <div className="flex gap-2 mt-2.5">
-                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-amber-500 text-white">Mehr lesen</button>
-                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600">Ergebnisse</button>
+                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-slate-800 text-white">Zur Schule</button>
+                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600">DWD-Warnung</button>
                           </div>
                         </div>
                         <p className="text-[10px] text-slate-400 text-center pt-1">Gesendet an 312 Eltern</p>
@@ -663,28 +655,27 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
                 <div className="w-full max-w-[520px] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-sm">
                   {/* Email client header */}
                   <div className="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                      <Trophy className="w-4 h-4 text-amber-600" />
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <AlertTriangle className="w-4 h-4 text-slate-600" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-bold text-slate-900 text-xs leading-tight">Primarschule Rosenbach &lt;info@ps-rosenbach.ch&gt;</p>
-                      <p className="text-[10px] text-slate-400">An: Alle Eltern · Do, 7. Mai 2026, 14:30</p>
+                      <p className="text-[10px] text-slate-400">An: Alle Eltern · Do, 7. Mai 2026, 07:14</p>
                     </div>
                   </div>
                   {/* Email body */}
                   <div className="p-6 space-y-4">
-                    <p className="text-base font-extrabold text-slate-900">🏅 Unsere Schüler bei der Regionalen Olympiade</p>
+                    <p className="text-base font-extrabold text-slate-900">⚠ Unwetterwarnung — Donnerstag, 7. Mai</p>
                     <p className="text-sm text-slate-600 leading-relaxed">Liebe Eltern,</p>
-                    <p className="text-sm text-slate-600 leading-relaxed">wir freuen uns, Ihnen mitteilen zu können, dass unsere Schülerinnen und Schüler bei der <strong>Regionalen Schulolympiade</strong> hervorragende Ergebnisse erzielt haben.</p>
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                      <p className="text-sm font-bold text-amber-800 mb-2">Unsere Medaillengewinner</p>
-                      <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
-                        <li><strong>Gold</strong> — Leichtathletik, 100 m Sprint</li>
-                        <li><strong>Silber</strong> — Schwimmen, 200 m Freistil</li>
-                        <li><strong>Bronze</strong> — Turnen, Mehrkampf</li>
+                    <p className="text-sm text-slate-600 leading-relaxed">der Deutsche Wetterdienst hat für den heutigen Donnerstag eine <strong>Unwetterwarnung der Stufe 2</strong> (Starkregen und Gewitter) ausgegeben.</p>
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                      <p className="text-sm font-bold text-slate-800 mb-2">Was bedeutet das für den Schulbetrieb?</p>
+                      <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
+                        <li>Der Unterricht findet <strong>wie gewohnt</strong> statt</li>
+                        <li>Sportunterricht wird in die <strong>Sporthalle verlegt</strong></li>
+                        <li>Bitte schicken Sie Ihr Kind mit regenfester Kleidung</li>
                       </ul>
                     </div>
-                    <p className="text-sm text-slate-600 leading-relaxed">Wir sind sehr stolz auf unsere Sportlerinnen und Sportler und gratulieren herzlich zu diesen großartigen Leistungen!</p>
                     <p className="text-sm text-slate-600">Mit freundlichen Grüßen,<br /><strong>Schulleitung Primarschule Rosenbach</strong></p>
                     <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-400">
                       Gesendet an 312 Empfänger · Diese E-Mail wurde automatisch von Presence erstellt
@@ -773,7 +764,7 @@ function PhoneNotifModal({ type, onClose }: { type: 'consent' | 'event'; onClose
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────
 export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSetup, onNavigate }: any) {
-  const [selectedAction, setSelectedAction] = useState<AiAction | null>(null);
+  const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
   const [removedActions, setRemovedActions] = useState<string[]>([]);
   const [previewVariant, setPreviewVariant] = useState<'teacher' | 'vacation' | null>(null);
   const [showConsentModal, setShowConsentModal] = useState(false);
@@ -905,7 +896,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               <span className="font-semibold text-emerald-700">{t('dashboard.status.connected')}</span>
-              <span className="text-slate-400 text-xs">oakwoodhigh.org</span>
+              <span className="text-slate-400 text-xs">{t('dashboard.status.siteDomain')}</span>
             </div>
 
             <div className="w-px h-3.5 bg-slate-200" />
@@ -1038,7 +1029,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                   <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.scienceFair.title')}</h3>
                   <p className="text-sm text-slate-600 mt-1">"{CC_ACTION.summary}"</p>
                   <button
-                    onClick={() => setSelectedAction(CC_ACTION)}
+                    onClick={() => setSelectedActionId(CC_ACTION.id)}
                     className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                   >
                     {t('dashboard.review.action.review')}
@@ -1051,7 +1042,7 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
                   <h3 className="font-semibold text-slate-800 text-sm">{t('dashboard.review.ada.title')}</h3>
                   <p className="text-sm text-slate-600 mt-1">"{WA_ACTION.summary}"</p>
                   <button
-                    onClick={() => setSelectedAction(WA_ACTION)}
+                    onClick={() => setSelectedActionId(WA_ACTION.id)}
                     className="mt-3 text-xs font-bold bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                   >
                     {t('dashboard.review.action.review')}
@@ -1160,14 +1151,14 @@ export function Dashboard({ hasHiredAgents, hasMonitoringSetup, hasAutoUpdatesSe
         />
       )}
 
-      {/* Review modal — unchanged */}
-      {selectedAction && (
+      {/* Review modal — action resolved fresh from current locale, not a snapshot */}
+      {selectedActionId && (
         <AiReviewModal
-          action={selectedAction}
-          onClose={() => setSelectedAction(null)}
+          action={selectedActionId === CC_ACTION.id ? CC_ACTION : WA_ACTION}
+          onClose={() => setSelectedActionId(null)}
           onComplete={(id) => {
             setRemovedActions(prev => [...prev, id]);
-            setSelectedAction(null);
+            setSelectedActionId(null);
           }}
         />
       )}

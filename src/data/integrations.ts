@@ -102,7 +102,7 @@ export const CATEGORIES: CategoryDef[] = [
   {
     labelKey: 'utilities.category.scheduling',
     connectors: [
-      'WebUntis', 'EduPage', 'DaVinci',
+      'EduPage', 'DaVinci',
     ],
   },
   {

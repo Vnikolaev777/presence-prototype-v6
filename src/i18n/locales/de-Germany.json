@@ -9,5 +9,6 @@
   "dashboard.fixture.autoUpdate.source.sis": "DaNiS",
   "dashboard.fixture.autoUpdate.source.sis.domain": "",
   "dashboard.fixture.autoUpdate.0.title": "Neues Lehrprofil veröffentlicht",
-  "dashboard.fixture.autoUpdate.0.detail": "Li Chen ist neu als Mathematik-Lehrkraft der Klasse 4b. Profilseite erstellt und im Kollegiumsverzeichnis ergänzt."
+  "dashboard.fixture.autoUpdate.0.detail": "Li Chen ist neu als Mathematik-Lehrkraft der Klasse 4b. Profilseite erstellt und im Kollegiumsverzeichnis ergänzt.",
+  "dashboard.status.siteDomain": "rosenbach.de"
 }

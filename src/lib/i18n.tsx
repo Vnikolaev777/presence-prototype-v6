@@ -54,7 +54,7 @@ export interface Locale {
 // ── Defaults & persistence ──────────────────────────────────────────────────
 
 const STORAGE_KEY = 'presence:locale';
-const DEFAULT_LOCALE: Locale = { language: 'en', region: 'US' };
+const DEFAULT_LOCALE: Locale = { language: 'en', region: 'Germany' };
 
 function loadStoredLocale(): Locale {
   if (typeof window === 'undefined') return DEFAULT_LOCALE;
@@ -63,8 +63,11 @@ function loadStoredLocale(): Locale {
     if (!raw) return DEFAULT_LOCALE;
     const parsed = JSON.parse(raw) as Partial<Locale> | null;
     const language: Language = parsed?.language === 'de' ? 'de' : 'en';
-    const region: Region = parsed?.region === 'Germany' ? 'Germany' : 'US';
-    return { language, region };
+    // Region is no longer user-controlled (the picker was removed from the
+    // ProfileMenu). Always default to Germany so users who had a stale `US`
+    // value stored from the old default aren't stuck on it. Devs can still
+    // call setRegion() programmatically; the value just won't survive a reload.
+    return { language, region: 'Germany' };
   } catch {
     return DEFAULT_LOCALE;
   }

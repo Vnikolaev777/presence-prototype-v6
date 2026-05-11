@@ -9,16 +9,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { useLocale, useT } from '../lib/i18n';
-import type { Region } from '../i18n/regions';
-
-const REGION_OPTIONS: Region[] = ['US', 'Germany'];
+import { useT } from '../lib/i18n';
 
 export function ProfileMenu() {
   const t = useT();
-  const { locale, setRegion } = useLocale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -68,29 +63,9 @@ export function ProfileMenu() {
                 {t('profileMenu.developerSettings')}
               </p>
             </div>
-            <div className="px-2 pt-1.5 pb-1">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1.5">
-                {t('localeSwitcher.region.label')}
-              </p>
-              <div className="space-y-0.5">
-                {REGION_OPTIONS.map(r => (
-                  <button
-                    key={r}
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={locale.region === r}
-                    onClick={() => { setRegion(r); setOpen(false); }}
-                    className={cn(
-                      'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors',
-                      locale.region === r ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-100'
-                    )}
-                  >
-                    <span>{t(`localeSwitcher.region.${r}`)}</span>
-                    {locale.region === r && <Check className="w-3.5 h-3.5" />}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <p className="px-3 py-3 text-xs text-slate-400 italic">
+              {t('profileMenu.empty')}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
