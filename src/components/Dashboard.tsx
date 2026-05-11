@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bot, CheckCircle, Clock, Zap, Database, BarChart2, FileText, Link2, ShieldCheck, Users, Rss, ExternalLink, CalendarDays, X, Bell, ClipboardCheck, Signal, Wifi, BatteryFull, Loader2, Globe, MessageSquare, Mail, AlertTriangle, Eye } from 'lucide-react';
+import { Bot, CheckCircle, Clock, Zap, Database, BarChart2, FileText, Link2, ShieldCheck, Users, Rss, ExternalLink, CalendarDays, X, Bell, ClipboardCheck, Signal, Wifi, BatteryFull, Loader2, Globe, MessageSquare, Mail, AlertTriangle, Eye, Trophy } from 'lucide-react';
 import type { AiAction } from '../data/mockData';
 import { AiReviewModal } from './AiReviewModal';
 import { AutoUpdatePreviewModal } from './AutoUpdatePreviewModal';
@@ -508,8 +508,8 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
         {/* ── Left panel ── */}
         <div className="w-full md:w-[400px] lg:w-[440px] flex flex-col shrink-0 bg-white z-0 relative">
           <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-            <div className="flex items-center gap-2 text-red-600 text-xs font-bold tracking-wide uppercase mb-2">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-amber-600 text-xs font-bold tracking-wide uppercase mb-2">
+              <Trophy className="w-4 h-4" />
               {t('dashboard.review.weather.badge')}
             </div>
             <h2 className="text-xl font-bold text-slate-900 leading-tight">{t('dashboard.review.weather.title')}</h2>
@@ -520,12 +520,12 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source</h3>
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center shrink-0">
-                  <img src="https://www.google.com/s2/favicons?domain=dwd.de&sz=64" alt="DWD" className="w-5 h-5 object-contain" />
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 shadow-sm flex items-center justify-center shrink-0">
+                  <Trophy className="w-4 h-4 text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">Deutscher Wetterdienst</p>
-                  <p className="text-xs text-slate-400">Unwetterwarnung Stufe 2 erkannt · Gerade eben</p>
+                  <p className="text-sm font-semibold text-slate-700">Regionale Schulolympiade</p>
+                  <p className="text-xs text-slate-400">Ergebnisse veröffentlicht · Gerade eben</p>
                 </div>
               </div>
             </div>
@@ -535,9 +535,9 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Prepared</h3>
               <ul className="space-y-3 bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
                 {[
-                  { icon: <Globe className="w-4 h-4 text-blue-500" />,    label: 'Announcement banner for the school website' },
-                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: 'Sdui push notification to all parents' },
-                  { icon: <Mail className="w-4 h-4 text-slate-400" />,    label: 'Email fallback for parents without Sdui' },
+                  { icon: <Globe className="w-4 h-4 text-blue-500" />,    label: 'Website post celebrating the medal winners' },
+                  { icon: <MessageSquare className="w-4 h-4 text-indigo-500" />, label: 'Sdui notification to share the news with parents' },
+                  { icon: <Mail className="w-4 h-4 text-slate-400" />,    label: 'Email for parents not yet on Sdui' },
                 ].map((item, i) => (
                   <li key={i} className="flex gap-3 text-slate-700 items-start">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>
@@ -635,15 +635,15 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
                       </div>
                       {/* Notification */}
                       <div className="flex-1 bg-slate-50 p-3 space-y-2">
-                        <div className="bg-red-50 border border-red-200 rounded-2xl p-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
+                        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 shadow-sm animate-in fade-in slide-in-from-top-2 duration-500">
                           <div className="flex items-center gap-1.5 mb-1.5">
-                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-red-600 bg-red-100 px-2 py-0.5 rounded-full">⚠ Unwetter</span>
+                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">🏅 Schulolympiade</span>
                           </div>
-                          <p className="text-[12px] font-extrabold text-slate-900 leading-snug">Unwetterwarnung Stufe 2 — Donnerstag, 7. Mai</p>
-                          <p className="text-[11px] text-slate-600 mt-1 leading-snug">Starkregen &amp; Gewitter erwartet. Schulbetrieb läuft — Sportunterricht findet in der Halle statt.</p>
+                          <p className="text-[12px] font-extrabold text-slate-900 leading-snug">Unsere Schüler gewinnen Medaillen bei der Regionalen Olympiade!</p>
+                          <p className="text-[11px] text-slate-600 mt-1 leading-snug">3 Schülerinnen und Schüler holten Gold, Silber und Bronze. Herzlichen Glückwunsch!</p>
                           <div className="flex gap-2 mt-2.5">
-                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-red-600 text-white">Zur Schule</button>
-                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600">DWD-Warnung</button>
+                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-amber-500 text-white">Mehr lesen</button>
+                            <button className="flex-1 text-[10px] font-bold py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600">Ergebnisse</button>
                           </div>
                         </div>
                         <p className="text-[10px] text-slate-400 text-center pt-1">Gesendet an 312 Eltern</p>
@@ -663,31 +663,31 @@ function WeatherAlertModal({ onClose, onApprove }: { onClose: () => void; onAppr
                 <div className="w-full max-w-[520px] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden text-sm">
                   {/* Email client header */}
                   <div className="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                      <AlertTriangle className="w-4 h-4 text-red-600" />
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                      <Trophy className="w-4 h-4 text-amber-600" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-bold text-slate-900 text-xs leading-tight">Primarschule Rosenbach &lt;info@ps-rosenbach.ch&gt;</p>
-                      <p className="text-[10px] text-slate-400">An: Alle Eltern · Do, 7. Mai 2026, 07:14</p>
+                      <p className="text-[10px] text-slate-400">An: Alle Eltern · Do, 7. Mai 2026, 14:30</p>
                     </div>
                   </div>
                   {/* Email body */}
                   <div className="p-6 space-y-4">
-                    <p className="text-base font-extrabold text-slate-900">⚠ Unwetterwarnung — Donnerstag, 7. Mai</p>
+                    <p className="text-base font-extrabold text-slate-900">🏅 Unsere Schüler bei der Regionalen Olympiade</p>
                     <p className="text-sm text-slate-600 leading-relaxed">Liebe Eltern,</p>
-                    <p className="text-sm text-slate-600 leading-relaxed">der Deutsche Wetterdienst hat für den heutigen Donnerstag eine <strong>Unwetterwarnung der Stufe 2</strong> (Starkregen und Gewitter) ausgegeben.</p>
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                      <p className="text-sm font-bold text-red-800 mb-1">Was bedeutet das für den Schulbetrieb?</p>
-                      <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
-                        <li>Der Unterricht findet <strong>wie gewohnt</strong> statt</li>
-                        <li>Sportunterricht wird in die <strong>Sporthalle verlegt</strong></li>
-                        <li>Bitte schicken Sie Ihr Kind mit regenfester Kleidung</li>
+                    <p className="text-sm text-slate-600 leading-relaxed">wir freuen uns, Ihnen mitteilen zu können, dass unsere Schülerinnen und Schüler bei der <strong>Regionalen Schulolympiade</strong> hervorragende Ergebnisse erzielt haben.</p>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                      <p className="text-sm font-bold text-amber-800 mb-2">Unsere Medaillengewinner</p>
+                      <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
+                        <li><strong>Gold</strong> — Leichtathletik, 100 m Sprint</li>
+                        <li><strong>Silber</strong> — Schwimmen, 200 m Freistil</li>
+                        <li><strong>Bronze</strong> — Turnen, Mehrkampf</li>
                       </ul>
                     </div>
-                    <p className="text-sm text-slate-600 leading-relaxed">Bei weiteren Fragen stehen wir Ihnen gerne zur Verfügung.</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Wir sind sehr stolz auf unsere Sportlerinnen und Sportler und gratulieren herzlich zu diesen großartigen Leistungen!</p>
                     <p className="text-sm text-slate-600">Mit freundlichen Grüßen,<br /><strong>Schulleitung Primarschule Rosenbach</strong></p>
                     <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-400">
-                      Gesendet an 312 Empfänger · Diese E-Mail wurde automatisch von Presence AI erstellt
+                      Gesendet an 312 Empfänger · Diese E-Mail wurde automatisch von Presence erstellt
                     </div>
                   </div>
                 </div>

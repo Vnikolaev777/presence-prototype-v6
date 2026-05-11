@@ -458,7 +458,7 @@ const AUDIT_LOCALE: Record<AuditLocaleKey, {
   'de-DACH': {
     auditTitle: 'Website-Audit-Bericht',
     newAuditTitle: 'Neuer Website-Audit-Bericht',
-    domain: 'oakwoodhigh.de · April 2026',
+    domain: 'rosenbachschule.de · April 2026',
     needsImprovement: 'Verbesserungsbedarf',
     excellent: 'Ausgezeichnet',
     healthScore: 'Gesundheitswert',
@@ -520,7 +520,7 @@ const AUDIT_LOCALE: Record<AuditLocaleKey, {
   'en-DACH': {
     auditTitle: 'Site Audit Report',
     newAuditTitle: 'New Site Audit Report',
-    domain: 'oakwoodhigh.de · April 2026',
+    domain: 'rosenbachschule.de · April 2026',
     needsImprovement: 'Needs Improvement',
     excellent: 'Excellent',
     healthScore: 'Health Score',
