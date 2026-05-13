@@ -2542,10 +2542,10 @@ export function AiWorkspaceView({ onFinishScenario, onAgentsHired, onMonitoringC
             <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 shadow-md flex items-center justify-center">
               <Sparkles className="w-10 h-10 text-slate-300" />
             </div>
-            <p className="text-slate-500 font-semibold text-sm max-w-xs">
+            <p className="text-slate-500 font-semibold text-sm max-w-xs text-center whitespace-pre-line">
               {isIdle
-                ? <>Select a quick action on the left to get started.<br />Your website preview will appear here.</>
-                : 'Your site preview will load once the URL is confirmed.'}
+                ? t('workspace.idle.canvasPrompt')
+                : t('workspace.idle.canvasUrlPending')}
             </p>
           </div>
         )}

@@ -641,6 +641,8 @@
   "workspace.idle.suggested": "Suggested",
   "workspace.idle.viewMore": "View more",
   "workspace.idle.viewLess": "View less",
+  "workspace.idle.canvasPrompt": "Select a quick action on the left to get started.\nYour website preview will appear here.",
+  "workspace.idle.canvasUrlPending": "Your site preview will load once the URL is confirmed.",
   "workspace.quickAction.improve": "Improve existing website",
   "workspace.quickAction.monitoring": "Set up internet monitoring",
   "workspace.quickAction.automated": "Set up automated updates",
