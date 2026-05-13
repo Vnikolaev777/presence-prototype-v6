@@ -194,18 +194,71 @@
     }
     @media (max-width: 860px) { .nav-menu.open ~ .nav-close, .nav-close.open { display: flex; } }
 
+    /* ── SCHOOL PHOTO HEADER ─────────────────────────── */
+    .school-photo-header {
+      position: relative;
+      width: 100%;
+      height: clamp(260px, 42vh, 500px);
+      overflow: hidden;
+      display: block;
+    }
+    .school-photo-header img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 38%;
+      display: block;
+    }
+    /* Rounded bottom corners for a card-like feel */
+    .school-photo-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(20,51,73,.05) 0%,
+        transparent 30%,
+        transparent 55%,
+        rgba(20,51,73,.6) 85%,
+        var(--g8) 100%
+      );
+      z-index: 1; pointer-events: none;
+    }
+    /* Subtle vignette on left and right edges */
+    .school-photo-header::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to right, rgba(12,30,45,.35) 0%, transparent 18%),
+        linear-gradient(to left,  rgba(12,30,45,.35) 0%, transparent 18%);
+      z-index: 1; pointer-events: none;
+    }
+    /* School name label overlaid at bottom-left */
+    .school-photo-label {
+      position: absolute; bottom: 1.5rem; left: 2rem;
+      z-index: 2;
+      display: flex; flex-direction: column; gap: .2rem;
+    }
+    .school-photo-label-name {
+      font-size: clamp(20px, 3vw, 32px);
+      font-weight: 800; color: #fff;
+      letter-spacing: -.4px; line-height: 1.1;
+      text-shadow: 0 2px 8px rgba(0,0,0,.35);
+    }
+    .school-photo-label-sub {
+      font-size: 13px; color: rgba(255,255,255,.7);
+      font-weight: 500;
+    }
+
     /* ── HERO ─────────────────────────────────────────── */
     .hero {
       position: relative; overflow: hidden;
       background: var(--g8);
-      min-height: 520px;
       display: flex; align-items: center;
     }
     .hero-bg {
       position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 90% 100% at 110% 50%, rgba(82,183,136,.18) 0%, transparent 65%),
-        radial-gradient(ellipse 60% 80% at -10% 80%, rgba(30,61,39,.6) 0%, transparent 70%);
+        radial-gradient(ellipse 80% 100% at 110% 50%, rgba(74,156,199,.14) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 80% at -10% 80%, rgba(12,30,45,.55) 0%, transparent 70%);
     }
     .hero-pattern {
       position: absolute; inset: 0; opacity: .04;
@@ -783,11 +836,18 @@
   <!-- FIX #8: <main> landmark element with id="main" -->
   <main id="main">
 
+    <!-- SCHOOL PHOTO — full-width above the hero, not a background -->
+    <div class="school-photo-header" role="img" aria-label="Schulgebäude der Primarschule Rosenbach in Rosenbach/Vogtl., Sachsen">
+      <img src="https://www.alliedtelesis.com/sites/default/files/styles/large_hq/public/image/2022-09/pullach-school-3840.jpg?itok=-6BF2C1z"
+           alt="Außenansicht des Schulgebäudes der Primarschule Rosenbach" />
+      <div class="school-photo-label" aria-hidden="true">
+        <span class="school-photo-label-name">Primarschule Rosenbach</span>
+        <span class="school-photo-label-sub">Rosenbach/Vogtl. &bull; Vogtlandkreis, Sachsen</span>
+      </div>
+    </div>
+
     <!-- HERO — h1 heading -->
     <section class="hero" aria-labelledby="hero-heading">
-      <!-- FIX #7: hero background image with empty alt (decorative) -->
-      <img src="./school_building.jpg" alt=""
-        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22;pointer-events:none;" />
       <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-pattern" aria-hidden="true"></div>
       <div class="hero-inner">
